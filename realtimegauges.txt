@@ -3,6 +3,6 @@
 "hum":"65",
 "wspeed":"7",
 "wgust":"13",
-"bearing":"244",
+"bearing":"241",
 "press":"1017.1",
 "rfall":"0.0"}
