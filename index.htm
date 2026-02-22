@@ -1,187 +1,244 @@
-<!doctype html>
-<html lang="ca">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Estació Meteorològica El Masnou-NE</title>
+<!--
+	index.html		v:0.0.1		d:Feb 2021	Neil Thomas
+	Last modified: 2025/11/21 20:16:37
+	Page: 1 main panel plus a right sidebar
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="weather data">
+		<meta name="keywords" content="Cumulus, weather, data, weather station">
+		<title>Cumulus MX</title>
+		<link rel="icon" type="image/png" href="images/favicon.png">
 
-  <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body { margin: 0; background: #fff; color: #111; }
-    header { padding: 18px 16px; border-bottom: 1px solid #ddd; }
-    header h1 { margin: 0; font-size: 20px; }
-    header .sub { margin-top: 6px; color: #444; font-size: 13px; }
+		<!--	jQuery library		-->
+		<script src="lib/jquery/jquery-latest.min.js"></script>
 
-    main { padding: 16px; max-width: 1100px; margin: 0 auto; }
+		<!--	Fonts	System will default to a sans-serif font if no Internet connection -->
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Rosario:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 14px; margin-bottom: 16px; }
-    .card h2 { margin: 0 0 10px 0; font-size: 16px; }
-    .muted { color: #555; font-size: 13px; }
+		<!--	All Styles	-->
+		<link href="css/w3Pro.css" rel="stylesheet">	<!--	Basic w3shools responsive styles	-->
+		<link href="css/colours.css" rel="stylesheet">	<!--	Slightly enhanced w3schools colours	-->
+		<link href="css/mx-templates.css" rel="stylesheet">	<!--	Specific styles for these templates.	-->
 
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 8px 8px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
-    th { background: #f7f7f7; border-bottom: 1px solid #ddd; }
-
-    .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-    @media (min-width: 900px) {
-      .grid { grid-template-columns: 1fr 1fr; }
-    }
-
-    .ok { color: #0a6; }
-    .err { color: #b00; }
-    code { background: #f3f3f3; padding: 2px 6px; border-radius: 6px; }
-    footer { padding: 16px; border-top: 1px solid #ddd; color: #555; font-size: 12px; }
-  </style>
-</head>
-
-<body>
-  <header>
-    <h1>Estació Meteorològica El Masnou-NE</h1>
-    <div class="sub">
-      Web pública (GitHub Pages) · Previsió model: OpenWeather · Tendència local: Cumulus/Zambretti
-    </div>
-  </header>
-
-  <main>
-    <!-- 1) BLOQUE OPENWEATHER -->
-    <section class="card" id="owm">
-      <h2>Previsió model (OpenWeather)</h2>
-      <div id="owm-meta" class="muted">Carregant previsió…</div>
-
-      <div class="grid" style="margin-top:12px;">
-        <div>
-          <h3 style="margin:0 0 8px 0; font-size:14px;">Diària (5 dies)</h3>
-          <div id="owm-daily"></div>
-        </div>
-
-        <div>
-          <h3 style="margin:0 0 8px 0; font-size:14px;">Horària (24 h)</h3>
-          <div id="owm-hourly"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 2) AQUÍ PUEDES PEGAR TU CONTENIDO ACTUAL DE CUMULUS / TU WEB -->
-    <section class="card">
-      <h2>Dades de l’estació</h2>
-      <div class="muted">
-        Aquí pots enganxar el contingut del teu <code>index.htm</code> antic (taules, gràfics, etc.).
-        Si vols, en el següent pas també llegim <code>websitedata.json</code> i mostrem Zambretti en català.
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    © Estació Meteorològica El Masnou-NE · Actualització automàtica de previsió via GitHub Actions
-  </footer>
-
-  <script>
-    // Lee los ficheros generados en la rama owm-data
-    const OWM_JSON_URL = "https://raw.githubusercontent.com/francescmontana-dev/fmp14352/owm-data/owm_forecast.json";
-    const OWM_UPD_URL  = "https://raw.githubusercontent.com/francescmontana-dev/fmp14352/owm-data/owm_forecast_updated_utc.txt";
-
-    function fmtDay(dt) {
-      return dt.toLocaleDateString("ca-ES", { weekday: "short", day: "2-digit", month: "2-digit" });
-    }
-    function fmtTime(dt) {
-      return dt.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
-    }
-
-    async function loadOWM() {
-      const meta = document.getElementById("owm-meta");
-      const dailyEl = document.getElementById("owm-daily");
-      const hourlyEl = document.getElementById("owm-hourly");
-
-      try {
-        const [rF, rU] = await Promise.all([
-          fetch(OWM_JSON_URL, { cache: "no-store" }),
-          fetch(OWM_UPD_URL, { cache: "no-store" })
-        ]);
-
-        if (!rF.ok) throw new Error("No puc llegir owm_forecast.json");
-        const data = await rF.json();
-
-        const updated = rU.ok ? (await rU.text()).trim() : "";
-        meta.innerHTML = updated
-          ? `<span class="ok">OK</span> · Actualitzat (UTC): <b>${updated}</b>`
-          : `<span class="ok">OK</span> · Actualitzat recentment`;
-
-        // Horària: pròximes 8 franges (≈24 h)
-        const nextRows = data.list.slice(0, 8).map(p => {
-          const dt = new Date(p.dt * 1000);
-          const t = Math.round(p.main.temp);
-          const pop = Math.round((p.pop ?? 0) * 100);
-          const w = Math.round((p.wind?.speed ?? 0) * 3.6); // m/s -> km/h
-          const desc = p.weather?.[0]?.description ?? "";
-          return `<tr>
-            <td>${fmtTime(dt)}</td>
-            <td>${t}°C</td>
-            <td>${pop}%</td>
-            <td>${w} km/h</td>
-            <td>${desc}</td>
-          </tr>`;
-        }).join("");
-
-        hourlyEl.innerHTML = `
-          <table>
-            <thead>
-              <tr><th>Hora</th><th>Temp</th><th>Prob. pluja</th><th>Vent</th><th>Estat</th></tr>
-            </thead>
-            <tbody>${nextRows}</tbody>
-          </table>
-        `;
-
-        // Diària: agrupar per dia
-        const byDay = new Map();
-        for (const p of data.list) {
-          const key = new Date(p.dt * 1000).toISOString().slice(0,10);
-          const tmin = p.main.temp_min;
-          const tmax = p.main.temp_max;
-          const pop = (p.pop ?? 0);
-          const wind = (p.wind?.speed ?? 0);
-          const desc = p.weather?.[0]?.description ?? "";
-          if (!byDay.has(key)) byDay.set(key, { tmin, tmax, popMax: pop, windMax: wind, desc });
-          const o = byDay.get(key);
-          o.tmin = Math.min(o.tmin, tmin);
-          o.tmax = Math.max(o.tmax, tmax);
-          o.popMax = Math.max(o.popMax, pop);
-          o.windMax = Math.max(o.windMax, wind);
-        }
-
-        const dayRows = Array.from(byDay.entries()).slice(0, 5).map(([key, o]) => {
-          const dt = new Date(key + "T12:00:00");
-          const tmin = Math.round(o.tmin);
-          const tmax = Math.round(o.tmax);
-          const pop = Math.round(o.popMax * 100);
-          const w = Math.round(o.windMax * 3.6);
-          const desc = o.desc || "";
-          return `<tr>
-            <td>${fmtDay(dt)}</td>
-            <td>${tmin}° / ${tmax}°</td>
-            <td>${pop}%</td>
-            <td>${w} km/h</td>
-            <td>${desc}</td>
-          </tr>`;
-        }).join("");
-
-        dailyEl.innerHTML = `
-          <table>
-            <thead>
-              <tr><th>Dia</th><th>Tmin / Tmax</th><th>Prob. pluja</th><th>Vent (max)</th><th>Estat</th></tr>
-            </thead>
-            <tbody>${dayRows}</tbody>
-          </table>
-        `;
-
-      } catch (e) {
-        meta.innerHTML = `<span class="err">ERROR</span> · No s’ha pogut carregar OpenWeather.`;
-        dailyEl.innerHTML = "";
-        hourlyEl.innerHTML = "";
-        console.error(e);
-      }
-    }
-
-    loadOWM();
-  </script>
-</body>
+		<!--	Scripts	-->
+		<script src="js/setpagedata.js"></script>	<!--	Utility javascripts for all pages.	-->
+		<script>
+			window.onload = () => {
+				$('#moonImg').attr('src', 'images/moon.png?' + Date.now());
+				// update the moon image every 20 minutes if the page is left open
+				setInterval(() => {
+					$('#moonImg').attr('src', 'images/moon.png?' + Date.now());
+				}, 1200000);
+			};
+		</script>
+	</head>
+	<body>
+		<div id="Header" class="w3-row w3-top w3-theme-dark w3-theme-bdr">
+			<div class="w3-row-padding site-width">
+				<div class="at-flex-between" style="align-items:center; flex-wrap:wrap;">
+					<img src="images/CumulusMX-Logo.png" class="w3-image logo" alt="Header logo"/>
+					<div class="w3-right-align" style="max-width:600px;">
+						<h5>Lat<span class="w3-hide-small">itude</span>:&nbsp;<span data-cmxdata="latitude"></span><span class="at-divider">|<wbr></span>Long<span class="w3-hide-small">itude</span>:&nbsp;<span data-cmxdata="longitude"></span><span class="at-divider">|<wbr></span>Alt<span class="w3-hide-small">itude</span>:&nbsp;<span data-cmxdata="altitude"></span></h5>
+					</div>
+				</div>
+				<!--	Start of Menu	-->
+				<div id="Main_Menu" class="w3-bar w3-theme-d4 w3-theme-bdr">
+				</div>
+				<!--	Mobile menu	-->
+				<div id="Main_Menu_Mobile" class="w3-bar-block w3-hide w3-hide-large">
+				</div>	<!-- End of Mobile menu -->
+			</div>
+		</div>
+		<div id="Content">	<!--	Start of panel content	-->
+			<div class="w3-row-padding w3-theme-light site-width">	<!--	Page Title	-->
+				<div class="w3-col l12">
+					<h1><span data-cmxdata="location"></span> Weather <span class="subText"></span></h1>
+				</div>
+			</div>	<!--	End of title row	-->
+			<div class="w3-row site-width w3-theme-light">	<!--	Start of Main panel	-->
+				<div class="w3-col l9 m12">	<!--	3/4 width panel	-->
+					<div class="w3-row-padding">	<!--	Row 1 of 3/4 width panel	-->
+						<div class="w3-col s12">		<!-- 	Full width of above panel	-->
+							<div class="w3-panel w3-container w3-theme-white">
+								<h3 class="">Almanac</h3>
+								<div class="w3-responsive">
+									<table class="w3-table" style="min-width:100%;">
+										<tbody>
+											<tr>
+												<td class="">Dawn:</td>
+												<td class=""><span data-cmxdata="dawn"></span></td>
+												<td class="">Sun Rise:</td>
+												<td class=""><span data-cmxdata="sunrise"></span></td>
+												<td class="">Moon Rise:</td>
+												<td class=""><span data-cmxdata="moonrise"></span></td>
+												<td rowspan="3" style="width:75px; height: 75px; padding:0"><img id="moonImg" src="images/moon.png" alt="Moon" width="75" height="75" class="w3-image" />Visible <span data-cmxdata="MoonPercentAbs"></span>%</td>
+											</tr>
+											<tr>
+												<td class="">Dusk:</td>
+												<td class=""><span data-cmxdata="dusk"></span></td>
+												<td class="">Sun Set:</td>
+												<td class=""><span data-cmxdata="sunset"></span></td>
+												<td class="">Moon Set:</td>
+												<td class=""><span data-cmxdata="moonset"></span></td>
+											</tr>
+											<tr>
+												<td class="">Daylight:</td>
+												<td class=""><span data-cmxdata="daylightlength"></span></td>
+												<td class="">Day Length:</td>
+												<td class=""><span data-cmxdata="daylength"></span></td>
+												<td class="">Moon Phase:</td>
+												<td class=""><span id="moonPhase" data-cmxdata="moonphase"></span></td>
+											</tr>
+											<tr id="currCond" class="w3-hide">
+												<td colspan="7"><strong>Current conditions</strong>: <span data-cmxdata="currcond"></span></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="w3-row-padding">	<!--	Row 2 of 3/4 width panel	-->
+						<div class="w3-col s12">		<!-- 	Full width of above panel	-->
+							<div class="w3-panel w3-card w3-theme-white">
+								<h3 class="">Conditions at local time <span data-cmxdata="time"></span></h3>
+								<div class="w3-responsive">
+									<table class="w3-table w3-hoverable" style="min-width:100%;">
+										<tr>
+											<td colspan="4" class="w3-theme-d5">Temperature and Humidity</td>
+										</tr>
+										<tr class="w3-theme-l2">
+											<td>Temperature</td>
+											<td><span data-cmxdata="temp"></span>&nbsp;<span data-cmxdata="tempunit"></span></td>
+											<td>Dew Point</td>
+											<td><span data-cmxdata="dew"></span>&nbsp;<span data-cmxdata="tempunit"></span></td>
+										</tr>
+										<tr class="w3-theme-l2">
+											<td>Windchill</td>
+											<td><span data-cmxdata="wchill"></span>&nbsp;<span data-cmxdata="tempunit"></span></td>
+											<td>Humidity</td>
+											<td><span data-cmxdata="hum"></span>&nbsp;%</td>
+										</tr>
+										<tr class="w3-theme-l2">
+											<td >Heat Index</td>
+											<td><span data-cmxdata="heatindex"></span>&nbsp;<span data-cmxdata="tempunit"></span></td>
+											<td><span data-cmx-apparent class="w3-hide">Apparent Temperature</span><span data-cmx-feels>Feels Like</span></td>
+											<td><span data-cmx-apparent data-cmxdata="apptemp" class="w3-hide"></span><span data-cmx-feels data-cmxdata="feelslike"></span>&nbsp;<span data-cmxdata="tempunit"></span></td>
+										</tr>
+										<tr class="w3-theme-l2">
+											<td>Temp change last hour</td>
+											<td><span data-cmxdata="TempChangeLastHour"></span>&nbsp;<span data-cmxdata="tempunit"></span></td>
+											<td></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td colspan="4" class="w3-theme-d4">Rainfall</td>
+										</tr>
+										<tr class="w3-theme-l3">
+											<td>Rainfall Today</td>
+											<td><span data-cmxdata="rfall"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+											<td>Rainfall Rate</td>
+											<td><span data-cmxdata="rrate"></span>&nbsp;<span data-cmxdata="rainunit"></span>/hr</td>
+										</tr>
+										<tr class="w3-theme-l3">
+											<td>Rainfall This Month</td>
+											<td><span data-cmxdata="rmonth"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+											<td>Rainfall This Year</td>
+											<td><span data-cmxdata="ryear"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+										</tr>
+										<tr class="w3-theme-l3" data-cmx-Snow="">
+											<td>Current snow depth</td>
+											<td><span data-cmxdata="snowdepth">--</span> <span data-cmxdata="snowunit">--</span></td>
+											<td>Snowfall in 24 hours</td>
+											<td><span data-cmxdata="snow24hr">--</span> <span data-cmxdata="snowunit">--</span></td>
+										</tr>
+										<tr class="w3-theme-l3">
+											<td>Rainfall Last Hour</td>
+											<td><span data-cmxdata="rhour"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+											<td>Last rainfall</td>
+											<td><span data-cmxdata="LastRainTip"></span></td>
+										</tr>
+										<tr class="w3-theme-l3">
+											<td>Rainfall Since Midnight</td>
+											<td><span data-cmxdata="rmidnight"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+											<td>Rainfall Last 24 Hours</td>
+											<td><span data-cmxdata="r24hour"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+										</tr>
+										<tr>
+											<td colspan="4" class="w3-theme-d3">Wind</td>
+										</tr>
+										<tr class="w3-theme-l4">
+											<td>Wind Speed <span class="subText">(gust)</span></td>
+											<td><span data-cmxdata="wgust"></span>&nbsp;<span data-cmxdata="windunit"></span></td>
+											<td>Wind Speed <span class="subText">(avg)</span></td>
+											<td><span data-cmxdata="wspeed"></span>&nbsp;<span data-cmxdata="windunit"></span></td>
+										</tr>
+										<tr class="w3-theme-l4">
+											<td>Wind Bearing</td>
+											<td><span data-cmxdata="avgbearing"></span>&deg; <span data-cmxdata="wdir"></span></td>
+											<td>Beaufort <span data-cmxdata="beaufort"></span></td>
+											<td><span data-cmxdata="beaudesc"></span></td>
+										</tr>
+										<tr class="w3-theme-l4">
+											<td>Wind Variation <span class="subText">(last 10 minutes)</span></td>
+											<td colspan="3">From <span data-cmxdata="BearingRangeFrom"></span>&deg; to <span data-cmxdata="BearingRangeTo"></span>&deg;</td>
+										</tr>
+										<tr>
+											<td colspan="4" class="w3-theme-d2">Pressure <span class="subText">(sea level)</span></td>
+										</tr>
+										<tr class="w3-theme-l5">
+											<td>Barometer</td>
+											<td><span data-cmxdata="press"></span>&nbsp;<span data-cmxdata="pressunit"></span></td>
+											<td><span data-cmxdata="presstrend"></span></td>
+											<td><span data-cmxdata="presstrendval"></span>&nbsp;<span data-cmxdata="pressunit"></span>/hr</td>
+										</tr>
+										<tr class="w3-hide" data-cmx-solar data-cmx-uv>
+											<td colspan="4" class="w3-theme-d1">Solar</td>
+										</tr>
+										<tr class="w3-theme-l6 w3-hide" data-cmx-solar>
+											<td>Solar Radiation</td>
+											<td><span data-cmxdata="SolarRad"></span>&nbsp;W/m&sup2;</td>
+											<td>Evapotranspiration Today</td>
+											<td><span data-cmxdata="ET"></span>&nbsp;<span data-cmxdata="rainunit"></span></td>
+										</tr>
+										<tr class="w3-theme-l6 w3-hide" data-cmx-uv>
+											<td>UV Index</td>
+											<td><span data-cmxdata="UV"></span></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</table>
+								</div>
+								<p class="w3-small credits">Page updated <span data-cmxdata="update"></span>.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w3-col l3 m12">	<!--	Start of Sidebar 1/4 width	-->
+					<div class="w3-row-padding">
+						<div class="w3-col l12">
+							<div class="w3-panel w3-container w3-theme-light">
+								<h3 class="w3-center">Welcome to <br/><span class="subText"><span data-cmxdata="longlocation"></span></span></h3>
+								<p>The weather station in use is the <span data-cmxdata="stationtype"></span><br>
+									This page is updated every <span data-cmxdata="interval"></span> minutes. The meteorological day used at this station ends at <span data-cmxdata="rollovertime"></span>.
+								</p>
+								<p><strong>Forecast:</strong> <span data-cmxdata="forecast"></span></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>	<!--	End of panel content -->
+		</div>	<!--	End of content	-->
+		<div id="Footer" class="w3-row w3-bottom w3-theme-dark w3-theme-bdr">
+			<div class="w3-row-padding site-width">
+				<p><em>Cumulus MX Template by Neil Thomas <script>document.write(new Date().getFullYear());</script>
+				<span class="w3-right">Powered by <span class="w3-theme-txt">Cumulus MX</span> v:<span data-cmxdata="version"></span>, b:<span data-cmxdata="build"></span></span></em></p>
+			</div>
+		</div>
+	</body>
 </html>
