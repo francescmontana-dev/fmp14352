@@ -1,4 +1,4 @@
-name: Update OpenWeather forecast
+name: Update OpenWeather forecast (API)
 
 on:
   workflow_dispatch:
@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
 
-# Evita que se pisen dos ejecuciones a la vez
 concurrency:
   group: openweather-forecast
   cancel-in-progress: false
@@ -16,53 +15,69 @@ concurrency:
 jobs:
   update-forecast:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Fetch OpenWeather forecast (5-day / 3h)
         env:
           API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          LAT: "41.4852910"   # <-- tu latitud
-          LON: "2.3275320"    # <-- tu longitud
+          LAT: "41.4852910"   # <-- tu latitud (punto decimal)
+          LON: "2.3275320"    # <-- tu longitud (punto decimal)
         run: |
           set -e
           curl -sS "https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&lang=ca" \
             -o owm_forecast.json
           date -u +"%Y-%m-%dT%H:%M:%SZ" > owm_forecast_updated_utc.txt
 
-      - name: Commit and push (with retry)
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Update files in main via GitHub API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
 
-          git add owm_forecast.json owm_forecast_updated_utc.txt
-          if git diff --cached --quiet; then
-            echo "No changes."
-            exit 0
-          fi
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = 'main';
 
-          git commit -m "Update OpenWeather forecast"
+            async function upsert(path, contentText, message) {
+              const content = Buffer.from(contentText, 'utf8').toString('base64');
 
-          # Reintenta por si hay pushes simultáneos a main
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing with origin/main..."
-            git fetch origin main
-            git rebase origin/main || (git rebase --abort && echo "Rebase failed, retrying..." && sleep 5 && continue)
+              for (let attempt = 1; attempt <= 5; attempt++) {
+                try {
+                  // 1) Intentar leer el archivo para obtener el SHA (si existe)
+                  let sha = undefined;
+                  try {
+                    const getResp = await github.rest.repos.getContent({
+                      owner, repo, path, ref: branch
+                    });
+                    sha = getResp.data.sha;
+                  } catch (e) {
+                    // Si no existe, GitHub devuelve 404: lo creamos sin sha
+                    if (e.status !== 404) throw e;
+                  }
 
-            echo "Attempt $i: pushing..."
-            if git push origin HEAD:main; then
-              echo "Push OK"
-              exit 0
-            fi
+                  // 2) Crear/actualizar el archivo
+                  await github.rest.repos.createOrUpdateFileContents({
+                    owner,
+                    repo,
+                    path,
+                    message,
+                    content,
+                    branch,
+                    sha
+                  });
 
-            echo "Push rejected, retrying in 5s..."
-            sleep 5
-          done
+                  core.info(`✅ Updated ${path}`);
+                  return;
+                } catch (e) {
+                  core.warning(`Attempt ${attempt} failed for ${path}: ${e.message}`);
+                  // Reintento breve por si hubo cambio concurrente
+                  await new Promise(r => setTimeout(r, 2000));
+                  if (attempt === 5) throw e;
+                }
+              }
+            }
 
-          echo "Failed to push after retries."
-          exit 1
+            const forecastJson = fs.readFileSync('owm_forecast.json', 'utf8');
+            const updatedTxt = fs.readFileSync('owm_forecast_updated_utc.txt', 'utf8');
+
+            await upsert('owm_forecast.json', forecastJson, 'Update OpenWeather forecast');
+            await upsert('owm_forecast_updated_utc.txt', updatedTxt, 'Update OpenWeather forecast timestamp');
