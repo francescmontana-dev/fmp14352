@@ -11,15 +11,18 @@ permissions:
 jobs:
   update-forecast:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Fetch OpenWeather 5-day forecast (3h)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # importante para poder hacer pull --rebase
+
+      - name: Fetch OpenWeather forecast (5-day / 3h)
         env:
           API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          LAT: "41.48"
-          LON: "2.32"
+          LAT: "41.4852910"   # <-- pon tu latitud exacta
+          LON: "2.3275320"    # <-- pon tu longitud exacta
         run: |
           set -e
           curl -sS "https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&lang=ca" \
@@ -30,10 +33,17 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add owm_forecast.json owm_forecast_updated_utc.txt
+
           if git diff --cached --quiet; then
             echo "No changes."
-          else
-            git commit -m "Update OpenWeather forecast"
-            git push
+            exit 0
           fi
+
+          git commit -m "Update OpenWeather forecast"
+
+          # Evita error 'fetch first'
+          git pull --rebase origin main
+
+          git push origin main 
