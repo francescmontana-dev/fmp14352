@@ -36,16 +36,6 @@
 				}, 1200000);
 			};
 		</script>
-
-		<!-- OWM START: small table style (optional, keeps it tidy) -->
-		<style>
-			.owm-table { width: 100%; border-collapse: collapse; }
-			.owm-table th, .owm-table td { padding: 6px 6px; border-bottom: 1px solid #eee; font-size: 0.92em; }
-			.owm-table th { background: rgba(0,0,0,0.03); }
-			.owm-meta { font-size: 0.85em; opacity: 0.85; margin-top: 6px; }
-			.owm-title { margin-bottom: 6px; }
-		</style>
-		<!-- OWM END -->
 	</head>
 	<body>
 		<div id="Header" class="w3-row w3-top w3-theme-dark w3-theme-bdr">
@@ -240,49 +230,6 @@
 								<p><strong>Forecast:</strong> <span data-cmxdata="forecast"></span></p>
 							</div>
 						</div>
-
-						<!-- OWM START: OpenWeather model forecast panel -->
-						<div class="w3-col l12">
-							<div class="w3-panel w3-container w3-theme-white">
-								<h3 class="w3-center owm-title">Previsió model (OpenWeather)</h3>
-								<p id="owmMeta" class="owm-meta">Carregant…</p>
-
-								<h5 style="margin:8px 0 6px 0;">Diària (5 dies)</h5>
-								<div class="w3-responsive">
-									<table class="w3-table owm-table">
-										<thead>
-											<tr>
-												<th>Dia</th>
-												<th>Tmin/Tmax</th>
-												<th>Pluja</th>
-												<th>Vent</th>
-											</tr>
-										</thead>
-										<tbody id="owmDaily">
-											<tr><td colspan="4">Carregant…</td></tr>
-										</tbody>
-									</table>
-								</div>
-
-								<h5 style="margin:10px 0 6px 0;">Horària (24 h)</h5>
-								<div class="w3-responsive">
-									<table class="w3-table owm-table">
-										<thead>
-											<tr>
-												<th>Hora</th>
-												<th>Temp</th>
-												<th>Pluja</th>
-												<th>Vent</th>
-											</tr>
-										</thead>
-										<tbody id="owmHourly">
-											<tr><td colspan="4">Carregant…</td></tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</div>
-						<!-- OWM END -->
 					</div>
 				</div>
 			</div>	<!--	End of panel content -->
@@ -293,93 +240,5 @@
 				<span class="w3-right">Powered by <span class="w3-theme-txt">Cumulus MX</span> v:<span data-cmxdata="version"></span>, b:<span data-cmxdata="build"></span></span></em></p>
 			</div>
 		</div>
-
-		<!-- OWM START: script to load forecast from owm-data branch -->
-		<script>
-			const OWM_JSON_URL = "https://raw.githubusercontent.com/francescmontana-dev/fmp14352/owm-data/owm_forecast.json";
-			const OWM_UPD_URL  = "https://raw.githubusercontent.com/francescmontana-dev/fmp14352/owm-data/owm_forecast_updated_utc.txt";
-
-			function fmtDay(dt) {
-				return dt.toLocaleDateString("ca-ES", { weekday: "short", day: "2-digit", month: "2-digit" });
-			}
-			function fmtTime(dt) {
-				return dt.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
-			}
-
-			async function loadOWM() {
-				const metaEl = document.getElementById("owmMeta");
-				const dailyBody = document.getElementById("owmDaily");
-				const hourlyBody = document.getElementById("owmHourly");
-
-				try {
-					const [rF, rU] = await Promise.all([
-						fetch(OWM_JSON_URL, { cache: "no-store" }),
-						fetch(OWM_UPD_URL, { cache: "no-store" })
-					]);
-
-					if (!rF.ok) throw new Error("No puc llegir owm_forecast.json");
-					const data = await rF.json();
-
-					const updated = rU.ok ? (await rU.text()).trim() : "";
-					metaEl.textContent = updated ? `Actualitzat (UTC): ${updated}` : "Actualitzat recentment";
-
-					// Horària: 8 franges (≈24 h)
-					const nextRows = data.list.slice(0, 8).map(p => {
-						const dt = new Date(p.dt * 1000);
-						const t = Math.round(p.main.temp);
-						const pop = Math.round((p.pop ?? 0) * 100);
-						const w = Math.round((p.wind?.speed ?? 0) * 3.6); // m/s -> km/h
-						return `<tr>
-							<td>${fmtTime(dt)}</td>
-							<td>${t}°C</td>
-							<td>${pop}%</td>
-							<td>${w} km/h</td>
-						</tr>`;
-					}).join("");
-					hourlyBody.innerHTML = nextRows || `<tr><td colspan="4">Sense dades</td></tr>`;
-
-					// Diària: agrupar per dia (Tmin/Tmax, POP max, vent max)
-					const byDay = new Map();
-					for (const p of data.list) {
-						const key = new Date(p.dt * 1000).toISOString().slice(0,10);
-						const tmin = p.main.temp_min;
-						const tmax = p.main.temp_max;
-						const pop = (p.pop ?? 0);
-						const wind = (p.wind?.speed ?? 0);
-						if (!byDay.has(key)) byDay.set(key, { tmin, tmax, popMax: pop, windMax: wind });
-						const o = byDay.get(key);
-						o.tmin = Math.min(o.tmin, tmin);
-						o.tmax = Math.max(o.tmax, tmax);
-						o.popMax = Math.max(o.popMax, pop);
-						o.windMax = Math.max(o.windMax, wind);
-					}
-
-					const dayRows = Array.from(byDay.entries()).slice(0, 5).map(([key, o]) => {
-						const dt = new Date(key + "T12:00:00");
-						const tmin = Math.round(o.tmin);
-						const tmax = Math.round(o.tmax);
-						const pop = Math.round(o.popMax * 100);
-						const w = Math.round(o.windMax * 3.6);
-						return `<tr>
-							<td>${fmtDay(dt)}</td>
-							<td>${tmin}° / ${tmax}°</td>
-							<td>${pop}%</td>
-							<td>${w} km/h</td>
-						</tr>`;
-					}).join("");
-
-					dailyBody.innerHTML = dayRows || `<tr><td colspan="4">Sense dades</td></tr>`;
-				} catch (e) {
-					console.error(e);
-					metaEl.textContent = "Error carregant OpenWeather.";
-					dailyBody.innerHTML = `<tr><td colspan="4">Error</td></tr>`;
-					hourlyBody.innerHTML = `<tr><td colspan="4">Error</td></tr>`;
-				}
-			}
-
-			// Lanza al cargar (tu setpagedata.js también corre; no interfiere)
-			loadOWM();
-		</script>
-		<!-- OWM END -->
 	</body>
 </html>
