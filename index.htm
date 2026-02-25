@@ -277,5 +277,52 @@ window.addEventListener("load", function () {
 });
 </script>
 
+  function norm(s) {
+    return (s || "")
+      .replace(/\s+/g, " ")
+      .replace(/\u00A0/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function translateNow() {
+    const el = document.getElementById("zForecast");
+    if (!el) return;
+
+    const raw = (el.textContent || "").trim();
+    if (!raw) return;
+
+    const key = norm(raw);
+
+    // Si hay match exacto, traduce
+    if (mapES[key]) {
+      if (el.textContent !== mapES[key]) el.textContent = mapES[key];
+      return;
+    }
+
+    // Fallback por palabras clave (por si Cumulus cambia ligeramente el texto)
+    if (key.includes("fine")) el.textContent = "Tiempo estable";
+    else if (key.includes("changeable")) el.textContent = "Tiempo variable";
+    else if (key.includes("unsettled")) el.textContent = "Tiempo inestable";
+    else if (key.includes("rain")) el.textContent = "Lluvia";
+    else if (key.includes("storm")) el.textContent = "Tormentoso";
+  }
+
+  window.addEventListener("load", () => {
+    // 1) intenta traducir cuando ya cargó la página
+    setTimeout(translateNow, 1500);
+
+    // 2) traduce cada pocos segundos (por si algo lo pisa)
+    setInterval(translateNow, 3000);
+
+    // 3) y además, vigila cambios en el texto y traduce al instante
+    const el = document.getElementById("zForecast");
+    if (el && window.MutationObserver) {
+      const obs = new MutationObserver(() => translateNow());
+      obs.observe(el, { childList: true, characterData: true, subtree: true });
+    }
+  });
+})();
+</script>
 </body>
 </html>
