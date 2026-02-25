@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Previsió (OpenWeather)</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .card {
+      box-sizing:border-box;
+      width:100%;
+      max-width:980px;
+      margin:0 auto;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,.12);
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+      background:#fff;
+    }
+    .top { display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
+    .title { font-size:18px; font-weight:700; margin:0; }
+    .meta { font-size:12px; opacity:.75; margin-top:2px; }
+    .pill {
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      background:rgba(0,0,0,.06);
+      white-space:nowrap;
+    }
+    .grid { display:grid; gap:10px; margin-top:12px; }
+    .grid.days { grid-template-columns: repeat(5, minmax(140px, 1fr)); }
+    .grid.hours { grid-template-columns: repeat(6, minmax(140px, 1fr)); }
+    .box {
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:14px;
+      padding:10px;
+      background:rgba(0,0,0,.02);
+      min-height:86px;
+    }
+    .k { font-size:12px; opacity:.75; margin:0 0 4px 0; }
+    .v { font-size:18px; font-weight:700; margin:0; }
+    .row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+    .small { font-size:12px; opacity:.8; margin-top:6px; line-height:1.25; }
+    .err { color:#b00020; font-size:12px; margin-top:8px; }
+    .footer { margin-top:10px; font-size:11px; opacity:.7; }
+    @media (max-width: 860px) {
+      .grid.days { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .grid.hours { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+    }
+    @media (max-width: 420px) {
+      .grid.days, .grid.hours { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <div>
+        <p class="title">Previsió (OpenWeather)</p>
+        <div class="meta" id="meta">Carregant…</div>
+      </div>
+      <div class="pill" id="pill">—</div>
+    </div>
+
+    <div class="grid days" id="days"></div>
+    <div style="height:6px"></div>
+    <div class="grid hours" id="hours"></div>
+
+    <div class="footer">
+      Dades: OpenWeather · Mostra orientativa (model) · Font: owm_forecast.json del teu repositori
+    </div>
+
+    <div class="err" id="err" style="display:none"></div>
+  </div>
+
+<script>
+(function(){
+  const OWM_JSON_URL = "./owm_forecast.json?cb=" + Date.now();
+  const OWM_UPD_URL  = "./owm_forecast_updated_utc.txt?cb=" + Date.now();
+
+  const $days = document.getElementById("days");
+  const $hours = document.getElementById("hours");
+  const $meta = document.getElementById("meta");
+  const $pill = document.getElementById("pill");
+  const $err = document.getElementById("err");
+
+  const caDay = ["dg","dl","dt","dc","dj","dv","ds"];
+
+  function pad2(n){ return (n<10?"0":"")+n; }
+  function fmtTime(d){ return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
+  function fmtDay(d){ return caDay[d.getDay()] + " " + pad2(d.getDate()) + "/" + pad2(d.getMonth()+1); }
+  function kmh(ms){ return Math.round((ms||0)*3.6); }
+  function c(v){ return Math.round(v); }
+  function pop(p){ return Math.round((p||0)*100); }
+
+  function iconUrl(code){
+    return "https://openweathermap.org/img/wn/" + code + "@2x.png";
+  }
+
+  function groupByDate(list){
+    const by = new Map();
+    for (const p of list) {
+      const d = new Date(p.dt*1000);
+      const key = d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+      const tmin = p.main.temp_min, tmax = p.main.temp_max;
+      const pr = p.pop ?? 0;
+      const w  = p.wind?.speed ?? 0;
+      const ico = p.weather?.[0]?.icon || "";
+      if (!by.has(key)) by.set(key, { d: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12,0,0),
+                                      tmin, tmax, popMax: pr, windMax: w, icon: ico });
+      const o = by.get(key);
+      o.tmin = Math.min(o.tmin, tmin);
+      o.tmax = Math.max(o.tmax, tmax);
+      o.popMax = Math.max(o.popMax, pr);
+      o.windMax = Math.max(o.windMax, w);
+      if (!o.icon && ico) o.icon = ico;
+    }
+    return Array.from(by.values());
+  }
+
+  function setHTML(el, html){ el.innerHTML = html; }
+
+  async function load(){
+    try{
+      const [rJ, rU] = await Promise.all([
+        fetch(OWM_JSON_URL, { cache:"no-store" }),
+        fetch(OWM_UPD_URL,  { cache:"no-store" })
+      ]);
+      if (!rJ.ok) throw new Error("No puc llegir owm_forecast.json (encara no existeix o no és accessible).");
+      const data = await rJ.json();
+      const upd = rU.ok ? (await rU.text()).trim() : "";
+
+      const city = data.city?.name ? data.city.name : "";
+      const country = data.city?.country ? data.city.country : "";
+      $pill.textContent = city ? (country ? (city + " · " + country) : city) : "Model";
+
+      $meta.textContent = upd ? ("Actualitzat (UTC): " + upd) : "Actualitzat recentment";
+
+      // Hores (properes 6 franges, ~18h)
+      const hrs = (data.list || []).slice(0, 6).map(p => {
+        const d = new Date(p.dt*1000);
+        const t = c(p.main.temp);
+        const pr = pop(p.pop);
+        const w = kmh(p.wind?.speed);
+        const ico = p.weather?.[0]?.icon || "";
+        const desc = p.weather?.[0]?.description || "";
+        return `
+          <div class="box">
+            <div class="row">
+              <p class="k">Hora</p>
+              <p class="k">${fmtTime(d)}</p>
+            </div>
+            <div class="row" style="margin-top:4px;">
+              <p class="v">${t}°C</p>
+              ${ico ? `<img alt="" src="${iconUrl(ico)}" width="48" height="48" />` : ""}
+            </div>
+            <div class="small">
+              Pluja: <b>${pr}%</b> · Vent: <b>${w} km/h</b><br/>
+              <span style="opacity:.75">${desc}</span>
+            </div>
+          </div>`;
+      }).join("");
+      setHTML($hours, hrs);
+
+      // Dies (5 dies)
+      const days = groupByDate(data.list || []).slice(0, 5).map(o => {
+        return `
+          <div class="box">
+            <div class="row">
+              <p class="k">Dia</p>
+              <p class="k">${fmtDay(o.d)}</p>
+            </div>
+            <div class="row" style="margin-top:4px;">
+              <p class="v">${c(o.tmin)}° / ${c(o.tmax)}°</p>
+              ${o.icon ? `<img alt="" src="${iconUrl(o.icon)}" width="48" height="48" />` : ""}
+            </div>
+            <div class="small">
+              Prob. pluja: <b>${pop(o.popMax)}%</b> · Vent màx.: <b>${kmh(o.windMax)} km/h</b>
+            </div>
+          </div>`;
+      }).join("");
+      setHTML($days, days);
+
+    } catch(e){
+      $err.style.display = "block";
+      $err.textContent = "No s’ha pogut carregar la previsió: " + (e && e.message ? e.message : e);
+      $meta.textContent = "Sense dades";
+    }
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
