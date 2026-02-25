@@ -5,50 +5,49 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Previsió (OpenWeather)</title>
   <style>
-    :root { color-scheme: light; }
-    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
-    .card {
-      box-sizing:border-box;
-      width:100%;
-      max-width:980px;
-      margin:0 auto;
-      padding:14px;
-      border-radius:16px;
-      border:1px solid rgba(0,0,0,.12);
-      box-shadow: 0 6px 18px rgba(0,0,0,.08);
-      background:#fff;
-    }
-    .top { display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
-    .title { font-size:18px; font-weight:700; margin:0; }
-    .meta { font-size:12px; opacity:.75; margin-top:2px; }
-    .pill {
-      font-size:12px; padding:6px 10px; border-radius:999px;
-      background:rgba(0,0,0,.06);
-      white-space:nowrap;
-    }
-    .grid { display:grid; gap:10px; margin-top:12px; }
-    .grid.days { grid-template-columns: repeat(5, minmax(140px, 1fr)); }
-    .grid.hours { grid-template-columns: repeat(6, minmax(140px, 1fr)); }
-    .box {
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:14px;
-      padding:10px;
-      background:rgba(0,0,0,.02);
-      min-height:86px;
-    }
-    .k { font-size:12px; opacity:.75; margin:0 0 4px 0; }
-    .v { font-size:18px; font-weight:700; margin:0; }
-    .row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
-    .small { font-size:12px; opacity:.8; margin-top:6px; line-height:1.25; }
-    .err { color:#b00020; font-size:12px; margin-top:8px; }
-    .footer { margin-top:10px; font-size:11px; opacity:.7; }
-    @media (max-width: 860px) {
-      .grid.days { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
-      .grid.hours { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
-    }
-    @media (max-width: 420px) {
-      .grid.days, .grid.hours { grid-template-columns: 1fr; }
-    }
+<style>
+body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+.card {
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+  padding:10px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  background:#fff;
+}
+.top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+.title { font-size:16px; font-weight:700; margin:0; }
+.meta { font-size:11px; opacity:.7; }
+.pill { font-size:11px; padding:4px 8px; border-radius:999px; background:rgba(0,0,0,.06); }
+
+.grid { display:grid; gap:8px; margin-top:8px; }
+.grid.days { grid-template-columns: repeat(5, 1fr); }
+.grid.hours { grid-template-columns: repeat(6, 1fr); }
+
+.box {
+  border:1px solid rgba(0,0,0,.10);
+  border-radius:12px;
+  padding:8px;
+  background:rgba(0,0,0,.02);
+  min-height:auto;
+}
+
+.k { font-size:11px; opacity:.7; margin:0; }
+.v { font-size:16px; font-weight:700; margin:0; }
+.small { font-size:11px; opacity:.8; margin-top:4px; }
+
+@media (max-width: 900px) {
+  .grid.days { grid-template-columns: repeat(3, 1fr); }
+  .grid.hours { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid.days { grid-template-columns: repeat(2, 1fr); }
+  .grid.hours { grid-template-columns: repeat(2, 1fr); }
+}
+
   </style>
 </head>
 <body>
