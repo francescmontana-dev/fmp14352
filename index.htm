@@ -242,40 +242,28 @@
 </div>
 
 <script>
-window.addEventListener("load", function () {
-  function translateForecast() {
-    var el = document.getElementById("zForecast");
-    if (!el) return;
-
-    var raw = (el.textContent || "").trim();
-    if (!raw) return;
-
-    var mapES = {
-      "Fine weather": "Tiempo estable",
-      "Fine, becoming less settled": "Tiempo estable, tendiendo a inestable",
-      "Fine, possible showers": "Tiempo estable, posibles chubascos",
-      "Fairly fine": "Bastante buen tiempo",
-      "Fairly fine, improving": "Bastante buen tiempo, mejorando",
-      "Fairly fine, showers likely": "Bastante buen tiempo, chubascos probables",
-      "Showery early, improving": "Chubascos al principio, mejorando",
-      "Changeable, mending": "Variable, mejorando",
-      "Changeable, some rain": "Variable, con algo de lluvia",
-      "Unsettled, probably improving": "Inestable, probablemente mejorando",
-      "Unsettled, short fine intervals": "Inestable, breves claros",
-      "Unsettled, rain later": "Inestable, lluvia más tarde",
-      "Rain at times, worse later": "Lluvia a ratos, empeorando más tarde",
-      "Rain at frequent intervals": "Lluvias frecuentes",
-      "Very unsettled, rain": "Muy inestable, lluvia",
-      "Stormy, much rain": "Tormentoso, mucha lluvia"
-    };
-
-    el.textContent = mapES[raw] || raw;
-  }
-
-  setTimeout(translateForecast, 1500);
-  setInterval(translateForecast, 5000);
-});
-</script>
+<script>
+(function () {
+  const mapES = {
+    "fine weather": "Tiempo estable",
+    "fine, becoming less settled": "Tiempo estable, tendiendo a inestable",
+    "fine, possible showers": "Tiempo estable, posibles chubascos",
+    "fairly fine": "Bastante buen tiempo",
+    "fairly fine, improving": "Bastante buen tiempo, mejorando",
+    "fairly fine, possible showers early": "Bastante buen tiempo, posibles chubascos al principio",
+    "fairly fine, showers likely": "Bastante buen tiempo, chubascos probables",
+    "showery early, improving": "Chubascos al principio, mejorando",
+    "changeable, mending": "Variable, mejorando",
+    "changeable, some rain": "Variable, con algo de lluvia",
+    "unsettled, probably improving": "Inestable, probablemente mejorando",
+    "unsettled, short fine intervals": "Inestable, breves claros",
+    "unsettled, rain later": "Inestable, lluvia más tarde",
+    "rain at times, worse later": "Lluvia a ratos, empeorando más tarde",
+    "rain at times, becoming very unsettled": "Lluvia a ratos, volviéndose muy inestable",
+    "rain at frequent intervals": "Lluvias frecuentes",
+    "very unsettled, rain": "Muy inestable, lluvia",
+    "stormy, much rain": "Tormentoso, mucha lluvia"
+  };
 
   function norm(s) {
     return (s || "")
