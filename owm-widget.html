@@ -5,73 +5,57 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Previsió (OpenWeather)</title>
   <style>
- <style>
-body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .card{
+      box-sizing:border-box;
+      width:100%;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+    }
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .title{ font-size:16px; font-weight:800; margin:0; }
+    .meta{ font-size:12px; opacity:.72; margin-top:2px; }
+    .pill{ font-size:12px; padding:4px 10px; border-radius:999px; background:rgba(0,0,0,.06); white-space:nowrap; }
 
-.card {
-  box-sizing:border-box;
-  width:100%;
-  margin:0 auto;
-  padding:8px;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,.12);
-  background:#fff;
-}
+    .grid{
+      display:grid;
+      gap:10px;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+    }
+    .day{
+      aspect-ratio: 1 / 1;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.10);
+      background:rgba(0,0,0,.02);
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      text-align:center;
+    }
+    .dname{ font-size:12px; opacity:.75; font-weight:700; }
+    .icon{ width:44px; height:44px; margin:0 auto; }
+    .tmax{ font-size:18px; font-weight:900; }
+    .tmin{ font-size:13px; opacity:.85; margin-top:2px; }
+    .pop{ font-size:12px; opacity:.8; margin-top:6px; }
 
-.top {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
+    .footer{ margin-top:10px; font-size:10px; opacity:.65; }
+    .err{ color:#b00020; font-size:12px; margin-top:8px; }
 
-.title { font-size:16px; font-weight:700; margin:0; }
-.meta { font-size:12px; opacity:.7; }
-.pill { font-size:12px; padding:4px 10px; border-radius:999px; background:rgba(0,0,0,.06); }
-
-.grid { display:grid; gap:8px; }
-
-/* 🔥 MÉS COLUMNES = QUADRATS MÉS PETITS */
-.grid.days { grid-template-columns: repeat(7, 1fr); }
-.grid.hours { grid-template-columns: repeat(8, 1fr); margin-top:8px; }
-
-.box {
-  aspect-ratio: 1 / 1;
-  border:1px solid rgba(0,0,0,.10);
-  border-radius:10px;
-  padding:8px;
-  background:rgba(0,0,0,.02);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-}
-
-/* 🔥 TEXT MÉS GRAN */
-.k { font-size:12px; opacity:.75; margin:0; }
-.v { font-size:18px; font-weight:700; margin:3px 0; }
-.small { font-size:12px; opacity:.85; margin-top:4px; line-height:1.2; }
-
-.box img {
-  width:38px;
-  height:38px;
-  margin:2px 0;
-}
-
-/* Responsive */
-@media (max-width: 1000px) {
-  .grid.days { grid-template-columns: repeat(4, 1fr); }
-  .grid.hours { grid-template-columns: repeat(4, 1fr); }
-}
-
-@media (max-width: 600px) {
-  .grid.days { grid-template-columns: repeat(2, 1fr); }
-  .grid.hours { grid-template-columns: repeat(2, 1fr); }
-}
-</style>
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+    }
+    @media (max-width: 560px){
+      .grid{ grid-template-columns: repeat(2, minmax(120px, 1fr)); }
     }
   </style>
 </head>
@@ -85,11 +69,10 @@ body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans
       <div class="pill" id="pill">—</div>
     </div>
 
-    <div class="grid days" id="days"></div>
-    <div class="grid hours" id="hours"></div>
+    <div class="grid" id="days"></div>
 
     <div class="footer">
-      Dades: OpenWeather · Previsió orientativa (model) · Font: owm_forecast.json del teu repositori
+      Dades: OpenWeather · Previsió orientativa (model) · Font: owm_forecast.json
     </div>
 
     <div class="err" id="err" style="display:none"></div>
@@ -101,23 +84,16 @@ body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans
   const OWM_UPD_URL  = "./owm_forecast_updated_utc.txt?cb=" + Date.now();
 
   const $days = document.getElementById("days");
-  const $hours = document.getElementById("hours");
   const $meta = document.getElementById("meta");
   const $pill = document.getElementById("pill");
-  const $err = document.getElementById("err");
+  const $err  = document.getElementById("err");
 
   const caDay = ["dg","dl","dt","dc","dj","dv","ds"];
-
   function pad2(n){ return (n<10?"0":"")+n; }
-  function fmtTime(d){ return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
   function fmtDay(d){ return caDay[d.getDay()] + " " + pad2(d.getDate()) + "/" + pad2(d.getMonth()+1); }
-  function kmh(ms){ return Math.round((ms||0)*3.6); }
   function c(v){ return Math.round(v); }
   function pop(p){ return Math.round((p||0)*100); }
-
-  function iconUrl(code){
-    return "https://openweathermap.org/img/wn/" + code + "@2x.png";
-  }
+  function iconUrl(code){ return "https://openweathermap.org/img/wn/" + code + "@2x.png"; }
 
   function groupByDate(list){
     const by = new Map();
@@ -127,23 +103,19 @@ body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans
       const tmin = p.main.temp_min;
       const tmax = p.main.temp_max;
       const pr = p.pop ?? 0;
-      const w  = p.wind?.speed ?? 0;
       const ico = p.weather?.[0]?.icon || "";
       if (!by.has(key)) by.set(key, {
         d: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12,0,0),
-        tmin, tmax, popMax: pr, windMax: w, icon: ico
+        tmin, tmax, popMax: pr, icon: ico
       });
       const o = by.get(key);
       o.tmin = Math.min(o.tmin, tmin);
       o.tmax = Math.max(o.tmax, tmax);
       o.popMax = Math.max(o.popMax, pr);
-      o.windMax = Math.max(o.windMax, w);
       if (!o.icon && ico) o.icon = ico;
     }
     return Array.from(by.values());
   }
-
-  function setHTML(el, html){ el.innerHTML = html; }
 
   async function load(){
     try{
@@ -151,7 +123,7 @@ body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans
         fetch(OWM_JSON_URL, { cache:"no-store" }),
         fetch(OWM_UPD_URL,  { cache:"no-store" })
       ]);
-      if (!rJ.ok) throw new Error("No puc llegir owm_forecast.json (encara no existeix o no és accessible).");
+      if (!rJ.ok) throw new Error("No puc llegir owm_forecast.json.");
 
       const data = await rJ.json();
       const upd = rU.ok ? (await rU.text()).trim() : "";
@@ -161,36 +133,18 @@ body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans
       $pill.textContent = city ? (country ? (city + " · " + country) : city) : "Model";
       $meta.textContent = upd ? ("Actualitzat (UTC): " + upd) : "Actualitzat recentment";
 
-      // HORES (properes 6 franges)
-      const hrs = (data.list || []).slice(0, 6).map(p => {
-        const d = new Date(p.dt*1000);
-        const t = c(p.main.temp);
-        const pr = pop(p.pop);
-        const w = kmh(p.wind?.speed);
-        const ico = p.weather?.[0]?.icon || "";
-        return `
-          <div class="box">
-            <div class="k">${fmtTime(d)}</div>
-            ${ico ? `<img alt="" src="${iconUrl(ico)}" />` : ""}
-            <div class="v">${t}°C</div>
-            <div class="small">Pluja <b>${pr}%</b></div>
-            <div class="small">Vent <b>${w}</b> km/h</div>
-          </div>`;
-      }).join("");
-      setHTML($hours, hrs);
-
-      // DIES (5 dies) amb MÀX i MÍN clars
-      const days = groupByDate(data.list || []).slice(0, 5).map(o => {
-        return `
-          <div class="box">
-            <div class="k">${fmtDay(o.d)}</div>
-            ${o.icon ? `<img alt="" src="${iconUrl(o.icon)}" />` : ""}
-            <div class="small">Màx <b>${c(o.tmax)}°</b> · Mín <b>${c(o.tmin)}°</b></div>
-            <div class="small">Pluja <b>${pop(o.popMax)}%</b></div>
-            <div class="small">Vent <b>${kmh(o.windMax)}</b> km/h</div>
-          </div>`;
-      }).join("");
-      setHTML($days, days);
+      const days = groupByDate(data.list || []).slice(0, 5);
+      $days.innerHTML = days.map(o => `
+        <div class="day">
+          <div class="dname">${fmtDay(o.d)}</div>
+          ${o.icon ? `<img class="icon" alt="" src="${iconUrl(o.icon)}" />` : `<div style="height:44px"></div>`}
+          <div>
+            <div class="tmax">${c(o.tmax)}°</div>
+            <div class="tmin">mín ${c(o.tmin)}°</div>
+            <div class="pop">pluja ${pop(o.popMax)}%</div>
+          </div>
+        </div>
+      `).join("");
 
     } catch(e){
       $err.style.display = "block";
