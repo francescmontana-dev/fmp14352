@@ -5,65 +5,73 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Previsió (OpenWeather)</title>
   <style>
-    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+ <style>
+body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
 
-    .card {
-      box-sizing:border-box;
-      width:100%;
-      margin:0 auto;
-      padding:8px;
-      border-radius:12px;
-      border:1px solid rgba(0,0,0,.12);
-      background:#fff;
-    }
+.card {
+  box-sizing:border-box;
+  width:100%;
+  margin:0 auto;
+  padding:8px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.12);
+  background:#fff;
+}
 
-    .top {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:8px;
-    }
+.top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
 
-    .title { font-size:15px; font-weight:700; margin:0; }
-    .meta { font-size:11px; opacity:.7; margin-top:2px; }
-    .pill { font-size:11px; padding:3px 8px; border-radius:999px; background:rgba(0,0,0,.06); white-space:nowrap; }
+.title { font-size:16px; font-weight:700; margin:0; }
+.meta { font-size:12px; opacity:.7; }
+.pill { font-size:12px; padding:4px 10px; border-radius:999px; background:rgba(0,0,0,.06); }
 
-    .grid { display:grid; gap:6px; }
-    .grid.days { grid-template-columns: repeat(5, 1fr); }
-    .grid.hours { grid-template-columns: repeat(6, 1fr); margin-top:6px; }
+.grid { display:grid; gap:8px; }
 
-    .box {
-      aspect-ratio: 1 / 1;   /* quadrat */
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:10px;
-      padding:6px;
-      background:rgba(0,0,0,.02);
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-      overflow:hidden;
-    }
+/* 🔥 MÉS COLUMNES = QUADRATS MÉS PETITS */
+.grid.days { grid-template-columns: repeat(7, 1fr); }
+.grid.hours { grid-template-columns: repeat(8, 1fr); margin-top:8px; }
 
-    .k { font-size:10px; opacity:.7; margin:0; }
-    .v { font-size:15px; font-weight:700; margin:2px 0; }
-    .small { font-size:10px; opacity:.78; margin-top:3px; line-height:1.15; }
+.box {
+  aspect-ratio: 1 / 1;
+  border:1px solid rgba(0,0,0,.10);
+  border-radius:10px;
+  padding:8px;
+  background:rgba(0,0,0,.02);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
 
-    .box img { width:32px; height:32px; }
+/* 🔥 TEXT MÉS GRAN */
+.k { font-size:12px; opacity:.75; margin:0; }
+.v { font-size:18px; font-weight:700; margin:3px 0; }
+.small { font-size:12px; opacity:.85; margin-top:4px; line-height:1.2; }
 
-    .footer { margin-top:8px; font-size:10px; opacity:.65; }
-    .err { color:#b00020; font-size:11px; margin-top:8px; }
+.box img {
+  width:38px;
+  height:38px;
+  margin:2px 0;
+}
 
-    @media (max-width: 900px) {
-      .grid.days { grid-template-columns: repeat(3, 1fr); }
-      .grid.hours { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 600px) {
-      .grid.days { grid-template-columns: repeat(2, 1fr); }
-      .grid.hours { grid-template-columns: repeat(2, 1fr); }
+/* Responsive */
+@media (max-width: 1000px) {
+  .grid.days { grid-template-columns: repeat(4, 1fr); }
+  .grid.hours { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .grid.days { grid-template-columns: repeat(2, 1fr); }
+  .grid.hours { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
     }
   </style>
 </head>
