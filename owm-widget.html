@@ -63,7 +63,33 @@ body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans
   .grid.days  { grid-template-columns: repeat(3, 1fr); }
   .grid.hours { grid-template-columns: repeat(3, 1fr); }
 }
+/* 🔥 Ajust fi per mòbil */
+@media (max-width: 600px) {
 
+  .grid.days  { grid-template-columns: repeat(2, 1fr); }
+  .grid.hours { grid-template-columns: repeat(2, 1fr); }
+
+  .box {
+    padding:4px;
+  }
+
+  .v {
+    font-size:18px;
+  }
+
+  .small {
+    font-size:11px;
+  }
+
+  .k {
+    font-size:11px;
+  }
+
+  .box img {
+    width:34px;
+    height:34px;
+  }
+}
 @media (max-width: 600px) {
   .grid.days  { grid-template-columns: repeat(2, 1fr); }
   .grid.hours { grid-template-columns: repeat(2, 1fr); }
