@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+
+/* ===== GOOGLE SITES FIX ===== */
+html,body{
+margin:0;
+padding:0;
+width:100%;
+height:100%;
+background:transparent;
+font-family:system-ui,Arial;
+}
+
+.wrapper{
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* ===== CARD ===== */
+.card{
+width:260px;
+height:260px;
+border-radius:22px;
+color:white;
+padding:14px;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+background:linear-gradient(160deg,#0b2d5c,#1565c0);
+box-shadow:0 12px 28px rgba(0,0,0,.28);
+transition:.6s;
+}
+
+/* ALERTA */
+@keyframes alertPulse{
+0%{box-shadow:0 12px 28px rgba(0,0,0,.28);}
+50%{box-shadow:0 0 25px rgba(255,255,255,.45);}
+100%{box-shadow:0 12px 28px rgba(0,0,0,.28);}
+}
+.alertActive{
+animation:alertPulse 3s ease-in-out infinite;
+}
+
+/* HEADER */
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.stationWrap{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.station{
+font-weight:700;
+font-size:15px;
+}
+
+.badge{
+font-size:12px;
+padding:3px 7px;
+border-radius:10px;
+background:rgba(255,255,255,.18);
+}
+
+.logo{
+width:30px;
+background:white;
+border-radius:6px;
+padding:2px;
+}
+
+/* TEMP */
+.temp{
+font-size:52px;
+font-weight:800;
+text-align:center;
+}
+
+/* GRID */
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+}
+
+.box{
+background:rgba(255,255,255,.15);
+border-radius:12px;
+padding:6px;
+text-align:center;
+}
+
+.label{
+font-size:11px;
+opacity:.8;
+}
+
+.footer{
+font-size:11px;
+text-align:center;
+}
+
+.windRow{
+display:flex;
+justify-content:center;
+gap:6px;
+}
+
+.arrow{
+transition:.5s;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="card" id="card">
+
+<div class="header">
+<div class="stationWrap">
+<div id="title">⏳ El Masnou NE</div>
+<div class="badge" id="alertBadge">✅ Sense alertes</div>
+</div>
+
+<img class="logo"
+src="https://francescmontana-dev.github.io/fmp14352/LOGO%20A%20TAMA%C3%91O%20WEB.png">
+</div>
+
+<div class="temp">
+<span id="temp">--</span>°C
+</div>
+
+<div class="grid">
+
+<div class="box">
+<div id="hum">--</div>
+<div class="label">Humitat</div>
+</div>
+
+<div class="box">
+<div class="windRow">
+<span class="arrow" id="wArrow">➤</span>
+<span id="wind">--</span>
+</div>
+<div class="label">Vent</div>
+</div>
+
+<div class="box">
+<div id="rain">--</div>
+<div class="label">Pluja</div>
+</div>
+
+<div class="box">
+<div id="press">--</div>
+<div class="label">Pressió</div>
+</div>
+
+</div>
+
+<div class="footer">
+📅 <span id="date"></span><br>
+🕒 <span id="clock"></span>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const realtime=
+"https://francescmontana-dev.github.io/fmp14352/realtime.txt";
+
+const el=id=>document.getElementById(id);
+
+function clock(){
+const n=new Date();
+el("clock").textContent=
+n.toLocaleTimeString("ca-ES");
+el("date").textContent=
+n.toLocaleDateString("ca-ES");
+}
+setInterval(clock,1000);
+clock();
+
+/* ALERTES */
+function setAlert(t,r,g){
+
+const badge=el("alertBadge");
+const card=el("card");
+
+let txt="✅ Sense alertes";
+
+if(g>=45) txt="💨 Vent fort";
+else if(r>=5) txt="🌧️ Pluja intensa";
+else if(t>=30) txt="🔥 Calor";
+else if(t<=0) txt="🧊 Gel";
+
+badge.textContent=txt;
+
+if(txt!=="✅ Sense alertes")
+card.classList.add("alertActive");
+else
+card.classList.remove("alertActive");
+}
+
+/* LOAD CUMULUS */
+async function load(){
+
+const r=await fetch(realtime+"?"+Date.now());
+const d=(await r.text()).split(" ");
+
+const t=parseFloat(d[2]);
+const hum=d[3];
+const wind=d[5];
+const gust=parseFloat(d[6]);
+const dir=parseFloat(d[7]);
+const rain=parseFloat(d[8]);
+const press=d[10];
+
+el("temp").textContent=d[2];
+el("hum").textContent=hum+" %";
+el("wind").textContent=wind+" km/h";
+el("rain").textContent=d[9]+" mm";
+el("press").textContent=press+" hPa";
+
+el("wArrow").style.transform=
+`rotate(${dir}deg)`;
+
+setAlert(t,rain,gust);
+}
+
+load();
+setInterval(load,30000);
+
+</script>
+
+</body>
+</html>
