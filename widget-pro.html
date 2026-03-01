@@ -60,7 +60,7 @@ html, body{
 
 /* Núvols: sempre molt subtil (dia i nit) */
 .fx-clouds{
-  opacity:.18;
+  opacity:.32;
   mix-blend-mode:screen;
   background:
     radial-gradient(circle at 10% 30%, rgba(255,255,255,.18) 0 22%, transparent 26%),
@@ -69,7 +69,7 @@ html, body{
     radial-gradient(circle at 80% 28%, rgba(255,255,255,.12) 0 22%, transparent 26%),
     radial-gradient(circle at 25% 60%, rgba(255,255,255,.10) 0 20%, transparent 24%),
     radial-gradient(circle at 65% 62%, rgba(255,255,255,.10) 0 22%, transparent 26%);
-  filter: blur(10px);
+  filter: blur(12px);
   transform: translateX(-20%);
   animation: cloudsMove 26s linear infinite;
 }
@@ -367,6 +367,20 @@ html, body{
 
   // Historial (tendències reals)
   const STORAGE_KEY = "elmasnou_hist_pro_fx_v1";
+  // Fallback si localStorage està bloquejat dins Google Sites
+let memoryHist = [];
+
+function storageOk(){
+  try{
+    const k="__t";
+    localStorage.setItem(k,"1");
+    localStorage.removeItem(k);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+const CAN_STORE = storageOk();
   const KEEP_MS = 4 * 60 * 60 * 1000;        // 4h
   const TARGET_TEMP_MS = 60 * 60 * 1000;     // 1h
   const TARGET_PRESS_MS = 3 * 60 * 60 * 1000;// 3h
@@ -495,14 +509,23 @@ html, body{
   }
 
   /* ===== HISTORIAL / TENDÈNCIES REALS ===== */
-  function loadHist(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(e){ return []; }
+    function loadHist(){
+  if(!CAN_STORE) return memoryHist;
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return [];
   }
+}
 
-  function saveHist(arr){
+function saveHist(arr){
+  if(!CAN_STORE){
+    memoryHist = arr;
+    return;
+  }
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(e){}
+}function saveHist(arr){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(e){}
   }
 
