@@ -68,14 +68,21 @@ body{
 }
 
 .badge{
-  display:none;
+  display:inline-block;
   font-size:12px;
   padding:3px 7px;
   border-radius:10px;
-  background:rgba(255,255,255,.22);
-  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.14);
   backdrop-filter: blur(6px);
   white-space:nowrap;
+  opacity:.95;
+}
+
+.badge.ok{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.10);
+  opacity:.8;
 }
 
 .logo{
@@ -178,7 +185,7 @@ body{
   <div class="header">
     <div class="stationWrap">
       <div class="station" id="title">⏳ El Masnou NE</div>
-      <span class="badge" id="alertBadge">⚠️</span>
+      <span class="badge ok" id="alertBadge">✅ Sense alertes</span>
     </div>
 
     <img class="logo"
@@ -241,10 +248,10 @@ body{
 
   // Historial per tendències reals
   const STORAGE_KEY = "elmasnou_hist_v3";
-  const KEEP_MS = 4 * 60 * 60 * 1000;      // 4 hores
-  const TARGET_TEMP_MS = 60 * 60 * 1000;    // 1h
+  const KEEP_MS = 4 * 60 * 60 * 1000;       // 4 hores
+  const TARGET_TEMP_MS = 60 * 60 * 1000;     // 1h
   const TARGET_PRESS_MS = 3 * 60 * 60 * 1000;// 3h
-  const TOL_MS = 12 * 60 * 1000;            // tolerància (12 min)
+  const TOL_MS = 12 * 60 * 1000;             // tolerància (12 min)
 
   const el = (id) => document.getElementById(id);
 
@@ -435,7 +442,7 @@ body{
     el("pArrow").textContent = arrowForDelta(dP, THR_P);
   }
 
-  // ===== ALERTES (llindars proposats) =====
+  // ===== ALERTES (amb "Sense alertes") =====
   // 💨 ratxa >= 45 km/h
   // 🌧️ rainRate >= 5 mm/h
   // 🔥 temp >= 30°C
@@ -452,11 +459,12 @@ body{
     else if (tempC != null && tempC <= 0) text = "🧊 Gel";
 
     if (text){
-      badge.style.display = "inline-block";
       badge.textContent = text;
+      badge.classList.remove("ok");
       card.classList.add("alertActive");
     }else{
-      badge.style.display = "none";
+      badge.textContent = "✅ Sense alertes";
+      badge.classList.add("ok");
       card.classList.remove("alertActive");
     }
   }
@@ -501,7 +509,7 @@ body{
     pushReading(tempC, pressNum, nowTs);
     updateTrendsReal(nowTs, tempC, pressNum);
 
-    // Alertes
+    // Alertes + "Sense alertes"
     setAlert(tempC, rainRate, gust);
   }
 
