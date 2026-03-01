@@ -30,26 +30,118 @@ html, body{
   --shadow:0 12px 28px rgba(0,0,0,.28);
 }
 
-/* ===== CARD ===== */
+/* ===== CARD (AUTO SIZE) ===== */
 .card{
+  width:min(92vw,420px);
+  aspect-ratio:1 / 1;
 
-/* AUTO SIZE */
-width:min(92vw,420px);
-aspect-ratio:1 / 1;
-
-border-radius:22px;
-padding:14px;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-
-color:white;
-background:linear-gradient(160deg,var(--c1),var(--c2));
-
-box-shadow:var(--shadow);
-transition: background 650ms ease, box-shadow 650ms ease;
-box-sizing:border-box;
+  border-radius:22px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  color:#fff;
+  background:linear-gradient(160deg,var(--c1),var(--c2));
+  box-shadow:var(--shadow);
+  transition: background 650ms ease, box-shadow 650ms ease;
+  box-sizing:border-box;
+  position:relative;
+  overflow:hidden; /* clau per efectes */
 }
+
+/* ===== OBSERVATORY FX LAYERS ===== */
+.fx{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 800ms ease;
+}
+
+/* Núvols: sempre molt subtil (dia i nit) */
+.fx-clouds{
+  opacity:.18;
+  mix-blend-mode:screen;
+  background:
+    radial-gradient(circle at 10% 30%, rgba(255,255,255,.18) 0 22%, transparent 26%),
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.15) 0 22%, transparent 26%),
+    radial-gradient(circle at 55% 30%, rgba(255,255,255,.14) 0 24%, transparent 28%),
+    radial-gradient(circle at 80% 28%, rgba(255,255,255,.12) 0 22%, transparent 26%),
+    radial-gradient(circle at 25% 60%, rgba(255,255,255,.10) 0 20%, transparent 24%),
+    radial-gradient(circle at 65% 62%, rgba(255,255,255,.10) 0 22%, transparent 26%);
+  filter: blur(10px);
+  transform: translateX(-20%);
+  animation: cloudsMove 26s linear infinite;
+}
+@keyframes cloudsMove{
+  0%{ transform: translateX(-20%); }
+  100%{ transform: translateX(20%); }
+}
+
+/* Estrelles: només de nit */
+.fx-stars{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 28% 32%, rgba(255,255,255,.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 44% 16%, rgba(255,255,255,.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 62% 22%, rgba(255,255,255,.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 14%, rgba(255,255,255,.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 36%, rgba(255,255,255,.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 18% 54%, rgba(255,255,255,.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 58%, rgba(255,255,255,.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 90% 72%, rgba(255,255,255,.6) 0 1px, transparent 2px);
+  opacity:0;
+  animation: twinkle 3.5s ease-in-out infinite;
+}
+@keyframes twinkle{
+  0%,100%{ opacity:.15; }
+  50%{ opacity:.35; }
+}
+
+/* Pluja: només quan plou */
+.fx-rain{
+  opacity:0;
+  background:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255,255,255,.0) 0px,
+      rgba(255,255,255,.0) 8px,
+      rgba(255,255,255,.18) 10px,
+      rgba(255,255,255,.0) 12px
+    );
+  transform: translateY(-20%);
+  animation: rainFall 0.9s linear infinite;
+}
+@keyframes rainFall{
+  0%{ transform: translateY(-25%); }
+  100%{ transform: translateY(25%); }
+}
+
+/* Vent fort: ratlles subtils */
+.fx-wind{
+  opacity:0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.0) 0px,
+      rgba(255,255,255,.0) 10px,
+      rgba(255,255,255,.12) 12px,
+      rgba(255,255,255,.0) 14px
+    );
+  filter: blur(0.3px);
+  transform: translateX(-15%);
+  animation: windMove 1.6s ease-in-out infinite;
+}
+@keyframes windMove{
+  0%{ transform: translateX(-18%); opacity:.10; }
+  50%{ transform: translateX(18%); opacity:.18; }
+  100%{ transform: translateX(-18%); opacity:.10; }
+}
+
+/* Activacions per classes al card */
+.card.isNight .fx-stars{ opacity:.35; }
+.card.isRain  .fx-rain{ opacity:.45; }
+.card.isWind  .fx-wind{ opacity:.35; }
 
 /* ===== ALERT PULSE ===== */
 @keyframes alertPulse{
@@ -67,6 +159,8 @@ box-sizing:border-box;
   justify-content:space-between;
   align-items:center;
   gap:10px;
+  position:relative;
+  z-index:2;
 }
 .stationWrap{
   min-width:0;
@@ -97,7 +191,6 @@ box-sizing:border-box;
   border:1px solid rgba(255,255,255,.10);
   opacity:.82;
 }
-
 .logo{
   width:30px;
   height:30px;
@@ -115,6 +208,8 @@ box-sizing:border-box;
   text-align:center;
   letter-spacing:-1px;
   line-height:1;
+  position:relative;
+  z-index:2;
 }
 
 /* ===== TRENDS ===== */
@@ -125,6 +220,8 @@ box-sizing:border-box;
   gap:8px;
   font-size:12px;
   opacity:.98;
+  position:relative;
+  z-index:2;
 }
 .trendChip{
   background: rgba(255,255,255,.12);
@@ -143,6 +240,8 @@ box-sizing:border-box;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
+  position:relative;
+  z-index:2;
 }
 .box{
   background:var(--chip);
@@ -163,6 +262,8 @@ box-sizing:border-box;
   text-align:center;
   opacity:.92;
   line-height:1.35;
+  position:relative;
+  z-index:2;
 }
 #clock{
   font-weight:700;
@@ -194,6 +295,11 @@ box-sizing:border-box;
 <div class="wrapper">
 
   <div class="card" id="card">
+    <!-- FX layers -->
+    <div class="fx fx-clouds" aria-hidden="true"></div>
+    <div class="fx fx-stars" aria-hidden="true"></div>
+    <div class="fx fx-rain" aria-hidden="true"></div>
+    <div class="fx fx-wind" aria-hidden="true"></div>
 
     <div class="header">
       <div class="stationWrap">
@@ -260,13 +366,14 @@ box-sizing:border-box;
   const LON = 2.3188;
 
   // Historial (tendències reals)
-  const STORAGE_KEY = "elmasnou_hist_pro_v1";
+  const STORAGE_KEY = "elmasnou_hist_pro_fx_v1";
   const KEEP_MS = 4 * 60 * 60 * 1000;        // 4h
   const TARGET_TEMP_MS = 60 * 60 * 1000;     // 1h
   const TARGET_PRESS_MS = 3 * 60 * 60 * 1000;// 3h
   const TOL_MS = 12 * 60 * 1000;             // ±12 min
 
   const el = (id) => document.getElementById(id);
+  const card = () => document.getElementById("card");
   const pad2 = (n) => String(n).padStart(2, "0");
   const num = (s) => {
     const x = parseFloat(String(s ?? "").replace(",", "."));
@@ -455,10 +562,9 @@ box-sizing:border-box;
   /* ===== ALERTES + "SENSE ALERTES" ===== */
   function setAlert(tempC, rainRate, gust){
     const badge = el("alertBadge");
-    const card  = el("card");
+    const c  = card();
 
     let text = "";
-    // llindars acordats:
     if (gust != null && gust >= 45) text = "💨 Vent fort";
     else if (rainRate != null && rainRate >= 5) text = "🌧️ Pluja intensa";
     else if (tempC != null && tempC >= 30) text = "🔥 Calor";
@@ -467,12 +573,23 @@ box-sizing:border-box;
     if (text){
       badge.textContent = text;
       badge.classList.remove("ok");
-      card.classList.add("alertActive");
+      c.classList.add("alertActive");
     }else{
       badge.textContent = "✅ Sense alertes";
       badge.classList.add("ok");
-      card.classList.remove("alertActive");
+      c.classList.remove("alertActive");
     }
+  }
+
+  /* ===== OBSERVATORY FX SWITCH ===== */
+  function setFX({ day, rainRate, gust }){
+    const c = card();
+    // night
+    c.classList.toggle("isNight", !day);
+    // rain
+    c.classList.toggle("isRain", rainRate != null && rainRate > 0);
+    // wind (ratxa forta)
+    c.classList.toggle("isWind", gust != null && gust >= 35);
   }
 
   /* ===== LOAD CUMULUS realtime.txt ===== */
@@ -481,10 +598,7 @@ box-sizing:border-box;
     const text = await r.text();
     const d = text.trim().split(/\s+/);
 
-    // format esperat:
-    // 0 date, 1 time, 2 temp, 3 hum, 5 wind, 6 gust, 7 bearing, 8 rainRate, 9 rainToday, 10 pressure
     const nowTs = Date.now();
-
     const timeStr = (d[1] ?? "").substring(0,5);
     const hour = Number.isFinite(parseInt(timeStr.split(":")[0],10)) ? parseInt(timeStr.split(":")[0],10) : null;
 
@@ -504,6 +618,7 @@ box-sizing:border-box;
     el("time").textContent  = timeStr || "--:--";
 
     const day = isDayByHour(hour);
+
     setThemeByTemp(tempC, day);
     el("title").textContent = meteoTitle(rainRate, humNum, gust, day);
     setWindArrow(bearing);
@@ -514,6 +629,9 @@ box-sizing:border-box;
 
     // Alertes
     setAlert(tempC, rainRate, gust);
+
+    // FX (observatori)
+    setFX({ day, rainRate, gust });
   }
 
   // START
