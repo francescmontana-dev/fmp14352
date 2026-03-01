@@ -7,16 +7,13 @@
 <style>
 /* ===== GOOGLE SITES / IFRAME FIX ===== */
 html, body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
+  margin:0; padding:0;
+  width:100%; height:100%;
   background:transparent;
   font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 .wrapper{
-  width:100%;
-  height:100%;
+  width:100%; height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -40,46 +37,47 @@ html, body{
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+
   color:#fff;
   background:linear-gradient(160deg,var(--c1),var(--c2));
   box-shadow:var(--shadow);
   transition: background 650ms ease, box-shadow 650ms ease;
+
   box-sizing:border-box;
   position:relative;
-  overflow:hidden; /* clau per efectes */
+  overflow:hidden;
 }
 
 /* ===== OBSERVATORY FX LAYERS ===== */
 .fx{
   position:absolute;
-  inset:0;
+  inset:-10%;
   pointer-events:none;
-  opacity:0;
-  transition:opacity 800ms ease;
+  z-index:1; /* darrere del contingut (que va a z=2) */
 }
 
-/* Núvols: sempre molt subtil (dia i nit) */
+/* Núvols (ara sí visibles) */
 .fx-clouds{
-  opacity:.32;
-  mix-blend-mode:screen;
+  opacity:.55;
+  filter: blur(10px);
   background:
-    radial-gradient(circle at 10% 30%, rgba(255,255,255,.18) 0 22%, transparent 26%),
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,.15) 0 22%, transparent 26%),
-    radial-gradient(circle at 55% 30%, rgba(255,255,255,.14) 0 24%, transparent 28%),
-    radial-gradient(circle at 80% 28%, rgba(255,255,255,.12) 0 22%, transparent 26%),
-    radial-gradient(circle at 25% 60%, rgba(255,255,255,.10) 0 20%, transparent 24%),
-    radial-gradient(circle at 65% 62%, rgba(255,255,255,.10) 0 22%, transparent 26%);
-  filter: blur(12px);
-  transform: translateX(-20%);
-  animation: cloudsMove 26s linear infinite;
+    radial-gradient(closest-side at 12% 28%, rgba(255,255,255,.28), transparent 70%),
+    radial-gradient(closest-side at 32% 22%, rgba(255,255,255,.22), transparent 72%),
+    radial-gradient(closest-side at 55% 30%, rgba(255,255,255,.22), transparent 72%),
+    radial-gradient(closest-side at 78% 24%, rgba(255,255,255,.20), transparent 72%),
+    radial-gradient(closest-side at 22% 62%, rgba(255,255,255,.18), transparent 72%),
+    radial-gradient(closest-side at 66% 64%, rgba(255,255,255,.18), transparent 72%);
+  transform: translateX(-18%) scale(1.08);
+  animation: cloudsMove 22s linear infinite;
 }
 @keyframes cloudsMove{
-  0%{ transform: translateX(-20%); }
-  100%{ transform: translateX(20%); }
+  0%{ transform: translateX(-18%) scale(1.08); }
+  100%{ transform: translateX(18%) scale(1.08); }
 }
 
-/* Estrelles: només de nit */
+/* Estrelles (només nit) */
 .fx-stars{
+  opacity:0;
   background:
     radial-gradient(circle at 12% 18%, rgba(255,255,255,.9) 0 1px, transparent 2px),
     radial-gradient(circle at 28% 32%, rgba(255,255,255,.7) 0 1px, transparent 2px),
@@ -90,58 +88,35 @@ html, body{
     radial-gradient(circle at 18% 54%, rgba(255,255,255,.6) 0 1px, transparent 2px),
     radial-gradient(circle at 72% 58%, rgba(255,255,255,.7) 0 1px, transparent 2px),
     radial-gradient(circle at 90% 72%, rgba(255,255,255,.6) 0 1px, transparent 2px);
-  opacity:0;
-  animation: twinkle 3.5s ease-in-out infinite;
+  animation: twinkle 3.6s ease-in-out infinite;
 }
 @keyframes twinkle{
-  0%,100%{ opacity:.15; }
-  50%{ opacity:.35; }
+  0%,100%{ opacity:.18; }
+  50%{ opacity:.42; }
 }
 
-/* Pluja: només quan plou */
+/* Pluja (només si plou) */
 .fx-rain{
   opacity:0;
   background:
     repeating-linear-gradient(
       115deg,
-      rgba(255,255,255,.0) 0px,
-      rgba(255,255,255,.0) 8px,
-      rgba(255,255,255,.18) 10px,
-      rgba(255,255,255,.0) 12px
+      rgba(255,255,255,0) 0px,
+      rgba(255,255,255,0) 8px,
+      rgba(255,255,255,.22) 10px,
+      rgba(255,255,255,0) 12px
     );
   transform: translateY(-20%);
-  animation: rainFall 0.9s linear infinite;
+  animation: rainFall 0.85s linear infinite;
 }
 @keyframes rainFall{
   0%{ transform: translateY(-25%); }
   100%{ transform: translateY(25%); }
 }
 
-/* Vent fort: ratlles subtils */
-.fx-wind{
-  opacity:0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,.0) 0px,
-      rgba(255,255,255,.0) 10px,
-      rgba(255,255,255,.12) 12px,
-      rgba(255,255,255,.0) 14px
-    );
-  filter: blur(0.3px);
-  transform: translateX(-15%);
-  animation: windMove 1.6s ease-in-out infinite;
-}
-@keyframes windMove{
-  0%{ transform: translateX(-18%); opacity:.10; }
-  50%{ transform: translateX(18%); opacity:.18; }
-  100%{ transform: translateX(-18%); opacity:.10; }
-}
-
-/* Activacions per classes al card */
-.card.isNight .fx-stars{ opacity:.35; }
-.card.isRain  .fx-rain{ opacity:.45; }
-.card.isWind  .fx-wind{ opacity:.35; }
+/* Activacions */
+.card.isNight .fx-stars{ opacity:.38; }
+.card.isRain  .fx-rain{ opacity:.52; }
 
 /* ===== ALERT PULSE ===== */
 @keyframes alertPulse{
@@ -153,14 +128,15 @@ html, body{
   animation: alertPulse 3s ease-in-out infinite;
 }
 
+/* ===== CONTENT LAYERS ===== */
+.header,.temp,.trends,.grid,.footer{ position:relative; z-index:2; }
+
 /* ===== HEADER ===== */
 .header{
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  position:relative;
-  z-index:2;
 }
 .stationWrap{
   min-width:0;
@@ -192,8 +168,7 @@ html, body{
   opacity:.82;
 }
 .logo{
-  width:30px;
-  height:30px;
+  width:30px; height:30px;
   object-fit:contain;
   background:white;
   border-radius:6px;
@@ -208,8 +183,6 @@ html, body{
   text-align:center;
   letter-spacing:-1px;
   line-height:1;
-  position:relative;
-  z-index:2;
 }
 
 /* ===== TRENDS ===== */
@@ -220,8 +193,6 @@ html, body{
   gap:8px;
   font-size:12px;
   opacity:.98;
-  position:relative;
-  z-index:2;
 }
 .trendChip{
   background: rgba(255,255,255,.12);
@@ -230,18 +201,13 @@ html, body{
   backdrop-filter: blur(6px);
   white-space:nowrap;
 }
-.trArrow{
-  font-weight:900;
-  margin-left:6px;
-}
+.trArrow{ font-weight:900; margin-left:6px; }
 
 /* ===== GRID ===== */
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  position:relative;
-  z-index:2;
 }
 .box{
   background:var(--chip);
@@ -262,17 +228,9 @@ html, body{
   text-align:center;
   opacity:.92;
   line-height:1.35;
-  position:relative;
-  z-index:2;
 }
-#clock{
-  font-weight:700;
-  letter-spacing:1px;
-}
-.sunrow{
-  margin-top:2px;
-  opacity:.95;
-}
+#clock{ font-weight:700; letter-spacing:1px; }
+.sunrow{ margin-top:2px; opacity:.95; }
 
 /* ===== WIND ARROW ===== */
 .windRow{
@@ -299,7 +257,6 @@ html, body{
     <div class="fx fx-clouds" aria-hidden="true"></div>
     <div class="fx fx-stars" aria-hidden="true"></div>
     <div class="fx fx-rain" aria-hidden="true"></div>
-    <div class="fx fx-wind" aria-hidden="true"></div>
 
     <div class="header">
       <div class="stationWrap">
@@ -312,9 +269,7 @@ html, body{
         alt="Logo estació">
     </div>
 
-    <div class="temp">
-      <span id="temp">--</span>°C
-    </div>
+    <div class="temp"><span id="temp">--</span>°C</div>
 
     <div class="trends">
       <div class="trendChip">🌡️ <span id="tTrend">--</span><span class="trArrow" id="tArrow">→</span> <span style="opacity:.85">1h</span></div>
@@ -322,39 +277,24 @@ html, body{
     </div>
 
     <div class="grid">
-      <div class="box">
-        <div id="hum">--</div>
-        <div class="label">Humitat</div>
-      </div>
+      <div class="box"><div id="hum">--</div><div class="label">Humitat</div></div>
 
       <div class="box">
-        <div class="windRow">
-          <span class="arrow" id="wArrow">➤</span>
-          <span id="wind">--</span>
-        </div>
+        <div class="windRow"><span class="arrow" id="wArrow">➤</span><span id="wind">--</span></div>
         <div class="label">Vent</div>
       </div>
 
-      <div class="box">
-        <div id="rain">--</div>
-        <div class="label">Pluja avui</div>
-      </div>
-
-      <div class="box">
-        <div id="press">--</div>
-        <div class="label">Pressió</div>
-      </div>
+      <div class="box"><div id="rain">--</div><div class="label">Pluja avui</div></div>
+      <div class="box"><div id="press">--</div><div class="label">Pressió</div></div>
     </div>
 
     <div class="footer">
-      📅 <span id="date">--</span>
-      &nbsp;•&nbsp; Actualitzat <span id="time">--:--</span>
-      <br>
+      📅 <span id="date">--</span> &nbsp;•&nbsp; Actualitzat <span id="time">--:--</span><br>
       🕒 <span id="clock">--:--:--</span>
       <div class="sunrow">🌅 <span id="sunrise">--:--</span> &nbsp; 🌇 <span id="sunset">--:--</span></div>
     </div>
-
   </div>
+
 </div>
 
 <script>
@@ -366,33 +306,34 @@ html, body{
   const LON = 2.3188;
 
   // Historial (tendències reals)
-  const STORAGE_KEY = "elmasnou_hist_pro_fx_v1";
-  // Fallback si localStorage està bloquejat dins Google Sites
-let memoryHist = [];
-
-function storageOk(){
-  try{
-    const k="__t";
-    localStorage.setItem(k,"1");
-    localStorage.removeItem(k);
-    return true;
-  }catch(e){
-    return false;
-  }
-}
-const CAN_STORE = storageOk();
-  const KEEP_MS = 4 * 60 * 60 * 1000;        // 4h
-  const TARGET_TEMP_MS = 60 * 60 * 1000;     // 1h
-  const TARGET_PRESS_MS = 3 * 60 * 60 * 1000;// 3h
-  const TOL_MS = 12 * 60 * 1000;             // ±12 min
+  const STORAGE_KEY = "elmasnou_hist_final_v1";
+  const KEEP_MS = 4 * 60 * 60 * 1000;         // 4h
+  const TARGET_TEMP_MS = 60 * 60 * 1000;      // 1h
+  const TARGET_PRESS_MS = 3 * 60 * 60 * 1000; // 3h
+  const TOL_MS = 12 * 60 * 1000;              // ±12 min
 
   const el = (id) => document.getElementById(id);
   const card = () => document.getElementById("card");
+
   const pad2 = (n) => String(n).padStart(2, "0");
   const num = (s) => {
     const x = parseFloat(String(s ?? "").replace(",", "."));
     return Number.isFinite(x) ? x : null;
   };
+
+  /* ===== localStorage fallback (Google Sites) ===== */
+  let memoryHist = [];
+  function storageOk(){
+    try{
+      const k="__t";
+      localStorage.setItem(k,"1");
+      localStorage.removeItem(k);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+  const CAN_STORE = storageOk();
 
   /* ===== DATA / RELLOTGE ===== */
   function updateDate(){
@@ -406,7 +347,7 @@ const CAN_STORE = storageOk();
     el("clock").textContent = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
   }
 
-  /* ===== DIA / NIT (per paleta; simple) ===== */
+  /* ===== DIA / NIT (simple) ===== */
   function isDayByHour(hour){
     return Number.isFinite(hour) ? (hour >= 7 && hour < 20) : true;
   }
@@ -436,7 +377,7 @@ const CAN_STORE = storageOk();
     document.documentElement.style.setProperty("--chip", day ? "rgba(255,255,255,.15)" : "rgba(255,255,255,.10)");
   }
 
-  /* ===== ICONA METEO (pluja/boira/vent + sol/lluna) ===== */
+  /* ===== ICONA METEO ===== */
   function meteoTitle(rainRate, hum, gust, day){
     if (rainRate != null && rainRate > 0) return "🌧️ El Masnou NE";
     if (hum != null && hum >= 95 && (gust != null && gust < 5)) return "🌫️ El Masnou NE";
@@ -494,13 +435,11 @@ const CAN_STORE = storageOk();
 
     return { sunrise: calc(true), sunset: calc(false) };
   }
-
   function fmtHM(dateObj){
     if(!dateObj) return "--:--";
     const d = new Date(dateObj);
     return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
   }
-
   function updateSun(){
     const now = new Date();
     const st = sunTimes(now, LAT, LON);
@@ -509,26 +448,19 @@ const CAN_STORE = storageOk();
   }
 
   /* ===== HISTORIAL / TENDÈNCIES REALS ===== */
-    function loadHist(){
-  if(!CAN_STORE) return memoryHist;
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){
-    return [];
+  function loadHist(){
+    if(!CAN_STORE) return memoryHist;
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return [];
+    }
   }
-}
-
-function saveHist(arr){
-  if(!CAN_STORE){
-    memoryHist = arr;
-    return;
-  }
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(e){}
-}function saveHist(arr){
+  function saveHist(arr){
+    if(!CAN_STORE){ memoryHist = arr; return; }
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(e){}
   }
-
   function pushReading(tempC, press, ts){
     if (tempC == null || press == null) return;
     let hist = loadHist();
@@ -537,7 +469,6 @@ function saveHist(arr){
     if(hist.length > 500) hist = hist.slice(hist.length - 500);
     saveHist(hist);
   }
-
   function closestTo(hist, targetTs){
     let best = null;
     let bestDt = Infinity;
@@ -550,20 +481,17 @@ function saveHist(arr){
     }
     return (best && bestDt <= TOL_MS) ? best : null;
   }
-
   function arrowForDelta(delta, thr){
     if (delta == null) return "→";
     if (delta > thr) return "↑";
     if (delta < -thr) return "↓";
     return "→";
   }
-
   function formatDelta(delta, unit){
     if (delta == null) return "--";
     const sign = delta > 0 ? "+" : "";
     return `${sign}${delta.toFixed(1)} ${unit}`;
   }
-
   function updateTrendsReal(nowTs, tempC, press){
     const hist = loadHist();
     const p1h = closestTo(hist, nowTs - TARGET_TEMP_MS);
@@ -577,7 +505,6 @@ function saveHist(arr){
 
     el("tTrend").textContent = formatDelta(dT, "°C");
     el("pTrend").textContent = formatDelta(dP, "hPa");
-
     el("tArrow").textContent = arrowForDelta(dT, THR_T);
     el("pArrow").textContent = arrowForDelta(dP, THR_P);
   }
@@ -604,15 +531,11 @@ function saveHist(arr){
     }
   }
 
-  /* ===== OBSERVATORY FX SWITCH ===== */
-  function setFX({ day, rainRate, gust }){
+  /* ===== FX SWITCH ===== */
+  function setFX({ day, rainRate }){
     const c = card();
-    // night
     c.classList.toggle("isNight", !day);
-    // rain
     c.classList.toggle("isRain", rainRate != null && rainRate > 0);
-    // wind (ratxa forta)
-    c.classList.toggle("isWind", gust != null && gust >= 35);
   }
 
   /* ===== LOAD CUMULUS realtime.txt ===== */
@@ -653,8 +576,8 @@ function saveHist(arr){
     // Alertes
     setAlert(tempC, rainRate, gust);
 
-    // FX (observatori)
-    setFX({ day, rainRate, gust });
+    // FX
+    setFX({ day, rainRate });
   }
 
   // START
