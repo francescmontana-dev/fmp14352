@@ -1,223 +1,289 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ca">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Previsió (OpenWeather)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
-body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
-
-.card {
-  box-sizing:border-box;
-  width:100%;
-  margin:0 auto;
-  padding:8px;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,.12);
-  background:#fff;
+:root{
+  --c1:#0b2d5c;
+  --c2:#1565c0;
+  --chip:rgba(255,255,255,.15);
+  --shadow:0 12px 28px rgba(0,0,0,.28);
 }
 
-.top {
+body{
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:system-ui,Segoe UI,Arial;
+  background:transparent;
+}
+
+.card{
+  width:260px;
+  height:260px;
+  border-radius:22px;
+  background:linear-gradient(160deg,var(--c1),var(--c2));
+  color:white;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:var(--shadow);
+  transition: background 650ms ease, box-shadow 650ms ease;
+}
+
+.header{
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
 }
 
-.title { font-size:16px; font-weight:800; margin:0; }
-.meta { font-size:12px; opacity:.75; }
-.pill { font-size:12px; padding:4px 8px; border-radius:999px; background:rgba(0,0,0,.06); }
+.station{
+  font-weight:750;
+  font-size:15px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 
-.grid { display:grid; gap:6px; }
+.logo{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+  background:white;
+  border-radius:6px;
+  padding:2px;
+  flex:0 0 auto;
+}
 
-/* més columnes = quadrats més petits */
-.grid.days  { grid-template-columns: repeat(6, 1fr); }
-.grid.hours { grid-template-columns: repeat(8, 1fr); margin-top:8px; }
-
-.box {
-  aspect-ratio: 1 / 1;
-  border:1px solid rgba(0,0,0,.10);
-  border-radius:10px;
-  padding:6px;
-  background:rgba(0,0,0,.02);
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  align-items:center;
+.temp{
+  font-size:52px;
+  font-weight:850;
   text-align:center;
+  letter-spacing:-1px;
 }
 
-.k { font-size:12px; font-weight:700; opacity:.8; margin:0; }
-.v { font-size:22px; font-weight:900; margin:2px 0; }
-.small { font-size:13px; font-weight:600; margin:1px 0; opacity:.9; }
-
-.box img { width:42px; height:42px; margin:0; }
-
-.footer { margin-top:8px; font-size:11px; opacity:.65; }
-.err { color:#b00020; font-size:12px; margin-top:8px; }
-
-@media (max-width: 600px) {
-  .grid.days  { grid-template-columns: repeat(3, 1fr); }
-  .grid.hours { grid-template-columns: repeat(3, 1fr); }
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
 }
-/* 🔥 Ajust fi per mòbil */
-@media (max-width: 600px) {
 
-  .grid.days  { grid-template-columns: repeat(2, 1fr); }
-  .grid.hours { grid-template-columns: repeat(2, 1fr); }
-
-  .box {
-    padding:4px;
-  }
-
-  .v {
-    font-size:18px;
-  }
-
-  .small {
-    font-size:11px;
-  }
-
-  .k {
-    font-size:11px;
-  }
-
-  .box img {
-    width:34px;
-    height:34px;
-  }
+.box{
+  background:var(--chip);
+  border-radius:12px;
+  padding:7px 6px;
+  text-align:center;
+  backdrop-filter: blur(6px);
 }
-@media (max-width: 600px) {
-  .grid.days  { grid-template-columns: repeat(2, 1fr); }
-  .grid.hours { grid-template-columns: repeat(2, 1fr); }
+
+.value{ font-weight:800; }
+
+.label{
+  font-size:11px;
+  opacity:.82;
+  margin-top:2px;
 }
-</style>
+
+.footer{
+  font-size:11px;
+  text-align:center;
+  opacity:.86;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  align-items:center;
+}
+
+.dot{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+}
 </style>
 </head>
 
 <body>
-<div class="card">
-  <div class="top">
-    <div>
-      <p class="title">Previsió (OpenWeather)</p>
-      <div class="meta" id="meta">Carregant…</div>
-    </div>
-    <div class="pill" id="pill">—</div>
+
+<div class="card" id="card">
+  <div class="header">
+    <div class="station" id="title">⏳ El Masnou NE</div>
+    <img class="logo"
+      src="https://francescmontana-dev.github.io/fmp14352/LOGO%20A%20TAMA%C3%91O%20WEB.png"
+      alt="Logo estació">
   </div>
 
-  <div class="grid days" id="days"></div>
-  <div class="grid hours" id="hours"></div>
+  <div class="temp">
+    <span id="temp">--</span>°C
+  </div>
+
+  <div class="grid">
+    <div class="box">
+      <div class="value" id="hum">--</div>
+      <div class="label">Humitat</div>
+    </div>
+
+    <div class="box">
+      <div class="value" id="wind">--</div>
+      <div class="label">Vent</div>
+    </div>
+
+    <div class="box">
+      <div class="value" id="rain">--</div>
+      <div class="label">Pluja avui</div>
+    </div>
+
+    <div class="box">
+      <div class="value" id="press">--</div>
+      <div class="label">Pressió</div>
+    </div>
+  </div>
 
   <div class="footer">
-    Dades: OpenWeather · Previsió orientativa (model)
+    <span class="dot"></span>
+    <span>Actualitzat</span>
+    <span id="time">--:--</span>
   </div>
-
-  <div class="err" id="err" style="display:none"></div>
 </div>
 
 <script>
-(function(){
-  const OWM_JSON_URL = "./owm_forecast.json?cb=" + Date.now();
-  const OWM_UPD_URL  = "./owm_forecast_updated_utc.txt?cb=" + Date.now();
+(() => {
+  const realtimeURL = "https://francescmontana-dev.github.io/fmp14352/realtime.txt";
 
-  const $days = document.getElementById("days");
-  const $hours = document.getElementById("hours");
-  const $meta = document.getElementById("meta");
-  const $pill = document.getElementById("pill");
-  const $err = document.getElementById("err");
+  // Coordenades El Masnou (aprox.)
+  const LAT = 41.4798;
+  const LON = 2.3188;
 
-  const caDay = ["dg","dl","dt","dc","dj","dv","ds"];
+  const el = (id) => document.getElementById(id);
+  const num = (s) => {
+    const x = parseFloat(String(s).replace(",", "."));
+    return Number.isFinite(x) ? x : null;
+  };
 
-  function pad2(n){ return (n<10?"0":"")+n; }
-  function fmtTime(d){ return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
-  function fmtDay(d){ return caDay[d.getDay()] + " " + pad2(d.getDate()) + "/" + pad2(d.getMonth()+1); }
-  function kmh(ms){ return Math.round((ms||0)*3.6); }
-  function c(v){ return Math.round(v); }
-  function pop(p){ return Math.round((p||0)*100); }
+  // Càlcul sortida/posta (estil NOAA). Retorna dates UTC que comparen bé amb Date() local.
+  function sunTimes(date, lat, lon) {
+    const rad = Math.PI / 180;
+    const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const start = new Date(day.getFullYear(), 0, 0);
+    const doy = Math.floor((day - start) / 86400000);
+    const lngHour = lon / 15;
 
-  function iconUrl(code){
-    return "https://openweathermap.org/img/wn/" + code + "@2x.png";
-  }
+    function calc(isSunrise) {
+      const t = doy + ((isSunrise ? 6 : 18) - lngHour) / 24;
+      const M = (0.9856 * t) - 3.289;
 
-  function groupByDate(list){
-    const by = new Map();
-    for (const p of list) {
-      const d = new Date(p.dt*1000);
-      const key = d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
-      const tmin = p.main.temp_min;
-      const tmax = p.main.temp_max;
-      const pr = p.pop ?? 0;
-      const w  = p.wind?.speed ?? 0;
-      const ico = p.weather?.[0]?.icon || "";
+      let L = M + (1.916 * Math.sin(M * rad)) + (0.020 * Math.sin(2 * M * rad)) + 282.634;
+      L = (L + 360) % 360;
 
-      if (!by.has(key)) by.set(key, {
-        d: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12,0,0),
-        tmin, tmax, popMax: pr, windMax: w, icon: ico
-      });
+      let RA = Math.atan(0.91764 * Math.tan(L * rad)) / rad;
+      RA = (RA + 360) % 360;
 
-      const o = by.get(key);
-      o.tmin = Math.min(o.tmin, tmin);
-      o.tmax = Math.max(o.tmax, tmax);
-      o.popMax = Math.max(o.popMax, pr);
-      o.windMax = Math.max(o.windMax, w);
-      if (!o.icon && ico) o.icon = ico;
+      const Lq  = Math.floor(L / 90) * 90;
+      const RAq = Math.floor(RA / 90) * 90;
+      RA = (RA + (Lq - RAq)) / 15;
+
+      const sinDec = 0.39782 * Math.sin(L * rad);
+      const cosDec = Math.cos(Math.asin(sinDec));
+
+      const zenith = 90.833;
+      const cosH = (Math.cos(zenith * rad) - (sinDec * Math.sin(lat * rad))) / (cosDec * Math.cos(lat * rad));
+      if (cosH > 1 || cosH < -1) return null;
+
+      let H = isSunrise ? (360 - (Math.acos(cosH) / rad)) : (Math.acos(cosH) / rad);
+      H = H / 15;
+
+      const T = H + RA - (0.06571 * t) - 6.622;
+
+      let UT = (T - lngHour) % 24;
+      if (UT < 0) UT += 24;
+
+      const utc = new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate(), 0, 0, 0));
+      utc.setUTCHours(Math.floor(UT), Math.floor((UT % 1) * 60), 0, 0);
+      return utc;
     }
-    return Array.from(by.values());
+
+    return { sunrise: calc(true), sunset: calc(false) };
   }
 
-  async function load(){
-    try{
-      const [rJ, rU] = await Promise.all([
-        fetch(OWM_JSON_URL, { cache:"no-store" }),
-        fetch(OWM_UPD_URL,  { cache:"no-store" })
-      ]);
-      if (!rJ.ok) throw new Error("No puc llegir owm_forecast.json.");
+  function isDayNow(now) {
+    const st = sunTimes(now, LAT, LON);
+    if (!st.sunrise || !st.sunset) {
+      const h = now.getHours();
+      return h >= 7 && h < 20;
+    }
+    return now >= st.sunrise && now < st.sunset;
+  }
 
-      const data = await rJ.json();
-      const upd = rU.ok ? (await rU.text()).trim() : "";
-
-      const city = data.city?.name || "";
-      const country = data.city?.country || "";
-      $pill.textContent = city ? (country ? (city + " · " + country) : city) : "Model";
-      $meta.textContent = upd ? ("Actualitzat (UTC): " + upd) : "Actualitzat recentment";
-
-      const days = groupByDate(data.list || []).slice(0, 5);
-      $days.innerHTML = days.map(o => `
-        <div class="box">
-          <div class="k">${fmtDay(o.d)}</div>
-          ${o.icon ? `<img src="${iconUrl(o.icon)}" />` : ""}
-          <div class="v">${c(o.tmax)}°</div>
-          <div class="small">mín ${c(o.tmin)}°</div>
-          <div class="small">pluja ${pop(o.popMax)}%</div>
-        </div>
-      `).join("");
-
-      const hrs = (data.list || []).slice(0, 6);
-      $hours.innerHTML = hrs.map(p => {
-        const d = new Date(p.dt*1000);
-        return `
-          <div class="box">
-            <div class="k">${fmtTime(d)}</div>
-            ${p.weather?.[0]?.icon ? `<img src="${iconUrl(p.weather[0].icon)}" />` : ""}
-            <div class="v">${c(p.main.temp)}°</div>
-            <div class="small">pluja ${pop(p.pop)}%</div>
-            <div class="small">vent ${kmh(p.wind?.speed)} km/h</div>
-<div class="small">hum ${p.main.humidity}%</div>
-          </div>`;
-      }).join("");
-
-    } catch(e){
-      $err.style.display = "block";
-      $err.textContent = "No s’ha pogut carregar la previsió.";
-      $meta.textContent = "Sense dades";
+  function setTheme(day) {
+    if (day) {
+      document.documentElement.style.setProperty("--c1", "#0b2d5c");
+      document.documentElement.style.setProperty("--c2", "#1565c0");
+      document.documentElement.style.setProperty("--chip", "rgba(255,255,255,.15)");
+      document.documentElement.style.setProperty("--shadow", "0 12px 28px rgba(0,0,0,.28)");
+    } else {
+      document.documentElement.style.setProperty("--c1", "#050716");
+      document.documentElement.style.setProperty("--c2", "#2b2a6f");
+      document.documentElement.style.setProperty("--chip", "rgba(255,255,255,.10)");
+      document.documentElement.style.setProperty("--shadow", "0 14px 34px rgba(0,0,0,.38)");
     }
   }
 
-  load();
+  // Icona segons condicions (simple i efectiva)
+  function pickIcon({ day, rainRate, hum, wind, gust }) {
+    if (rainRate != null && rainRate > 0) return "🌧️";
+    if (hum != null && hum >= 95 && (wind != null && wind <= 5)) return "🌫️";
+    if (gust != null && gust >= 35) return "💨";
+    return day ? "☀️" : "🌙";
+  }
+
+  async function load() {
+    const r = await fetch(realtimeURL + "?t=" + Date.now(), { cache: "no-store" });
+    const text = (await r.text()).trim();
+    const d = text.split(/\s+/);
+
+    // 0 date, 1 time, 2 temp, 3 hum, 4 dew, 5 wind, 6 gust, 7 bearing, 8 rainRate, 9 rainToday, 10 pressure, 11 winddir
+    const timeStr = d[1] ? d[1].substring(0,5) : "--:--";
+    const temp = d[2] ?? "--";
+    const hum  = d[3] ?? "--";
+    const wind = d[5] ?? "--";
+    const gust = d[6] ?? "--";
+    const rainRate = num(d[8]);
+    const rainToday = d[9] ?? "--";
+    const press = d[10] ?? "--";
+    const wdir = d[11] ? ` ${d[11]}` : "";
+
+    el("temp").textContent = temp;
+    el("hum").textContent  = hum + " %";
+    el("wind").textContent = `${wind} km/h (ratxa ${gust})${wdir}`;
+    el("rain").textContent = rainToday + " mm";
+    el("press").textContent= press + " hPa";
+    el("time").textContent = timeStr;
+
+    const now = new Date();
+    const day = isDayNow(now);
+    setTheme(day);
+
+    const icon = pickIcon({
+      day,
+      rainRate,
+      hum: num(hum),
+      wind: num(wind),
+      gust: num(gust)
+    });
+
+    el("title").textContent = `${icon} El Masnou NE`;
+  }
+
+  load().catch(()=>{});
+  setInterval(() => load().catch(()=>{}), 30000);
 })();
 </script>
+
 </body>
 </html>
