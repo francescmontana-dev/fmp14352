@@ -32,18 +32,23 @@ html, body{
 
 /* ===== CARD ===== */
 .card{
-  width:260px;
-  height:260px;
-  border-radius:22px;
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  color:#fff;
-  background:linear-gradient(160deg,var(--c1),var(--c2));
-  box-shadow:var(--shadow);
-  transition: background 650ms ease, box-shadow 650ms ease;
-  box-sizing:border-box;
+
+/* AUTO SIZE */
+width:min(92vw,420px);
+aspect-ratio:1 / 1;
+
+border-radius:22px;
+padding:14px;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+
+color:white;
+background:linear-gradient(160deg,var(--c1),var(--c2));
+
+box-shadow:var(--shadow);
+transition: background 650ms ease, box-shadow 650ms ease;
+box-sizing:border-box;
 }
 
 /* ===== ALERT PULSE ===== */
