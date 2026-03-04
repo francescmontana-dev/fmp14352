@@ -252,29 +252,84 @@
   }
 
   /********** TAULA 24h **********/
-  function renderTable24(forecast){
-    const hourly = Array.isArray(forecast?.hourly) ? forecast.hourly : [];
-    const h24 = hourly.slice(0, 24);
+  function dayKey_(iso){
+  const d = new Date(iso);
+  // clau YYYY-MM-DD en hora local
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const da = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${da}`;
+}
 
-    const tbody = document.getElementById("tbody24");
-    if(!h24.length){
-      tbody.innerHTML = `<tr><td colspan="7">Sense dades</td></tr>`;
-      return;
+function dayLabel_(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString("ca-ES", { weekday:"long", day:"2-digit", month:"short" });
+}
+
+function renderTable24(forecast){
+  const hourly = Array.isArray(forecast?.hourly) ? forecast.hourly : [];
+  const h = hourly.slice(0, 48); // fem 48h per veure mínims/màxims amb sentit (2 dies)
+
+  const tbody = document.getElementById("tbody24");
+  if(!h.length){
+    tbody.innerHTML = `<tr><td colspan="7">Sense dades</td></tr>`;
+    return;
+  }
+
+  document.getElementById("tableNote").textContent = `primeres ${h.length} h (separat per dies)`;
+
+  // Agrupem per dia
+  const groups = new Map();
+  for(const p of h){
+    const k = dayKey_(p.t);
+    if(!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(p);
+  }
+
+  let html = "";
+
+  for(const [k, arr] of groups.entries()){
+    // Calculs diaris
+    let tmin = null, tmax = null, rainSum = 0;
+
+    for(const p of arr){
+      if(typeof p.temp === "number"){
+        tmin = (tmin === null) ? p.temp : Math.min(tmin, p.temp);
+        tmax = (tmax === null) ? p.temp : Math.max(tmax, p.temp);
+      }
+      if(typeof p.rain_mm === "number") rainSum += p.rain_mm;
     }
 
-    document.getElementById("tableNote").textContent = `de ${hhmm(h24[0].t)} a ${hhmm(h24[h24.length-1].t)}`;
+    // Fila capçalera del dia
+    html += `
+      <tr>
+        <td colspan="7" style="
+          text-align:left;
+          font-weight:950;
+          background:rgba(255,255,255,.08);
+          border-bottom:1px solid rgba(255,255,255,.12);
+        ">
+          📅 ${dayLabel_(arr[0].t)} · Tmin ${fmt1(tmin)}° / Tmax ${fmt1(tmax)}° · 🌧️ ${fmt1(rainSum)} mm
+        </td>
+      </tr>
+    `;
 
-    tbody.innerHTML = h24.map(p => {
+    // Files horàries del dia
+    html += arr.map(p => {
       const w = (p.wind_kmh == null) ? "—" : `${Math.round(p.wind_kmh)} km/h`;
       const r = (p.rain_mm == null) ? 0 : p.rain_mm;
       const rh = (p.rh == null) ? "—" : `${Math.round(p.rh)}%`;
       const t = (p.temp == null) ? "—" : `${fmt1(p.temp)}°`;
+
+      // micro-estil: pluja destacada
+      const rainStyle = (r >= 0.2) ? "font-weight:950;" : "opacity:.9;";
+
       return `
         <tr>
           <td class="wx">${wxIcon(p.symbol)}</td>
           <td>${hhmm(p.t)}</td>
           <td>${t}</td>
-          <td>${fmt1(r)}</td>
+          <td style="${rainStyle}">${fmt1(r)}</td>
           <td>${w}</td>
           <td>${windArrow(p.wdir_deg)}</td>
           <td>${rh}</td>
@@ -282,6 +337,9 @@
       `;
     }).join("");
   }
+
+  tbody.innerHTML = html;
+}
 
   /********** GRÀFIQUES **********/
   let chartTemp, chartRainWind, chartRH;
