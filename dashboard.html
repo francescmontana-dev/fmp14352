@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tauler Meteo — El Masnou NE</title>
+  <title>Tauler Meteo — El Masnou</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -13,7 +13,7 @@
       --card:#111827;
       --muted:#94a3b8;
       --text:#e5e7eb;
-      --accent:#60a5fa;
+      --grid:rgba(255,255,255,.06);
     }
     *{box-sizing:border-box;}
     body{
@@ -46,6 +46,19 @@
       letter-spacing:.2px;
     }
     .meta{font-size:12px;color:var(--muted);line-height:1.3;}
+
+    .alert{
+      margin-top:8px;
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(96,165,250,.18);
+      border:1px solid rgba(96,165,250,.35);
+      font-weight:900;
+      font-size:12px;
+      width:fit-content;
+    }
+
     .kpis{
       flex:2 1 520px;
       display:grid;
@@ -62,17 +75,6 @@
     .kpi .k{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:800;}
     .kpi .v{font-size:18px;font-weight:950;line-height:1.1;}
     .kpi .s{font-size:11px;color:var(--muted);margin-top:4px;}
-
-    .alert{
-      margin-top:8px;
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(96,165,250,.18);
-      border:1px solid rgba(96,165,250,.35);
-      font-weight:900;
-      font-size:12px;
-    }
 
     .grid{
       display:grid;
@@ -105,6 +107,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
@@ -115,10 +118,29 @@
       </div>
 
       <div class="card kpis" aria-label="Dades actuals">
-        <div class="kpi"><div class="k">Temperatura (OBS)</div><div class="v" id="kTemp">—</div><div class="s" id="kDeltaT">Δ —</div></div>
-        <div class="kpi"><div class="k">Humitat (OBS)</div><div class="v" id="kRH">—</div><div class="s" id="kDeltaRH">Δ —</div></div>
-        <div class="kpi"><div class="k">Vent (OBS)</div><div class="v" id="kWind">—</div><div class="s" id="kGust">Ratxa —</div></div>
-        <div class="kpi"><div class="k">Pluja</div><div class="v" id="kRain">—</div><div class="s" id="kRainSoon">3h —</div></div>
+        <div class="kpi">
+          <div class="k">Temperatura (OBS)</div>
+          <div class="v" id="kTemp">—</div>
+          <div class="s" id="kDeltaT">Δ —</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Humitat (OBS)</div>
+          <div class="v" id="kRH">—</div>
+          <div class="s" id="kDeltaRH">Δ —</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Vent (OBS)</div>
+          <div class="v" id="kWind">—</div>
+          <div class="s" id="kGust">Ratxa —</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Pluja</div>
+          <div class="v" id="kRain">—</div>
+          <div class="s" id="kRainSoon">3h —</div>
+        </div>
       </div>
     </div>
 
@@ -150,24 +172,29 @@
   </div>
 
 <script>
+  /********************* CONFIG *********************/
   // 🔴 POSA AQUÍ LA TEVA URL BASE (acaba amb /exec)
-  const DATA_BASE = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/execPOSA_AQUI_LA_TEU_URL_EXEC";
+  const DATA_BASE = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
 
-  const END_CURRENT  = `${DATA_BASE}?out=current`;
-  const END_FORECAST = `${DATA_BASE}?out=forecast`;
+  const END_CURRENT  = `${DATA_BASE}?out=current&callback=cbCurrent`;
+  const END_FORECAST = `${DATA_BASE}?out=forecast&callback=cbForecast`;
 
+  /********************* FORMATS *********************/
   const fmt1 = (x) => (x === null || x === undefined || Number.isNaN(x)) ? "—" : (Math.round(x*10)/10).toFixed(1);
   const fmt0 = (x) => (x === null || x === undefined || Number.isNaN(x)) ? "—" : String(Math.round(x));
 
   function hhmm(iso){
+    if(!iso) return "—";
     const d = new Date(iso);
     return d.toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"});
   }
   function ddhh(iso){
+    if(!iso) return "—";
     const d = new Date(iso);
     return d.toLocaleString("ca-ES",{weekday:"short", hour:"2-digit", minute:"2-digit"});
   }
 
+  /********************* SITUACIÓ *********************/
   function situacioText(current){
     const rain3 = current?.derived?.rain_3h_mm ?? 0;
     const gust = current?.obs?.gust_kmh;
@@ -179,34 +206,63 @@
     return "☀️ Situació estable al Masnou";
   }
 
-  async function loadData(){
-    const [cRes, fRes] = await Promise.all([
-      fetch(END_CURRENT, {cache:"no-store"}),
-      fetch(END_FORECAST, {cache:"no-store"})
-    ]);
-
-    if(!cRes.ok) throw new Error("Error current: " + cRes.status);
-    if(!fRes.ok) throw new Error("Error forecast: " + fRes.status);
-
-    const current = await cRes.json();
-    const forecast = await fRes.json();
-
-    renderKPIs(current);
-    renderCharts(forecast);
-
-    const updated = current?.source?.forecast_updated_at || forecast?.updated_at || "";
-    document.getElementById("metaLine").textContent =
-      `Actualitzat: ${new Date().toLocaleString("ca-ES")} · Met.no: ${updated}`;
-    document.getElementById("situation").textContent = situacioText(current);
+  /********************* JSONP LOADER *********************/
+  function loadJSONP(url) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = url + "&_=" + Date.now();
+      s.async = true;
+      s.onload = () => resolve(true);
+      s.onerror = () => reject(new Error("JSONP error"));
+      document.body.appendChild(s);
+    });
   }
 
-  function renderKPIs(current){
-    const obs = current.obs || {};
-    const prev = current.prev_now || {};
+  let _current = null;
+  let _forecast = null;
+
+  // callbacks globals (necessaris per JSONP)
+  window.cbCurrent = (data) => {
+    _current = data;
+    maybeRender_();
+  };
+
+  window.cbForecast = (data) => {
+    _forecast = data;
+    maybeRender_();
+  };
+
+  function maybeRender_(){
+    if(!_current || !_forecast) return;
+
+    renderKPIs_(_current);
+    renderCharts_(_forecast);
+
+    const updated = _current?.source?.forecast_updated_at || _forecast?.updated_at || "";
+    document.getElementById("metaLine").textContent =
+      `Actualitzat: ${new Date().toLocaleString("ca-ES")} · Met.no: ${updated}`;
+
+    document.getElementById("situation").textContent = situacioText(_current);
+  }
+
+  function loadData_(){
+    Promise.all([
+      loadJSONP(END_CURRENT),
+      loadJSONP(END_FORECAST)
+    ]).catch(err => {
+      document.getElementById("metaLine").textContent = "Error carregant dades.";
+      document.getElementById("situation").textContent = "❌ No s'han pogut carregar les dades";
+      console.error(err);
+    });
+  }
+
+  /********************* KPIs *********************/
+  function renderKPIs_(current){
+    const obs = current?.obs || {};
+    const prev = current?.prev_now || {};
 
     const dT  = (obs.temp !== null && prev.temp !== null) ? (obs.temp - prev.temp) : null;
     const dRH = (obs.rh !== null && prev.rh !== null) ? (obs.rh - prev.rh) : null;
-    const dW  = (obs.wind_kmh !== null && prev.wind_kmh !== null) ? (obs.wind_kmh - prev.wind_kmh) : null;
 
     document.getElementById("kTemp").textContent = `${fmt1(obs.temp)}°C`;
     document.getElementById("kRH").textContent   = `${fmt0(obs.rh)}%`;
@@ -217,21 +273,26 @@
 
     document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
     document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
-    // si quieres mostrar Δ viento:
-    // document.getElementById("kDeltaW").textContent = ...
   }
 
-  function slice48h(hourly){
+  /********************* CHARTS *********************/
+  function slice48h_(hourly){
     const max = Math.min(hourly.length, 48);
     return hourly.slice(0, max);
   }
 
   let chartTemp, chartRainWind, chartRH;
 
-  function renderCharts(forecast){
-    const hourly = Array.isArray(forecast.hourly) ? forecast.hourly : [];
-    const h48 = slice48h(hourly);
+  function renderCharts_(forecast){
+    const hourly = Array.isArray(forecast?.hourly) ? forecast.hourly : [];
+    if(!hourly.length){
+      document.getElementById("tNote").textContent = "sense dades";
+      document.getElementById("rwNote").textContent = "sense dades";
+      document.getElementById("rhNote").textContent = "sense dades";
+      return;
+    }
 
+    const h48 = slice48h_(hourly);
     const labels = h48.map(p => ddhh(p.t));
     const temp = h48.map(p => p.temp);
     const rain = h48.map(p => p.rain_mm);
@@ -242,7 +303,6 @@
     document.getElementById("rwNote").textContent = `48 h · mm/h i km/h`;
     document.getElementById("rhNote").textContent = `48 h`;
 
-    // Destruir si ya existe (por si recargas)
     if(chartTemp) chartTemp.destroy();
     if(chartRainWind) chartRainWind.destroy();
     if(chartRH) chartRH.destroy();
@@ -283,11 +343,7 @@
           }
         ]
       },
-      options: commonOpts_({
-        yTitle:"mm/h",
-        y2Title:"km/h",
-        dualAxis:true
-      })
+      options: commonOpts_({yTitle:"mm/h", y2Title:"km/h", dualAxis:true})
     });
 
     chartRH = new Chart(document.getElementById("cRH"), {
@@ -309,20 +365,21 @@
   function commonOpts_({yTitle, y2Title, dualAxis=false}){
     const scales = {
       x: {
-        ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 },
+        ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12, color: "rgba(229,231,235,.72)" },
         grid: { color: "rgba(255,255,255,.06)" }
       },
       y: {
         title: { display: !!yTitle, text: yTitle, color: "rgba(229,231,235,.85)", font:{weight:"800"} },
-        ticks: { color: "rgba(229,231,235,.75)" },
+        ticks: { color: "rgba(229,231,235,.72)" },
         grid: { color: "rgba(255,255,255,.06)" }
       }
     };
+
     if(dualAxis){
       scales.y2 = {
         position: "right",
         title: { display: !!y2Title, text: y2Title, color: "rgba(229,231,235,.85)", font:{weight:"800"} },
-        ticks: { color: "rgba(229,231,235,.75)" },
+        ticks: { color: "rgba(229,231,235,.72)" },
         grid: { drawOnChartArea:false }
       };
     }
@@ -339,11 +396,8 @@
     };
   }
 
-  loadData().catch(err => {
-    document.getElementById("metaLine").textContent = "Error carregant dades.";
-    document.getElementById("situation").textContent = "❌ No s'han pogut carregar les dades";
-    console.error(err);
-  });
+  /********************* START *********************/
+  loadData_();
 </script>
 </body>
 </html>
