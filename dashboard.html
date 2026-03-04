@@ -1,171 +1,80 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Tauler Meteo Masnou</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body{
-font-family:Arial,Helvetica,sans-serif;
-background:#0f172a;
-color:white;
-margin:0;
-padding:10px;
-}
-
-.container{
-max-width:900px;
-margin:auto;
-}
-
-.card{
-background:#1e293b;
-padding:15px;
-border-radius:12px;
-margin-bottom:10px;
-}
-
-h1{
-margin:0 0 10px 0;
-font-size:20px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:8px;
-}
-
-.kpi{
-background:#334155;
-padding:10px;
-border-radius:10px;
-text-align:center;
-}
-
-.kpi-title{
-font-size:12px;
-opacity:0.8;
-}
-
-.kpi-value{
-font-size:20px;
-font-weight:bold;
-}
-
-canvas{
-background:#1e293b;
-border-radius:12px;
-padding:10px;
-}
-</style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tauler Meteo — El Masnou</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body{margin:0;padding:12px;font-family:system-ui;background:#0f172a;color:#fff}
+    .card{background:#1e293b;border-radius:14px;padding:12px;margin-bottom:10px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .kpi{background:#334155;border-radius:12px;padding:10px;text-align:center}
+    .t{font-size:12px;opacity:.8;font-weight:800}
+    .v{font-size:18px;font-weight:950;margin-top:4px}
+    @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+    canvas{width:100%;max-height:280px}
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <div style="font-weight:950;font-size:18px">🌦️ El Masnou - NE</div>
+    <div id="status" style="opacity:.8;margin-top:4px">Carregant dades…</div>
+  </div>
 
-<div class="container">
+  <div class="card grid">
+    <div class="kpi"><div class="t">Temperatura</div><div class="v" id="temp">—</div></div>
+    <div class="kpi"><div class="t">Humitat</div><div class="v" id="hum">—</div></div>
+    <div class="kpi"><div class="t">Vent</div><div class="v" id="wind">—</div></div>
+    <div class="kpi"><div class="t">Pluja avui</div><div class="v" id="rain">—</div></div>
+  </div>
 
-<div class="card">
-<h1>🌦️ El Masnou - NE</h1>
-<div id="status">Carregant dades...</div>
-</div>
-
-<div class="card grid">
-
-<div class="kpi">
-<div class="kpi-title">Temperatura</div>
-<div class="kpi-value" id="temp">--</div>
-</div>
-
-<div class="kpi">
-<div class="kpi-title">Humitat</div>
-<div class="kpi-value" id="hum">--</div>
-</div>
-
-<div class="kpi">
-<div class="kpi-title">Vent</div>
-<div class="kpi-value" id="wind">--</div>
-</div>
-
-<div class="kpi">
-<div class="kpi-title">Pluja avui</div>
-<div class="kpi-value" id="rain">--</div>
-</div>
-
-</div>
-
-<div class="card">
-<canvas id="tempChart"></canvas>
-</div>
-
-</div>
+  <div class="card">
+    <canvas id="tempChart"></canvas>
+  </div>
 
 <script>
+  const DATA_BASE = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
 
-const DATA_BASE="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec"
+  function loadJSONP(url){
+    const s = document.createElement("script");
+    s.src = url + "&_=" + Date.now();
+    s.async = true;
+    document.body.appendChild(s);
+  }
 
-function loadJSONP(url){
-const s=document.createElement("script")
-s.src=url+"&_="+Date.now()
-document.body.appendChild(s)
-}
+  let _forecastDone = false;
 
-function cbCurrent(data){
+  window.cbCurrent = (data) => {
+    const obs = data.obs || {};
+    document.getElementById("temp").textContent = (obs.temp ?? "—") + "°C";
+    document.getElementById("hum").textContent  = (obs.rh ?? "—") + "%";
+    document.getElementById("wind").textContent = (obs.wind_kmh == null ? "—" : Math.round(obs.wind_kmh)) + " km/h";
+    document.getElementById("rain").textContent = (obs.rain_day_mm ?? "—") + " mm";
+    document.getElementById("status").textContent = _forecastDone ? "Dades actualitzades ✅" : "Dades actuals OK… (esperant previsió)";
+  };
 
-const obs=data.obs
+  window.cbForecast = (data) => {
+    const h = (data.hourly || []).slice(0, 24);
+    const labels = h.map(p => {
+      const d = new Date(p.t);
+      return d.toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"});
+    });
+    const temps = h.map(p => p.temp);
 
-document.getElementById("temp").textContent=obs.temp+"°C"
-document.getElementById("hum").textContent=obs.rh+"%"
-document.getElementById("wind").textContent=Math.round(obs.wind_kmh)+" km/h"
-document.getElementById("rain").textContent=obs.rain_day_mm+" mm"
+    new Chart(document.getElementById("tempChart"), {
+      type: "line",
+      data: { labels, datasets: [{ label: "Temperatura (°C)", data: temps, borderWidth: 2, tension: 0.3, pointRadius: 0 }] },
+      options: { responsive:true, plugins:{ legend:{ labels:{ color:"#fff" } } }, scales:{ x:{ ticks:{ color:"#fff"}}, y:{ ticks:{ color:"#fff"}} } }
+    });
 
-document.getElementById("status").textContent="Dades actualitzades"
+    _forecastDone = true;
+    const st = document.getElementById("status");
+    st.textContent = st.textContent.includes("esperant") ? "Dades actualitzades ✅" : "Previsió OK ✅";
+  };
 
-}
-
-function cbForecast(data){
-
-const hours=data.hourly.slice(0,24)
-
-const labels=hours.map(h=>new Date(h.t).getHours()+":00")
-const temps=hours.map(h=>h.temp)
-
-new Chart(document.getElementById("tempChart"),{
-
-type:"line",
-
-data:{
-labels:labels,
-datasets:[{
-label:"Temperatura °C",
-data:temps,
-borderWidth:2,
-tension:0.3
-}]
-},
-
-options:{
-responsive:true,
-plugins:{legend:{labels:{color:"white"}}},
-scales:{
-x:{ticks:{color:"white"}},
-y:{ticks:{color:"white"}}
-}
-}
-
-})
-
-}
-
-loadJSONP(DATA_BASE+"?out=current&callback=cbCurrent")
-loadJSONP(DATA_BASE+"?out=forecast&callback=cbForecast")
-
+  loadJSONP(DATA_BASE + "?out=current&callback=cbCurrent");
+  loadJSONP(DATA_BASE + "?out=forecast&callback=cbForecast");
 </script>
-
 </body>
 </html>
