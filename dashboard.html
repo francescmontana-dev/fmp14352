@@ -268,7 +268,7 @@ function dayLabel_(iso){
 
 function renderTable24(forecast){
   const hourly = Array.isArray(forecast?.hourly) ? forecast.hourly : [];
-  const h = hourly.slice(0, 48); // fem 48h per veure mínims/màxims amb sentit (2 dies)
+  const h = hourly.slice(0, 72); // fem 48h per veure mínims/màxims amb sentit (2 dies)
 
   const tbody = document.getElementById("tbody24");
   if(!h.length){
@@ -307,7 +307,7 @@ function renderTable24(forecast){
           text-align:left;
           font-weight:950;
           background:rgba(255,255,255,.08);
-          border-bottom:1px solid rgba(255,255,255,.12);
+          border-top:4px solid rgba(255,255,255,.18); border-bottom:2px solid rgba(255,255,255,.14);
         ">
           📅 ${dayLabel_(arr[0].t)} · Tmin ${fmt1(tmin)}° / Tmax ${fmt1(tmax)}° · 🌧️ ${fmt1(rainSum)} mm
         </td>
