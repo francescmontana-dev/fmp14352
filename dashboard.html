@@ -207,7 +207,8 @@ function dirArrow_(deg){
   if (d >= 202.5 && d < 247.5)  return "↙";
   if (d >= 247.5 && d < 292.5)  return "←";
   return "↖";
-}function dirText8_(deg){
+}
+  function dirText8_(deg){
   if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
   const d = ((deg % 360) + 360) % 360;
   const dirs = ["N","NE","E","SE","S","SO","O","NO"];
@@ -226,7 +227,6 @@ function dirArrow_(deg){
   if (d >= 247.5 && d < 292.5)  return "←";
   return "↖";
 }
-  }
 
   /********** KPIs **********/
   function renderKPIs(current){
