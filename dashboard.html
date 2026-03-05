@@ -312,8 +312,23 @@
 
   window.cbForecast = (data) => {
     gotForecast = true;
-    const first = (data?.hourly || [])[0] || {};
-forecastIcon = iconFromSymbol_(first.symbol || first.symbol_code);
+    const arr = (data?.hourly || []);
+const now = Date.now();
+
+let best = arr[0] || {};
+let bestDiff = Infinity;
+
+for (const p of arr){
+  const t = p?.t ? new Date(p.t).getTime() : NaN;
+  if (!Number.isFinite(t)) continue;
+  const diff = Math.abs(t - now);
+  if (diff < bestDiff){
+    bestDiff = diff;
+    best = p;
+  }
+}
+
+forecastIcon = iconFromSymbol_(best.symbol || best.symbol_code);
     renderCharts48(data);
     updateStatus();
   };
