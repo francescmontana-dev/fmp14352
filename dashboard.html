@@ -179,6 +179,7 @@
   }
 
   let gotCurrent = false, gotForecast = false;
+  let forecastIcon = "🌤️";
 
   function updateStatus(){
     const pill = document.getElementById("statusPill");
@@ -205,12 +206,26 @@
     document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
     document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
 
-    let icon = "🌤️";
-    if ((current?.derived?.rain_3h_mm ?? 0) >= 0.2) icon = "🌧️";
-    if ((obs.wind_kmh ?? 0) >= 30) icon = "💨";
+    let icon = forecastIcon || "🌤️";
 
     const dirTxt = dirText8_(obs.wdir_deg);
     const dirArr = dirArrow_(obs.wdir_deg);
+    function iconFromSymbol_(symbol){
+  const s = String(symbol || "").toLowerCase();
+
+  if (!s) return "🌤️";
+  if (s.includes("thunder")) return "⛈️";
+  if (s.includes("snow")) return "❄️";
+  if (s.includes("sleet")) return "🌨️";
+  if (s.includes("fog")) return "🌫️";
+  if (s.includes("rain")) return "🌧️";
+  if (s.includes("showers")) return "🌦️";
+  if (s.includes("cloudy")) return "☁️";
+  if (s.includes("partly")) return "🌤️";
+  if (s.includes("clearsky") || s.includes("clear")) return "☀️";
+
+  return "🌤️";
+}
 
     document.getElementById("currentBig").innerHTML =
       icon + " <span style='font-size:20px;font-weight:900;'>" + fmt1(obs.temp) + "°C</span><br>" +
@@ -297,6 +312,8 @@
 
   window.cbForecast = (data) => {
     gotForecast = true;
+    const first = (data?.hourly || [])[0] || {};
+forecastIcon = iconFromSymbol_(first.symbol || first.symbol_code);
     renderCharts48(data);
     updateStatus();
   };
