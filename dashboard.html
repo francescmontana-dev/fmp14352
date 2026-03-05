@@ -171,7 +171,25 @@
     if(gotCurrent && gotForecast) pill.textContent = "✅ Gràfiques actualitzades";
     else if(gotCurrent && !gotForecast) pill.textContent = "⏳ Dades actuals OK… (esperant previsió)";
     else if(!gotCurrent && gotForecast) pill.textContent = "⏳ Previsió OK… (esperant dades actuals)";
-    else pill.textContent = "⏳ Preparant gràfiques…";
+    else pill.textContent = "⏳ Preparant gràfiques…";function dirText8_(deg){
+  if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
+  const d = ((deg % 360) + 360) % 360;
+  const dirs = ["N","NE","E","SE","S","SO","O","NO"];
+  const idx = Math.round(d / 45) % 8;
+  return dirs[idx];
+}
+function dirArrow_(deg){
+  if(deg === null || deg === undefined || Number.isNaN(deg)) return "";
+  const d = ((deg % 360) + 360) % 360;
+  if (d >= 337.5 || d < 22.5)   return "↑";
+  if (d >= 22.5  && d < 67.5)   return "↗";
+  if (d >= 67.5  && d < 112.5)  return "→";
+  if (d >= 112.5 && d < 157.5)  return "↘";
+  if (d >= 157.5 && d < 202.5)  return "↓";
+  if (d >= 202.5 && d < 247.5)  return "↙";
+  if (d >= 247.5 && d < 292.5)  return "←";
+  return "↖";
+}
   }
 
   /********** KPIs **********/
@@ -199,7 +217,7 @@
   if(obs.rain_day_mm>0) icon="🌧️";
   if(obs.wind_kmh>30) icon="💨";
 
-  document.getElementById("currentBig").innerHTML =
+  const dirTxt = dirText8_(obs.wdir_deg); const dirArr = dirArrow_(obs.wdir_deg);  document.getElementById("currentBig").innerHTML =   icon+" <span style='font-size:20px;font-weight:900;'>"+fmt1(obs.temp)+"°C</span><br>"+   "<span style='font-size:13px;'>Vent "+dirTxt+" "+dirArr+" "+fmt0(obs.wind_kmh)+" km/h</span>"; =
   icon+" <span style='font-size:20px;font-weight:900;'>"+fmt1(obs.temp)+"°C</span><br>"+
   "<span style='font-size:13px;'>Vent "+fmt0(obs.wind_kmh)+" km/h</span>";
 }
