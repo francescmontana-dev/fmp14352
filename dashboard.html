@@ -235,9 +235,13 @@ function dirArrow_(deg){
   if(obs.rain_day_mm>0) icon="🌧️";
   if(obs.wind_kmh>30) icon="💨";
 
-  const dirTxt = dirText8_(obs.wdir_deg); const dirArr = dirArrow_(obs.wdir_deg);  document.getElementById("currentBig").innerHTML =   icon+" <span style='font-size:20px;font-weight:900;'>"+fmt1(obs.temp)+"°C</span><br>"+   "<span style='font-size:13px;'>Vent "+dirTxt+" "+dirArr+" "+fmt0(obs.wind_kmh)+" km/h</span>"; =
+  // direcció vent
+const dirTxt = dirText8_(obs.wdir_deg);
+const dirArr = dirArrow_(obs.wdir_deg);
+
+document.getElementById("currentBig").innerHTML =
   icon+" <span style='font-size:20px;font-weight:900;'>"+fmt1(obs.temp)+"°C</span><br>"+
-  "<span style='font-size:13px;'>Vent "+fmt0(obs.wind_kmh)+" km/h</span>";
+  "<span style='font-size:13px;'>Vent "+dirTxt+" "+dirArr+" "+fmt0(obs.wind_kmh)+" km/h</span>";
 }
 
   /********** CHARTS **********/
