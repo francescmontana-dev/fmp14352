@@ -152,25 +152,27 @@
   const fmt0 = (x) => (x === null || x === undefined || Number.isNaN(x)) ? "—" : String(Math.round(x));
   const hhmm = (iso) => iso ? new Date(iso).toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"}) : "—";
   const ddhh = (iso) => iso ? new Date(iso).toLocaleString("ca-ES",{weekday:"short", hour:"2-digit", minute:"2-digit"}) : "—";
-function dirText8_(deg){
-  if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
-  const d = ((deg % 360) + 360) % 360;
-  const dirs = ["N","NE","E","SE","S","SO","O","NO"];
-  const idx = Math.round(d / 45) % 8;
-  return dirs[idx];
-}
-function dirArrow_(deg){
-  if(deg === null || deg === undefined || Number.isNaN(deg)) return "";
-  const d = ((deg % 360) + 360) % 360;
-  if (d >= 337.5 || d < 22.5)   return "↑";
-  if (d >= 22.5  && d < 67.5)   return "↗";
-  if (d >= 67.5  && d < 112.5)  return "→";
-  if (d >= 112.5 && d < 157.5)  return "↘";
-  if (d >= 157.5 && d < 202.5)  return "↓";
-  if (d >= 202.5 && d < 247.5)  return "↙";
-  if (d >= 247.5 && d < 292.5)  return "←";
-  return "↖";
-}
+
+  function dirText8_(deg){
+    if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
+    const d = ((deg % 360) + 360) % 360;
+    const dirs = ["N","NE","E","SE","S","SO","O","NO"];
+    const idx = Math.round(d / 45) % 8;
+    return dirs[idx];
+  }
+  function dirArrow_(deg){
+    if(deg === null || deg === undefined || Number.isNaN(deg)) return "";
+    const d = ((deg % 360) + 360) % 360;
+    if (d >= 337.5 || d < 22.5)   return "↑";
+    if (d >= 22.5  && d < 67.5)   return "↗";
+    if (d >= 67.5  && d < 112.5)  return "→";
+    if (d >= 112.5 && d < 157.5)  return "↘";
+    if (d >= 157.5 && d < 202.5)  return "↓";
+    if (d >= 202.5 && d < 247.5)  return "↙";
+    if (d >= 247.5 && d < 292.5)  return "←";
+    return "↖";
+  }
+
   function loadJSONP(url){
     const s = document.createElement("script");
     s.src = url + "&_=" + Date.now();
@@ -189,76 +191,39 @@ function dirArrow_(deg){
     if(gotCurrent && gotForecast) pill.textContent = "✅ Gràfiques actualitzades";
     else if(gotCurrent && !gotForecast) pill.textContent = "⏳ Dades actuals OK… (esperant previsió)";
     else if(!gotCurrent && gotForecast) pill.textContent = "⏳ Previsió OK… (esperant dades actuals)";
-    else pill.textContent = "⏳ Preparant gràfiques…";function dirText8_(deg){
-  if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
-  const d = ((deg % 360) + 360) % 360;
-  const dirs = ["N","NE","E","SE","S","SO","O","NO"];
-  const idx = Math.round(d / 45) % 8;
-  return dirs[idx];
-}
-function dirArrow_(deg){
-  if(deg === null || deg === undefined || Number.isNaN(deg)) return "";
-  const d = ((deg % 360) + 360) % 360;
-  if (d >= 337.5 || d < 22.5)   return "↑";
-  if (d >= 22.5  && d < 67.5)   return "↗";
-  if (d >= 67.5  && d < 112.5)  return "→";
-  if (d >= 112.5 && d < 157.5)  return "↘";
-  if (d >= 157.5 && d < 202.5)  return "↓";
-  if (d >= 202.5 && d < 247.5)  return "↙";
-  if (d >= 247.5 && d < 292.5)  return "←";
-  return "↖";
-}
-  function dirText8_(deg){
-  if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
-  const d = ((deg % 360) + 360) % 360;
-  const dirs = ["N","NE","E","SE","S","SO","O","NO"];
-  const idx = Math.round(d / 45) % 8;
-  return dirs[idx];
-}
-function dirArrow_(deg){
-  if(deg === null || deg === undefined || Number.isNaN(deg)) return "";
-  const d = ((deg % 360) + 360) % 360;
-  if (d >= 337.5 || d < 22.5)   return "↑";
-  if (d >= 22.5  && d < 67.5)   return "↗";
-  if (d >= 67.5  && d < 112.5)  return "→";
-  if (d >= 112.5 && d < 157.5)  return "↘";
-  if (d >= 157.5 && d < 202.5)  return "↓";
-  if (d >= 202.5 && d < 247.5)  return "↙";
-  if (d >= 247.5 && d < 292.5)  return "←";
-  return "↖";
-}
+    else pill.textContent = "⏳ Preparant gràfiques…";
+  }
 
   /********** KPIs **********/
   function renderKPIs(current){
+    const obs = current?.obs || {};
+    const prev = current?.prev_now || {};
 
-  const obs = current?.obs || {};
-  const prev = current?.prev_now || {};
+    const dT  = (obs.temp !== null && prev.temp !== null) ? (obs.temp - prev.temp) : null;
+    const dRH = (obs.rh !== null && prev.rh !== null) ? (obs.rh - prev.rh) : null;
 
-  const dT  = (obs.temp !== null && prev.temp !== null) ? (obs.temp - prev.temp) : null;
-  const dRH = (obs.rh !== null && prev.rh !== null) ? (obs.rh - prev.rh) : null;
+    document.getElementById("kTemp").textContent = `${fmt1(obs.temp)}°C`;
+    document.getElementById("kRH").textContent   = `${fmt0(obs.rh)}%`;
+    document.getElementById("kWind").textContent = `${fmt0(obs.wind_kmh)} km/h`;
+    document.getElementById("kGust").textContent = `Ratxa ${fmt0(obs.gust_kmh)} km/h`;
+    document.getElementById("kRain").textContent = `${fmt1(obs.rain_day_mm)} mm`;
+    document.getElementById("kRainSoon").textContent = `3h ${fmt1(current?.derived?.rain_3h_mm)} mm`;
 
-  document.getElementById("kTemp").textContent = `${fmt1(obs.temp)}°C`;
-  document.getElementById("kRH").textContent   = `${fmt0(obs.rh)}%`;
-  document.getElementById("kWind").textContent = `${fmt0(obs.wind_kmh)} km/h`;
-  document.getElementById("kGust").textContent = `Ratxa ${fmt0(obs.gust_kmh)} km/h`;
-  document.getElementById("kRain").textContent = `${fmt1(obs.rain_day_mm)} mm`;
-  document.getElementById("kRainSoon").textContent = `3h ${fmt1(current?.derived?.rain_3h_mm)} mm`;
+    document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
+    document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
 
-  document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
-  document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
+    // icona simple
+    let icon = "🌤️";
+    if ((current?.derived?.rain_3h_mm ?? 0) >= 0.2) icon = "🌧️";
+    if ((obs.wind_kmh ?? 0) >= 30) icon = "💨";
 
-  // icona simple
-  let icon = "🌤️";
-  if ((current?.derived?.rain_3h_mm ?? 0) >= 0.2) icon = "🌧️";
-  if ((obs.wind_kmh ?? 0) >= 30) icon = "💨";
+    const dirTxt = dirText8_(obs.wdir_deg);
+    const dirArr = dirArrow_(obs.wdir_deg);
 
-  const dirTxt = dirText8_(obs.wdir_deg);
-  const dirArr = dirArrow_(obs.wdir_deg);
-
-  document.getElementById("currentBig").innerHTML =
-    icon + " <span style='font-size:20px;font-weight:900;'>" + fmt1(obs.temp) + "°C</span><br>" +
-    "<span style='font-size:13px;'>Vent " + dirTxt + " " + dirArr + " " + fmt0(obs.wind_kmh) + " km/h</span>";
-}
+    document.getElementById("currentBig").innerHTML =
+      icon + " <span style='font-size:20px;font-weight:900;'>" + fmt1(obs.temp) + "°C</span><br>" +
+      "<span style='font-size:13px;'>Vent " + dirTxt + " " + dirArr + " " + fmt0(obs.wind_kmh) + " km/h</span>";
+  }
 
   /********** CHARTS **********/
   let chartTemp, chartRainWind, chartRH;
@@ -351,5 +316,3 @@ function dirArrow_(deg){
   loadJSONP(END_CURRENT);
   loadJSONP(END_FORECAST);
 </script>
-</body>
-</html>
