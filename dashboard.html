@@ -12,7 +12,6 @@
       --card:#111827;
       --muted:#94a3b8;
       --text:#e5e7eb;
-      --grid:rgba(255,255,255,.06);
     }
     *{box-sizing:border-box;}
     body{
@@ -141,6 +140,7 @@
   </div>
 
 <script>
+  // URL del teu Apps Script (Web App /exec)
   const DATA_BASE = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
   const END_CURRENT  = `${DATA_BASE}?out=current&callback=cbCurrent`;
   const END_FORECAST = `${DATA_BASE}?out=forecast&callback=cbForecast`;
@@ -169,33 +169,18 @@
     if (d >= 247.5 && d < 292.5)  return "←";
     return "↖";
   }
-  function iconFromSymbol_(symbol){
-  const s = String(symbol || "").toLowerCase();
-
-  if (!s) return "🌤️";
-  if (s.includes("thunder")) return "⛈️";
-  if (s.includes("snow")) return "❄️";
-  if (s.includes("sleet")) return "🌨️";
-  if (s.includes("fog")) return "🌫️";
-  if (s.includes("rain")) return "🌧️";
-  if (s.includes("showers")) return "🌦️";
-  if (s.includes("cloudy")) return "☁️";
-  if (s.includes("partly")) return "🌤️";
-  if (s.includes("clearsky") || s.includes("clear")) return "☀️";
-
-  return "🌤️";
-}
 
   function loadJSONP(url){
     const s = document.createElement("script");
     s.src = url + "&_=" + Date.now();
     s.async = true;
-    s.onerror = () => { document.getElementById("statusPill").textContent = "❌ Error carregant dades (JSONP)"; };
+    s.onerror = () => {
+      document.getElementById("statusPill").textContent = "❌ Error carregant dades (JSONP)";
+    };
     document.body.appendChild(s);
   }
 
   let gotCurrent = false, gotForecast = false;
-  let forecastIcon = "🌤️";
 
   function updateStatus(){
     const pill = document.getElementById("statusPill");
@@ -222,26 +207,13 @@
     document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
     document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
 
-    let icon = forecastIcon || "🌤️";
+    // icona simple (estable)
+    let icon = "🌤️";
+    if ((current?.derived?.rain_3h_mm ?? 0) >= 0.2) icon = "🌧️";
+    if ((obs.wind_kmh ?? 0) >= 30) icon = "💨";
 
     const dirTxt = dirText8_(obs.wdir_deg);
     const dirArr = dirArrow_(obs.wdir_deg);
-    function iconFromSymbol_(symbol){
-  const s = String(symbol || "").toLowerCase();
-
-  if (!s) return "🌤️";
-  if (s.includes("thunder")) return "⛈️";
-  if (s.includes("snow")) return "❄️";
-  if (s.includes("sleet")) return "🌨️";
-  if (s.includes("fog")) return "🌫️";
-  if (s.includes("rain")) return "🌧️";
-  if (s.includes("showers")) return "🌦️";
-  if (s.includes("cloudy")) return "☁️";
-  if (s.includes("partly")) return "🌤️";
-  if (s.includes("clearsky") || s.includes("clear")) return "☀️";
-
-  return "🌤️";
-}
 
     document.getElementById("currentBig").innerHTML =
       icon + " <span style='font-size:20px;font-weight:900;'>" + fmt1(obs.temp) + "°C</span><br>" +
@@ -327,38 +299,7 @@
   };
 
   window.cbForecast = (data) => {
-      // Convertidor symbol -> icona (definit aquí per evitar errors de scope)
-  function iconFromSymbol_(symbol){
-    const s = String(symbol || "").toLowerCase();
-    if (!s) return "🌤️";
-    if (s.includes("thunder")) return "⛈️";
-    if (s.includes("snow")) return "❄️";
-    if (s.includes("sleet")) return "🌨️";
-    if (s.includes("fog")) return "🌫️";
-    if (s.includes("rain")) return "🌧️";
-    if (s.includes("showers")) return "🌦️";
-    if (s.includes("cloudy")) return "☁️";
-    if (s.includes("partly")) return "🌤️";
-    if (s.includes("clearsky") || s.includes("clear")) return "☀️";
-    return "🌤️";
-  }gotForecast = true;
-    const arr = (data?.hourly || []);
-const now = Date.now();
-
-let best = arr[0] || {};
-let bestDiff = Infinity;
-
-for (const p of arr){
-  const t = p?.t ? new Date(p.t).getTime() : NaN;
-  if (!Number.isFinite(t)) continue;
-  const diff = Math.abs(t - now);
-  if (diff < bestDiff){
-    bestDiff = diff;
-    best = p;
-  }
-}
-
-forecastIcon = iconFromSymbol_(best.symbol || best.symbol_code);
+    gotForecast = true;
     renderCharts48(data);
     updateStatus();
   };
@@ -367,5 +308,6 @@ forecastIcon = iconFromSymbol_(best.symbol || best.symbol_code);
   loadJSONP(END_CURRENT);
   loadJSONP(END_FORECAST);
 </script>
+
 </body>
 </html>
