@@ -98,6 +98,7 @@
     <div class="card top">
       <div class="brand">
         <h1>🌦️ El Masnou - NE · Gràfiques</h1>
+        <div id="currentBig" style="font-size:26px;font-weight:900;margin-top:4px;">—</div>
         <div class="meta" id="metaLine">Carregant dades…</div>
 
         <div class="pillRow">
@@ -190,6 +191,14 @@
 
     document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
     document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
+    // icona temps actual
+let icon="🌤️";
+
+if(obs.rain_day_mm>0) icon="🌧️";
+if(obs.wind_kmh>30) icon="💨";
+
+document.getElementById("currentBig").innerHTML =
+  icon+" "+fmt1(obs.temp)+"°C · Vent "+fmt0(obs.wind_kmh)+" km/h";
   }
 
   /********** CHARTS **********/
