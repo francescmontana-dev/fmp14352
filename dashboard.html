@@ -189,6 +189,24 @@ function dirArrow_(deg){
   if (d >= 202.5 && d < 247.5)  return "↙";
   if (d >= 247.5 && d < 292.5)  return "←";
   return "↖";
+}function dirText8_(deg){
+  if(deg === null || deg === undefined || Number.isNaN(deg)) return "—";
+  const d = ((deg % 360) + 360) % 360;
+  const dirs = ["N","NE","E","SE","S","SO","O","NO"];
+  const idx = Math.round(d / 45) % 8;
+  return dirs[idx];
+}
+function dirArrow_(deg){
+  if(deg === null || deg === undefined || Number.isNaN(deg)) return "";
+  const d = ((deg % 360) + 360) % 360;
+  if (d >= 337.5 || d < 22.5)   return "↑";
+  if (d >= 22.5  && d < 67.5)   return "↗";
+  if (d >= 67.5  && d < 112.5)  return "→";
+  if (d >= 112.5 && d < 157.5)  return "↘";
+  if (d >= 157.5 && d < 202.5)  return "↓";
+  if (d >= 202.5 && d < 247.5)  return "↙";
+  if (d >= 247.5 && d < 292.5)  return "←";
+  return "↖";
 }
   }
 
