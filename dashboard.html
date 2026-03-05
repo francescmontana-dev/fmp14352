@@ -169,6 +169,22 @@
     if (d >= 247.5 && d < 292.5)  return "←";
     return "↖";
   }
+  function iconFromSymbol_(symbol){
+  const s = String(symbol || "").toLowerCase();
+
+  if (!s) return "🌤️";
+  if (s.includes("thunder")) return "⛈️";
+  if (s.includes("snow")) return "❄️";
+  if (s.includes("sleet")) return "🌨️";
+  if (s.includes("fog")) return "🌫️";
+  if (s.includes("rain")) return "🌧️";
+  if (s.includes("showers")) return "🌦️";
+  if (s.includes("cloudy")) return "☁️";
+  if (s.includes("partly")) return "🌤️";
+  if (s.includes("clearsky") || s.includes("clear")) return "☀️";
+
+  return "🌤️";
+}
 
   function loadJSONP(url){
     const s = document.createElement("script");
