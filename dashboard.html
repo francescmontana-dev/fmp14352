@@ -200,8 +200,8 @@
   if(obs.wind_kmh>30) icon="💨";
 
   document.getElementById("currentBig").innerHTML =
-    icon+" "+fmt1(obs.temp)+"°C · Vent "+fmt0(obs.wind_kmh)+" km/h";
-
+  icon+" <span style='font-size:20px;font-weight:900;'>"+fmt1(obs.temp)+"°C</span><br>"+
+  "<span style='font-size:13px;'>Vent "+fmt0(obs.wind_kmh)+" km/h</span>";
 }
 
   /********** CHARTS **********/
