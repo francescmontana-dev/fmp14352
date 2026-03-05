@@ -176,30 +176,33 @@
 
   /********** KPIs **********/
   function renderKPIs(current){
-    const obs = current?.obs || {};
-    const prev = current?.prev_now || {};
 
-    const dT  = (obs.temp !== null && prev.temp !== null) ? (obs.temp - prev.temp) : null;
-    const dRH = (obs.rh !== null && prev.rh !== null) ? (obs.rh - prev.rh) : null;
+  const obs = current?.obs || {};
+  const prev = current?.prev_now || {};
 
-    document.getElementById("kTemp").textContent = `${fmt1(obs.temp)}°C`;
-    document.getElementById("kRH").textContent   = `${fmt0(obs.rh)}%`;
-    document.getElementById("kWind").textContent = `${fmt0(obs.wind_kmh)} km/h`;
-    document.getElementById("kGust").textContent = `Ratxa ${fmt0(obs.gust_kmh)} km/h`;
-    document.getElementById("kRain").textContent = `${fmt1(obs.rain_day_mm)} mm`;
-    document.getElementById("kRainSoon").textContent = `3h ${fmt1(current?.derived?.rain_3h_mm)} mm`;
+  const dT  = (obs.temp !== null && prev.temp !== null) ? (obs.temp - prev.temp) : null;
+  const dRH = (obs.rh !== null && prev.rh !== null) ? (obs.rh - prev.rh) : null;
 
-    document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
-    document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
-    // icona temps actual
-let icon="🌤️";
+  document.getElementById("kTemp").textContent = `${fmt1(obs.temp)}°C`;
+  document.getElementById("kRH").textContent   = `${fmt0(obs.rh)}%`;
+  document.getElementById("kWind").textContent = `${fmt0(obs.wind_kmh)} km/h`;
+  document.getElementById("kGust").textContent = `Ratxa ${fmt0(obs.gust_kmh)} km/h`;
+  document.getElementById("kRain").textContent = `${fmt1(obs.rain_day_mm)} mm`;
+  document.getElementById("kRainSoon").textContent = `3h ${fmt1(current?.derived?.rain_3h_mm)} mm`;
 
-if(obs.rain_day_mm>0) icon="🌧️";
-if(obs.wind_kmh>30) icon="💨";
+  document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
+  document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
 
-document.getElementById("currentBig").innerHTML =
-  icon+" "+fmt1(obs.temp)+"°C · Vent "+fmt0(obs.wind_kmh)+" km/h";
-  }
+  // icona temps actual gran
+  let icon="🌤️";
+
+  if(obs.rain_day_mm>0) icon="🌧️";
+  if(obs.wind_kmh>30) icon="💨";
+
+  document.getElementById("currentBig").innerHTML =
+    icon+" "+fmt1(obs.temp)+"°C · Vent "+fmt0(obs.wind_kmh)+" km/h";
+
+}
 
   /********** CHARTS **********/
   let chartTemp, chartRainWind, chartRH;
