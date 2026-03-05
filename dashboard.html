@@ -10,7 +10,7 @@
     :root{
       --bg:#0b1020;
       --card:#111827;
-      --muted:#94a3b8;F
+      --muted:#94a3b8;
       --text:#e5e7eb;
       --grid:rgba(255,255,255,.06);
     }
@@ -78,16 +78,13 @@
       gap:10px;
       margin-bottom:8px;
     }
-    .chartTitle h2{
-      margin:0;font-size:13px;font-weight:900;
-    }
-    .chartTitle span{
-      font-size:12px;color:var(--muted);
-    }
+    .chartTitle h2{margin:0;font-size:13px;font-weight:900;}
+    .chartTitle span{font-size:12px;color:var(--muted);}
+
     .canvasWrap{position:relative;height:210px;width:100%;}
-@media (max-width: 720px){
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
-  .canvasWrap{height:190px;}
+    @media (max-width: 720px){
+      .kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .canvasWrap{height:190px;}
     }
   </style>
 </head>
@@ -98,7 +95,9 @@
     <div class="card top">
       <div class="brand">
         <h1>🌦️ El Masnou - NE · Gràfiques</h1>
+
         <div id="currentBig" style="margin-top:4px;line-height:1.2;">—</div>
+
         <div class="meta" id="metaLine">Carregant dades…</div>
 
         <div class="pillRow">
@@ -142,12 +141,10 @@
   </div>
 
 <script>
-  /********** CONFIG **********/
   const DATA_BASE = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
   const END_CURRENT  = `${DATA_BASE}?out=current&callback=cbCurrent`;
   const END_FORECAST = `${DATA_BASE}?out=forecast&callback=cbForecast`;
 
-  /********** UTIL **********/
   const fmt1 = (x) => (x === null || x === undefined || Number.isNaN(x)) ? "—" : (Math.round(x*10)/10).toFixed(1);
   const fmt0 = (x) => (x === null || x === undefined || Number.isNaN(x)) ? "—" : String(Math.round(x));
   const hhmm = (iso) => iso ? new Date(iso).toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"}) : "—";
@@ -177,14 +174,11 @@
     const s = document.createElement("script");
     s.src = url + "&_=" + Date.now();
     s.async = true;
-    s.onerror = () => {
-      document.getElementById("statusPill").textContent = "❌ Error carregant dades (JSONP)";
-    };
+    s.onerror = () => { document.getElementById("statusPill").textContent = "❌ Error carregant dades (JSONP)"; };
     document.body.appendChild(s);
   }
 
-  let gotCurrent = false;
-  let gotForecast = false;
+  let gotCurrent = false, gotForecast = false;
 
   function updateStatus(){
     const pill = document.getElementById("statusPill");
@@ -194,7 +188,6 @@
     else pill.textContent = "⏳ Preparant gràfiques…";
   }
 
-  /********** KPIs **********/
   function renderKPIs(current){
     const obs = current?.obs || {};
     const prev = current?.prev_now || {};
@@ -212,7 +205,6 @@
     document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
     document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
 
-    // icona simple
     let icon = "🌤️";
     if ((current?.derived?.rain_3h_mm ?? 0) >= 0.2) icon = "🌧️";
     if ((obs.wind_kmh ?? 0) >= 30) icon = "💨";
@@ -225,7 +217,6 @@
       "<span style='font-size:13px;'>Vent " + dirTxt + " " + dirArr + " " + fmt0(obs.wind_kmh) + " km/h</span>";
   }
 
-  /********** CHARTS **********/
   let chartTemp, chartRainWind, chartRH;
 
   function renderCharts48(forecast){
@@ -293,7 +284,6 @@
     };
   }
 
-  /********** CALLBACKS **********/
   window.cbCurrent = (data) => {
     gotCurrent = true;
     renderKPIs(data);
@@ -311,8 +301,9 @@
     updateStatus();
   };
 
-  /********** START **********/
   updateStatus();
   loadJSONP(END_CURRENT);
   loadJSONP(END_FORECAST);
 </script>
+</body>
+</html>
