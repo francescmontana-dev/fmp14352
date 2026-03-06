@@ -247,13 +247,11 @@
     }
   }
 
+     <script>
   function renderKPIs(current){
-    if(!current || current.ok === false){
-      throw new Error("Resposta current no vàlida");
-    }
-
-    const obs = current?.obs || {};
-    const prev = current?.prev_now || {};
+    const obs = current && current.obs ? current.obs : {};
+    const prev = current && current.prev_now ? current.prev_now : {};
+    const derived = current && current.derived ? current.derived : {};
 
     const obsTemp = (typeof obs.temp === "number") ? obs.temp : null;
     const obsRH = (typeof obs.rh === "number") ? obs.rh : null;
@@ -265,20 +263,34 @@
     const prevTemp = (typeof prev.temp === "number") ? prev.temp : null;
     const prevRH = (typeof prev.rh === "number") ? prev.rh : null;
 
-    const rain3h = (typeof current?.derived?.rain_3h_mm === "number") ? current.derived.rain_3h_mm : null;
+    const rain3h = (typeof derived.rain_3h_mm === "number") ? derived.rain_3h_mm : null;
 
-    const dT  = (obsTemp !== null && prevTemp !== null) ? (obsTemp - prevTemp) : null;
+    const dT = (obsTemp !== null && prevTemp !== null) ? (obsTemp - prevTemp) : null;
     const dRH = (obsRH !== null && prevRH !== null) ? (obsRH - prevRH) : null;
 
-    document.getElementById("kTemp").textContent = `${fmt1(obsTemp)}°C`;
-    document.getElementById("kRH").textContent   = `${fmt0(obsRH)}%`;
-    document.getElementById("kWind").textContent = `${fmt0(obsWind)} km/h`;
-    document.getElementById("kGust").textContent = `Ratxa ${fmt0(obsGust)} km/h`;
-    document.getElementById("kRain").textContent = `${fmt1(obsRain)} mm`;
-    document.getElementById("kRainSoon").textContent = `3h ${fmt1(rain3h)} mm`;
+    const elKTemp = document.getElementById("kTemp");
+    const elKRH = document.getElementById("kRH");
+    const elKWind = document.getElementById("kWind");
+    const elKGust = document.getElementById("kGust");
+    const elKRain = document.getElementById("kRain");
+    const elKRainSoon = document.getElementById("kRainSoon");
+    const elKDeltaT = document.getElementById("kDeltaT");
+    const elKDeltaRH = document.getElementById("kDeltaRH");
+    const elCurrentBig = document.getElementById("currentBig");
 
-    document.getElementById("kDeltaT").textContent  = `Δ ${dT === null ? "—" : (dT>0?"+":"") + fmt1(dT)}°C`;
-    document.getElementById("kDeltaRH").textContent = `Δ ${dRH === null ? "—" : (dRH>0?"+":"") + fmt0(dRH)}%`;
+    if (!elKTemp || !elKRH || !elKWind || !elKGust || !elKRain || !elKRainSoon || !elKDeltaT || !elKDeltaRH || !elCurrentBig) {
+      throw new Error("Falten elements HTML dels KPI");
+    }
+
+    elKTemp.textContent = `${fmt1(obsTemp)}°C`;
+    elKRH.textContent = `${fmt0(obsRH)}%`;
+    elKWind.textContent = `${fmt0(obsWind)} km/h`;
+    elKGust.textContent = `Ratxa ${fmt0(obsGust)} km/h`;
+    elKRain.textContent = `${fmt1(obsRain)} mm`;
+    elKRainSoon.textContent = `3h ${fmt1(rain3h)} mm`;
+
+    elKDeltaT.textContent = `Δ ${dT === null ? "—" : (dT > 0 ? "+" : "") + fmt1(dT)}°C`;
+    elKDeltaRH.textContent = `Δ ${dRH === null ? "—" : (dRH > 0 ? "+" : "") + fmt0(dRH)}%`;
 
     let icon = "🌤️";
     if ((rain3h ?? 0) >= 0.2) icon = "🌧️";
@@ -287,115 +299,11 @@
     const dirTxt = dirText8_(obsDir);
     const dirArr = dirArrow_(obsDir);
 
-    document.getElementById("currentBig").innerHTML =
+    elCurrentBig.innerHTML =
       icon + " <span style='font-size:20px;font-weight:900;'>" + fmt1(obsTemp) + "°C</span><br>" +
       "<span style='font-size:13px;'>Vent " + dirTxt + " " + dirArr + " " + fmt0(obsWind) + " km/h</span>";
   }
 
-  let chartTemp = null;
-  let chartRainWind = null;
-  let chartRH = null;
-
-     <script>
-  function renderCharts48(forecast){
-    const hourly = Array.isArray(forecast?.hourly) ? forecast.hourly : [];
-
-    if (!hourly.length) {
-      document.getElementById("tNote").textContent  = "sense dades";
-      document.getElementById("rwNote").textContent = "sense dades";
-      document.getElementById("rhNote").textContent = "sense dades";
-      return;
-    }
-
-    const h48 = hourly.slice(0, 48);
-
-    const labels = h48.map(p => p?.t ? ddhh(p.t) : "—");
-    const temp = h48.map(p => (typeof p?.temp === "number" ? p.temp : null));
-    const rain = h48.map(p => (typeof p?.rain_mm === "number" ? p.rain_mm : 0));
-    const wind = h48.map(p => (typeof p?.wind_kmh === "number" ? p.wind_kmh : null));
-    const rh   = h48.map(p => (typeof p?.rh === "number" ? p.rh : null));
-
-    document.getElementById("tNote").textContent =
-      `de ${hhmm(h48[0]?.t)} a ${hhmm(h48[h48.length-1]?.t)}`;
-    document.getElementById("rwNote").textContent = `48 h · mm/h i km/h`;
-    document.getElementById("rhNote").textContent = `48 h`;
-
-    if (chartTemp) {
-      chartTemp.destroy();
-      chartTemp = null;
-    }
-    if (chartRainWind) {
-      chartRainWind.destroy();
-      chartRainWind = null;
-    }
-    if (chartRH) {
-      chartRH.destroy();
-      chartRH = null;
-    }
-
-    const elTemp = document.getElementById("cTemp");
-    const elRainWind = document.getElementById("cRainWind");
-    const elRH = document.getElementById("cRH");
-
-    if (!elTemp || !elRainWind || !elRH) {
-      throw new Error("No s'han trobat els canvas cTemp / cRainWind / cRH");
-    }
-
-    chartTemp = new Chart(elTemp.getContext("2d"), {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label: "Temperatura (°C)",
-          data: temp,
-          borderWidth: 2,
-          tension: 0.35,
-          pointRadius: 0
-        }]
-      },
-      options: commonOpts({ yTitle: "°C" })
-    });
-
-    chartRainWind = new Chart(elRainWind.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          {
-            type: "bar",
-            label: "Pluja (mm/h)",
-            data: rain,
-            borderWidth: 0
-          },
-          {
-            type: "line",
-            label: "Vent (km/h)",
-            data: wind,
-            yAxisID: "y2",
-            borderWidth: 2,
-            tension: 0.35,
-            pointRadius: 0
-          }
-        ]
-      },
-      options: commonOpts({ yTitle: "mm/h", y2Title: "km/h", dualAxis: true })
-    });
-
-    chartRH = new Chart(elRH.getContext("2d"), {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label: "Humitat (%)",
-          data: rh,
-          borderWidth: 2,
-          tension: 0.35,
-          pointRadius: 0
-        }]
-      },
-      options: commonOpts({ yTitle: "%" })
-    });
-  }
 </script>
 
   function commonOpts({yTitle, y2Title, dualAxis=false}){
@@ -432,23 +340,31 @@
     };
   }
 
+  <script>
   window.cbCurrent = (data) => {
     try{
       gotCurrent = true;
       renderKPIs(data);
 
-      const upd = data?.source?.forecast_updated_at || "";
-      document.getElementById("metaLine").textContent =
-        `Actualitzat: ${new Date().toLocaleString("ca-ES")} · Met.no: ${upd || "—"}`;
+      const upd = data && data.source && data.source.forecast_updated_at
+        ? data.source.forecast_updated_at
+        : "—";
+
+      const meta = document.getElementById("metaLine");
+      if (meta) {
+        meta.textContent = `Actualitzat: ${new Date().toLocaleString("ca-ES")} · Met.no: ${upd}`;
+      }
 
       clearError();
     } catch(err){
-      setError("Error a cbCurrent / renderKPIs:\n" + (err?.stack || err));
+      const msg = err && err.message ? err.message : String(err);
+      const stk = err && err.stack ? "\n\n" + err.stack : "";
+      setError("Error a cbCurrent / renderKPIs:\n" + msg + stk + "\n\nDATA:\n" + JSON.stringify(data, null, 2));
     }
     updateStatus();
   };
+</script>
 
-   <script>
   window.cbForecast = (data) => {
     try{
       gotForecast = true;
