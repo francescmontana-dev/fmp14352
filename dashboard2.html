@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tauler Meteo · El Masnou</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,Arial;
+  background:#0f172a;
+  color:#e5e7eb;
+  padding:12px;
+}
+
+.wrap{max-width:960px;margin:auto}
+
+.card{
+  background:#111827;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:10px;
+}
+
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.kpi{
+  background:#020617;
+  padding:10px;
+  border-radius:10px;
+}
+
+.k{font-size:11px;color:#94a3b8}
+.v{font-size:18px;font-weight:700}
+
+.canvasWrap{
+  height:220px;
+}
+
+#status{
+  font-size:12px;
+  color:#fbbf24;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="card">
+<h2>🌦️ El Masnou</h2>
+<div id="status">carregant dades…</div>
+</div>
+
+<div class="card kpis">
+
+<div class="kpi">
+<div class="k">Temperatura</div>
+<div class="v" id="kTemp">—</div>
+</div>
+
+<div class="kpi">
+<div class="k">Humitat</div>
+<div class="v" id="kRH">—</div>
+</div>
+
+<div class="kpi">
+<div class="k">Vent</div>
+<div class="v" id="kWind">—</div>
+</div>
+
+<div class="kpi">
+<div class="k">Pluja avui</div>
+<div class="v" id="kRain">—</div>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Temperatura 48 h</h3>
+<div class="canvasWrap">
+<canvas id="cTemp"></canvas>
+</div>
+</div>
+
+<div class="card">
+<h3>Pluja + vent 48 h</h3>
+<div class="canvasWrap">
+<canvas id="cRainWind"></canvas>
+</div>
+</div>
+
+<div class="card">
+<h3>Humitat 48 h</h3>
+<div class="canvasWrap">
+<canvas id="cRH"></canvas>
+</div>
+</div>
+
+</div>
+
+<script>
+
+const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec"
+
+let chartTemp
+let chartRainWind
+let chartRH
+
+function loadJSONP(url){
+ const s=document.createElement("script")
+ s.src=url+"&_="+Date.now()
+ document.body.appendChild(s)
+}
+
+function fmt1(x){
+ if(typeof x!=="number") return "—"
+ return (Math.round(x*10)/10).toFixed(1)
+}
+
+window.cbCurrent=function(data){
+
+ const obs=data.obs||{}
+
+ document.getElementById("kTemp").textContent=fmt1(obs.temp)+"°C"
+ document.getElementById("kRH").textContent=Math.round(obs.rh||0)+"%"
+ document.getElementById("kWind").textContent=Math.round(obs.wind_kmh||0)+" km/h"
+ document.getElementById("kRain").textContent=fmt1(obs.rain_day_mm)+" mm"
+
+ document.getElementById("status").textContent="dades actuals OK"
+}
+
+window.cbForecast=function(data){
+
+ const h=data.hourly.slice(0,48)
+
+ const labels=h.map(x=>new Date(x.t).getHours()+":00")
+
+ const temp=h.map(x=>x.temp)
+ const rain=h.map(x=>x.rain_mm)
+ const wind=h.map(x=>x.wind_kmh)
+ const rh=h.map(x=>x.rh)
+
+ if(chartTemp) chartTemp.destroy()
+ if(chartRainWind) chartRainWind.destroy()
+ if(chartRH) chartRH.destroy()
+
+ chartTemp=new Chart(cTemp,{
+  type:"line",
+  data:{
+   labels,
+   datasets:[{
+    label:"°C",
+    data:temp,
+    borderWidth:2,
+    tension:.3
+   }]
+  }
+ })
+
+ chartRainWind=new Chart(cRainWind,{
+  data:{
+   labels,
+   datasets:[
+   {
+    type:"bar",
+    label:"mm",
+    data:rain
+   },
+   {
+    type:"line",
+    label:"km/h",
+    data:wind,
+    yAxisID:"y1"
+   }]
+  },
+  options:{
+   scales:{
+    y:{beginAtZero:true},
+    y1:{position:"right"}
+   }
+  }
+ })
+
+ chartRH=new Chart(cRH,{
+  type:"line",
+  data:{
+   labels,
+   datasets:[{
+    label:"%",
+    data:rh,
+    borderWidth:2
+   }]
+  }
+ })
+
+ document.getElementById("status").textContent="previsió OK"
+}
+
+loadJSONP(API+"?out=current&callback=cbCurrent")
+loadJSONP(API+"?out=forecast&callback=cbForecast")
+
+</script>
+
+</body>
+</html>
