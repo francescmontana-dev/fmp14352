@@ -8,154 +8,105 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+
 :root{
-  --bg:#0b1020;
-  --card:#111827;
-  --muted:#94a3b8;
-  --text:#e5e7eb;
-  --grid:rgba(255,255,255,.06);
+--bg:#0b1020;
+--card:#111827;
+--muted:#94a3b8;
+--text:#e5e7eb;
+--grid:rgba(255,255,255,.06);
 }
 
 *{box-sizing:border-box}
 
 body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:linear-gradient(180deg,#0b1020,#0f172a,#0b1020);
-  color:var(--text);
-  padding:12px;
+margin:0;
+font-family:system-ui,Arial;
+background:linear-gradient(180deg,#0b1020,#0f172a,#0b1020);
+color:var(--text);
+padding:12px;
 }
 
 .wrap{max-width:980px;margin:auto}
 
 .card{
-  background:rgba(17,24,39,.92);
-  border-radius:18px;
-  padding:12px;
-  margin-bottom:10px;
-  border:1px solid rgba(255,255,255,.06);
-  box-shadow:0 14px 34px rgba(0,0,0,.28);
+background:rgba(17,24,39,.92);
+border-radius:18px;
+padding:12px;
+margin-bottom:10px;
 }
 
 .top{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
 }
 
 .brand{
-  flex:1 1 280px;
+flex:1 1 260px;
 }
 
 .brand h1{
-  margin:0;
-  font-size:22px;
-  font-weight:900;
+margin:0;
+font-size:22px;
+font-weight:900;
 }
 
 .meta{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.35;
-}
-
-.hero{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-top:6px;
-  margin-bottom:6px;
-}
-
-.heroIcon{
-  font-size:40px;
-  line-height:1;
-}
-
-.heroMain{
-  font-size:20px;
-  font-weight:900;
-  line-height:1.1;
-}
-
-.heroSub{
-  font-size:13px;
-  color:var(--muted);
-  margin-top:2px;
+font-size:12px;
+color:var(--muted);
 }
 
 .pillRow{
-  margin-top:8px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+margin-top:6px;
 }
 
 .pill{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  background:rgba(96,165,250,.18);
-  border:1px solid rgba(96,165,250,.35);
-  font-weight:900;
-  font-size:12px;
-  color:var(--text);
-  text-decoration:none;
+display:inline-block;
+padding:6px 10px;
+border-radius:999px;
+background:rgba(96,165,250,.18);
+border:1px solid rgba(96,165,250,.35);
+font-weight:900;
+font-size:12px;
+color:var(--text);
+text-decoration:none;
 }
 
 .kpis{
-  flex:2 1 520px;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
+flex:2 1 520px;
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:8px;
 }
 
 .kpi{
-  background:rgba(255,255,255,.04);
-  border-radius:14px;
-  padding:10px;
+background:rgba(255,255,255,.04);
+border-radius:14px;
+padding:10px;
 }
 
 .k{font-size:11px;color:var(--muted)}
 .v{font-size:18px;font-weight:900}
-.s{font-size:11px;color:var(--muted);margin-top:4px}
+.s{font-size:11px;color:var(--muted)}
 
 .chartTitle{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:6px;
-  font-size:13px;
-  font-weight:900;
-}
-
-.chartTitle span{
-  color:var(--muted);
-  font-size:12px;
-  font-weight:600;
+display:flex;
+justify-content:space-between;
+margin-bottom:6px;
+font-size:13px;
+font-weight:900;
 }
 
 .canvasWrap{
-  height:220px;
-}
-
-.errorBox{
-  display:none;
-  white-space:pre-wrap;
-  font-size:12px;
-  line-height:1.4;
-  color:#fecaca;
-  background:rgba(127,29,29,.22);
-  border:1px solid rgba(239,68,68,.28);
-  border-radius:14px;
-  padding:10px;
-  margin-top:8px;
+height:220px;
 }
 
 @media(max-width:720px){
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .canvasWrap{height:190px}
+.kpis{grid-template-columns:repeat(2,1fr)}
+.canvasWrap{height:190px}
 }
+
 </style>
 </head>
 
@@ -163,367 +114,196 @@ body{
 
 <div class="wrap">
 
-  <div class="card top">
+<div class="card top">
 
-    <div class="brand">
-      <h1>🌦️ El Masnou - NE</h1>
+<div class="brand">
+<h1>🌦️ El Masnou - NE</h1>
 
-      <div class="hero">
-        <div id="heroIcon" class="heroIcon">⛅</div>
-        <div>
-          <div id="heroMain" class="heroMain">—</div>
-          <div id="heroSub" class="heroSub">Carregant…</div>
-        </div>
-      </div>
+<div id="currentBig">—</div>
 
-      <div class="meta" id="metaLine">Carregant dades…</div>
+<div class="meta" id="metaLine">
+Carregant dades…
+</div>
 
-      <div class="pillRow">
-        <a class="pill" href="./taula.html">📋 Taula 72 h</a>
-      </div>
+<div class="pillRow">
+<a class="pill" href="./taula.html">📋 Taula 72 h</a>
+</div>
 
-      <div id="errorBox" class="errorBox"></div>
-    </div>
+</div>
 
-    <div class="kpis">
+<div class="kpis">
 
-      <div class="kpi">
-        <div class="k">Temperatura</div>
-        <div class="v" id="kTemp">—</div>
-        <div class="s" id="kDeltaT">Δ —</div>
-      </div>
+<div class="kpi">
+<div class="k">Temperatura</div>
+<div class="v" id="kTemp">—</div>
+<div class="s" id="kDeltaT">Δ —</div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Humitat</div>
-        <div class="v" id="kRH">—</div>
-        <div class="s" id="kDeltaRH">Δ —</div>
-      </div>
+<div class="kpi">
+<div class="k">Humitat</div>
+<div class="v" id="kRH">—</div>
+<div class="s" id="kDeltaRH">Δ —</div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Vent</div>
-        <div class="v" id="kWind">—</div>
-        <div class="s" id="kGust">Ratxa —</div>
-      </div>
+<div class="kpi">
+<div class="k">Vent</div>
+<div class="v" id="kWind">—</div>
+<div class="s" id="kGust">Ratxa —</div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Pluja</div>
-        <div class="v" id="kRain">—</div>
-        <div class="s" id="kRainSoon">3h —</div>
-      </div>
+<div class="kpi">
+<div class="k">Pluja</div>
+<div class="v" id="kRain">—</div>
+<div class="s" id="kRainSoon">3h —</div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Direcció vent</div>
-        <div class="v" id="kDir">—</div>
-        <div class="s">Observació actual</div>
-      </div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Previsió icona</div>
-        <div class="v" id="kSymbol">—</div>
-        <div class="s">Primera hora forecast</div>
-      </div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Ratxa màx. prev. 6 h</div>
-        <div class="v" id="kWind6">—</div>
-        <div class="s" id="kWind6Time">Hora —</div>
-      </div>
+<div class="card">
+<div class="chartTitle">
+Temperatura · 72 h
+</div>
+<div class="canvasWrap">
+<canvas id="cTemp72"></canvas>
+</div>
+</div>
 
-      <div class="kpi">
-        <div class="k">Estat</div>
-        <div class="v" id="kStatus">⏳</div>
-        <div class="s" id="kStatusText">Preparant dades…</div>
-      </div>
+<div class="card">
+<div class="chartTitle">
+Vent · 72 h
+</div>
+<div class="canvasWrap">
+<canvas id="cWind72"></canvas>
+</div>
+</div>
 
-    </div>
+<div class="card">
+<div class="chartTitle">
+Pluja · 72 h
+</div>
+<div class="canvasWrap">
+<canvas id="cRain72"></canvas>
+</div>
+</div>
 
-  </div>
-
-  <div class="card">
-    <div class="chartTitle">
-      Temperatura · 72 h
-      <span id="temp72Note">—</span>
-    </div>
-    <div class="canvasWrap">
-      <canvas id="cTemp72"></canvas>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="chartTitle">
-      Vent · 72 h
-      <span id="wind72Note">—</span>
-    </div>
-    <div class="canvasWrap">
-      <canvas id="cWind72"></canvas>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="chartTitle">
-      Pluja · 72 h
-      <span id="rain72Note">—</span>
-    </div>
-    <div class="canvasWrap">
-      <canvas id="cRain72"></canvas>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="chartTitle">
-      Humitat · 72 h
-      <span id="rh72Note">—</span>
-    </div>
-    <div class="canvasWrap">
-      <canvas id="cRH72"></canvas>
-    </div>
-  </div>
+<div class="card">
+<div class="chartTitle">
+Humitat · 72 h
+</div>
+<div class="canvasWrap">
+<canvas id="cRH72"></canvas>
+</div>
+</div>
 
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
 
-let gotCurrent = false;
-let gotForecast = false;
-
-let chartTemp72 = null;
-let chartWind72 = null;
-let chartRain72 = null;
-let chartRH72 = null;
-
-let currentData = null;
-let forecastData = null;
+const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec"
 
 function loadJSONP(url){
-  const s = document.createElement("script");
-  s.src = url + "&_=" + Date.now();
-  s.async = true;
-  s.onerror = function(){
-    setError("Error carregant JSONP:\n" + s.src);
-  };
-  document.body.appendChild(s);
+const s=document.createElement("script")
+s.src=url+"&_="+Date.now()
+document.body.appendChild(s)
 }
 
 function fmt1(x){
-  return (typeof x === "number" && Number.isFinite(x)) ? (Math.round(x * 10) / 10).toFixed(1) : "—";
+return (typeof x==="number")?(Math.round(x*10)/10).toFixed(1):"—"
 }
 
 function fmt0(x){
-  return (typeof x === "number" && Number.isFinite(x)) ? String(Math.round(x)) : "—";
+return (typeof x==="number")?Math.round(x):"—"
 }
 
 function ddhh(t){
-  const d = new Date(t);
-  return isNaN(d) ? "—" : d.toLocaleString("ca-ES",{weekday:"short",hour:"2-digit"});
+return new Date(t).toLocaleString("ca-ES",{weekday:"short",hour:"2-digit"})
 }
 
-function hhmm(t){
-  const d = new Date(t);
-  return isNaN(d) ? "—" : d.toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"});
-}
-
-function dirText8_(deg){
-  if (typeof deg !== "number" || !Number.isFinite(deg)) return "—";
-  const d = ((deg % 360) + 360) % 360;
-  const dirs = ["N","NE","E","SE","S","SO","O","NO"];
-  return dirs[Math.round(d / 45) % 8];
-}
-
-function dirArrow_(deg){
-  if (typeof deg !== "number" || !Number.isFinite(deg)) return "";
-  const d = ((deg % 360) + 360) % 360;
-  if (d >= 337.5 || d < 22.5) return "↑";
-  if (d < 67.5) return "↗";
-  if (d < 112.5) return "→";
-  if (d < 157.5) return "↘";
-  if (d < 202.5) return "↓";
-  if (d < 247.5) return "↙";
-  if (d < 292.5) return "←";
-  return "↖";
-}
-
-function symbolToEmoji(sym){
-  const s = String(sym || "").toLowerCase();
-  if (!s) return "⛅";
-  if (s.includes("thunder")) return "⛈️";
-  if (s.includes("snow")) return "❄️";
-  if (s.includes("rainshowers")) return "🌦️";
-  if (s.includes("heavyrain")) return "🌧️";
-  if (s.includes("rain")) return "🌧️";
-  if (s.includes("fog")) return "🌫️";
-  if (s.includes("cloudy")) return "☁️";
-  if (s.includes("partlycloudy")) return "⛅";
-  if (s.includes("clearsky")) return "☀️";
-  return "⛅";
-}
-
-function setError(msg){
-  const box = document.getElementById("errorBox");
-  box.style.display = "block";
-  box.textContent = msg;
-  document.getElementById("kStatus").textContent = "❌";
-  document.getElementById("kStatusText").textContent = "Error";
-}
-
-function clearError(){
-  const box = document.getElementById("errorBox");
-  box.style.display = "none";
-  box.textContent = "";
-}
-
-function updateStatus(){
-  if (gotCurrent && gotForecast){
-    document.getElementById("kStatus").textContent = "✅";
-    document.getElementById("kStatusText").textContent = "Dades carregades";
-  } else if (gotCurrent || gotForecast){
-    document.getElementById("kStatus").textContent = "⏳";
-    document.getElementById("kStatusText").textContent = "Càrrega parcial";
-  } else {
-    document.getElementById("kStatus").textContent = "⏳";
-    document.getElementById("kStatusText").textContent = "Preparant dades…";
-  }
-}
+let chartTemp72
+let chartWind72
+let chartRain72
+let chartRH72
 
 function commonOpts(unit){
-  return {
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{
-      legend:{display:false}
-    },
-    scales:{
-      x:{
-        grid:{color:"rgba(255,255,255,.06)"},
-        ticks:{color:"rgba(229,231,235,.72)", maxTicksLimit:12}
-      },
-      y:{
-        title:{display:true,text:unit,color:"rgba(229,231,235,.85)"},
-        ticks:{color:"rgba(229,231,235,.72)"},
-        grid:{color:"rgba(255,255,255,.06)"}
-      }
-    }
-  };
+return{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}},
+scales:{
+x:{grid:{color:"rgba(255,255,255,.06)"}},
+y:{title:{display:true,text:unit}}
+}
+}
 }
 
-function updateHero(){
-  const obs = currentData?.obs || {};
-  const first = Array.isArray(forecastData?.hourly) && forecastData.hourly.length ? forecastData.hourly[0] : null;
+window.cbCurrent=function(data){
 
-  const obsTemp = typeof obs.temp === "number" ? obs.temp : null;
-  const obsWind = typeof obs.wind_kmh === "number" ? obs.wind_kmh : null;
-  const obsDir = typeof obs.wdir_deg === "number" ? obs.wdir_deg : null;
-  const sym = first?.symbol || "";
+const obs=data.obs||{}
+const prev=data.prev_now||{}
 
-  document.getElementById("heroIcon").textContent = symbolToEmoji(sym);
-  document.getElementById("heroMain").textContent = `${fmt1(obsTemp)}°C`;
-  document.getElementById("heroSub").textContent =
-    `Vent ${dirText8_(obsDir)} ${dirArrow_(obsDir)} ${fmt0(obsWind)} km/h · ${sym || "sense símbol"}`;
+const dT=(obs.temp&&prev.temp)?obs.temp-prev.temp:null
+const dRH=(obs.rh&&prev.rh)?obs.rh-prev.rh:null
+
+kTemp.textContent=fmt1(obs.temp)+"°C"
+kRH.textContent=fmt0(obs.rh)+"%"
+kWind.textContent=fmt0(obs.wind_kmh)+" km/h"
+kGust.textContent="Ratxa "+fmt0(obs.gust_kmh)+" km/h"
+kRain.textContent=fmt1(obs.rain_day_mm)+" mm"
+kRainSoon.textContent="3h "+fmt1(data.derived?.rain_3h_mm)+" mm"
+
+kDeltaT.textContent="Δ "+(dT?fmt1(dT):"—")
+kDeltaRH.textContent="Δ "+(dRH?fmt0(dRH):"—")
+
+metaLine.textContent="Actualitzat: "+new Date().toLocaleString("ca-ES")
 }
 
-function renderCurrent(data){
-  const obs = data?.obs || {};
-  const prev = data?.prev_now || {};
-  const der = data?.derived || {};
+window.cbForecast=function(data){
 
-  const dT = (typeof obs.temp === "number" && typeof prev.temp === "number") ? obs.temp - prev.temp : null;
-  const dRH = (typeof obs.rh === "number" && typeof prev.rh === "number") ? obs.rh - prev.rh : null;
+const h=data.hourly.slice(0,72)
 
-  document.getElementById("kTemp").textContent = fmt1(obs.temp) + "°C";
-  document.getElementById("kRH").textContent = fmt0(obs.rh) + "%";
-  document.getElementById("kWind").textContent = fmt0(obs.wind_kmh) + " km/h";
-  document.getElementById("kGust").textContent = "Ratxa " + fmt0(obs.gust_kmh) + " km/h";
-  document.getElementById("kRain").textContent = fmt1(obs.rain_day_mm) + " mm";
-  document.getElementById("kRainSoon").textContent = "3h " + fmt1(der.rain_3h_mm) + " mm";
+const labels=h.map(x=>ddhh(x.t))
 
-  document.getElementById("kDeltaT").textContent = "Δ " + (dT === null ? "—" : ((dT > 0 ? "+" : "") + fmt1(dT)));
-  document.getElementById("kDeltaRH").textContent = "Δ " + (dRH === null ? "—" : ((dRH > 0 ? "+" : "") + fmt0(dRH)));
+const temp=h.map(x=>x.temp)
+const wind=h.map(x=>x.wind_kmh)
+const rain=h.map(x=>x.rain_mm)
+const rh=h.map(x=>x.rh)
 
-  document.getElementById("kDir").textContent = `${dirText8_(obs.wdir_deg)} ${dirArrow_(obs.wdir_deg)}`;
-  document.getElementById("kWind6").textContent = fmt1(der.wind6_max_kmh) + " km/h";
-  document.getElementById("kWind6Time").textContent = "Hora " + (der.wind6_peak_hhmm || "—");
+if(chartTemp72)chartTemp72.destroy()
+if(chartWind72)chartWind72.destroy()
+if(chartRain72)chartRain72.destroy()
+if(chartRH72)chartRH72.destroy()
 
-  const upd = data?.source?.forecast_updated_at || "—";
-  document.getElementById("metaLine").textContent =
-    "Actualitzat: " + new Date().toLocaleString("ca-ES") + " · Met.no: " + upd;
+chartTemp72=new Chart(cTemp72,{
+type:"line",
+data:{labels:labels,datasets:[{data:temp,tension:.35}]},
+options:commonOpts("°C")
+})
+
+chartWind72=new Chart(cWind72,{
+type:"line",
+data:{labels:labels,datasets:[{data:wind,tension:.35}]},
+options:commonOpts("km/h")
+})
+
+chartRain72=new Chart(cRain72,{
+type:"bar",
+data:{labels:labels,datasets:[{data:rain}]},
+options:commonOpts("mm")
+})
+
+chartRH72=new Chart(cRH72,{
+type:"line",
+data:{labels:labels,datasets:[{data:rh,tension:.35}]},
+options:commonOpts("%")
+})
+
 }
 
-function renderForecast(data){
-  const h = Array.isArray(data?.hourly) ? data.hourly.slice(0,72) : [];
-  if (!h.length) throw new Error("Forecast sense hourly");
+loadJSONP(API+"?out=current&callback=cbCurrent")
+loadJSONP(API+"?out=forecast&callback=cbForecast")
 
-  const labels = h.map(x => ddhh(x.t));
-  const temp = h.map(x => typeof x.temp === "number" ? x.temp : null);
-  const wind = h.map(x => typeof x.wind_kmh === "number" ? x.wind_kmh : null);
-  const rain = h.map(x => typeof x.rain_mm === "number" ? x.rain_mm : 0);
-  const rh = h.map(x => typeof x.rh === "number" ? x.rh : null);
-
-  const first = h[0];
-  document.getElementById("kSymbol").textContent = symbolToEmoji(first?.symbol);
-  document.getElementById("temp72Note").textContent = "de " + hhmm(h[0].t) + " a " + hhmm(h[h.length-1].t);
-  document.getElementById("wind72Note").textContent = "72 h";
-  document.getElementById("rain72Note").textContent = "72 h";
-  document.getElementById("rh72Note").textContent = "72 h";
-
-  if (chartTemp72) chartTemp72.destroy();
-  if (chartWind72) chartWind72.destroy();
-  if (chartRain72) chartRain72.destroy();
-  if (chartRH72) chartRH72.destroy();
-
-  chartTemp72 = new Chart(document.getElementById("cTemp72"), {
-    type:"line",
-    data:{ labels, datasets:[{ data:temp, tension:.35, borderWidth:2 }] },
-    options: commonOpts("°C")
-  });
-
-  chartWind72 = new Chart(document.getElementById("cWind72"), {
-    type:"line",
-    data:{ labels, datasets:[{ data:wind, tension:.35, borderWidth:2 }] },
-    options: commonOpts("km/h")
-  });
-
-  chartRain72 = new Chart(document.getElementById("cRain72"), {
-    type:"bar",
-    data:{ labels, datasets:[{ data:rain, borderWidth:0 }] },
-    options: commonOpts("mm")
-  });
-
-  chartRH72 = new Chart(document.getElementById("cRH72"), {
-    type:"line",
-    data:{ labels, datasets:[{ data:rh, tension:.35, borderWidth:2 }] },
-    options: commonOpts("%")
-  });
-}
-
-window.cbCurrent = function(data){
-  try{
-    gotCurrent = true;
-    currentData = data;
-    renderCurrent(data);
-    if (forecastData) updateHero();
-    clearError();
-  } catch(err){
-    setError("Error current:\n" + (err?.message || String(err)));
-  }
-  updateStatus();
-};
-
-window.cbForecast = function(data){
-  try{
-    gotForecast = true;
-    forecastData = data;
-    renderForecast(data);
-    if (currentData) updateHero();
-    clearError();
-  } catch(err){
-    setError("Error forecast:\n" + (err?.message || String(err)));
-  }
-  updateStatus();
-};
-
-updateStatus();
-loadJSONP(API + "?out=current&callback=cbCurrent");
-loadJSONP(API + "?out=forecast&callback=cbForecast");
 </script>
 
 </body>
