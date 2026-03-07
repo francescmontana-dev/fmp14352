@@ -1,8 +1,8 @@
-{"date":"21:15",
-"temp":"12.8",
-"hum":"83",
+{"date":"21:20",
+"temp":"12.9",
+"hum":"82",
 "wspeed":"1",
-"wgust":"4",
-"bearing":"78",
+"wgust":"5",
+"bearing":"74",
 "press":"1022.9",
 "rfall":"0.0"}
