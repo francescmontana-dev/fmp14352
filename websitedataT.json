@@ -82,9 +82,8 @@
 "press":"<#press>",
 "presstrend":"<#presstrend>",
 "presstrendval":"<#presstrendval>",
-"snowdepth":"<#snowdepth>",
-"snow24hr":"<#snow24hr>",
-"snowunit":"<#snowunit>",
+"snowdepth":"<#snowDepth>",
+"snow24h":"<#snow24h>",
 
 "tempTH":"<#tempTH>",
 "TtempTH":"<#TtempTH>",
@@ -450,5 +449,8 @@
 "pressL":"<#pressL>",
 "TpressL":"<#TpressL>",
 "pressH":"<#pressH>",
-"TpressH":"<#TpressH>"
+"TpressH":"<#TpressH>",
+
+"snowdepth":"<#snowdepth>",
+"snow24h":"<#snow24h>"
 }

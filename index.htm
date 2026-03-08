@@ -1,6 +1,6 @@
 <!--
 	index.html		v:0.0.1		d:Feb 2021	Neil Thomas
-	Last modified: 2025/11/21 20:16:37
+	Last modified: 2022/11/20 16:28:39
 	Page: 1 main panel plus a right sidebar
 -->
 <!DOCTYPE html>
@@ -29,7 +29,7 @@
 		<script src="js/setpagedata.js"></script>	<!--	Utility javascripts for all pages.	-->
 		<script>
 			window.onload = () => {
-				$('#moonImg').attr('src', 'images/moon.jpg?' + Date.now());
+				$('#moonImg').attr('src', 'images/moon.png?' + Date.now());
 				// update the moon image every 20 minutes if the page is left open
 				setInterval(() => {
 					$('#moonImg').attr('src', 'images/moon.png?' + Date.now());
@@ -84,7 +84,6 @@
 												<td class="">Sun Set:</td>
 												<td class=""><span data-cmxdata="sunset"></span></td>
 												<td class="">Moon Set:</td>
-												
 												<td class=""><span data-cmxdata="moonset"></span></td>
 											</tr>
 											<tr>
@@ -93,12 +92,8 @@
 												<td class="">Day Length:</td>
 												<td class=""><span data-cmxdata="daylength"></span></td>
 												<td class="">Moon Phase:</td>
-<td class="">
-<span id="moonPhase" data-cmxdata="moonphase"></span>
-<br>
-<img id="moonImg" src="images/moon.png">
-</td>
-												
+												<td class=""><span id="moonPhase" data-cmxdata="moonphase"></span></td>
+											</tr>
 											<tr id="currCond" class="w3-hide">
 												<td colspan="7"><strong>Current conditions</strong>: <span data-cmxdata="currcond"></span></td>
 											</tr>
@@ -160,7 +155,7 @@
 											<td>Current snow depth</td>
 											<td><span data-cmxdata="snowdepth">--</span> <span data-cmxdata="snowunit">--</span></td>
 											<td>Snowfall in 24 hours</td>
-											<td><span data-cmxdata="snow24hr">--</span> <span data-cmxdata="snowunit">--</span></td>
+											<td><span data-cmxdata="snow24h">--</span> <span data-cmxdata="snowunit">--</span></td>
 										</tr>
 										<tr class="w3-theme-l3">
 											<td>Rainfall Last Hour</td>
@@ -219,7 +214,7 @@
 										</tr>
 									</table>
 								</div>
-								<p><strong> <span id="zForecast" data-cmxdata="forecast"></span></p>
+								<p class="w3-small credits">Page updated <span data-cmxdata="update"></span>.</p>
 							</div>
 						</div>
 					</div>
@@ -232,54 +227,18 @@
 								<p>The weather station in use is the <span data-cmxdata="stationtype"></span><br>
 									This page is updated every <span data-cmxdata="interval"></span> minutes. The meteorological day used at this station ends at <span data-cmxdata="rollovertime"></span>.
 								</p>
-						<p><strong>Previsión:</strong> 
-  <span id="zForecast" data-cmxdata="forecast"></span>
-</p>
+								<p><strong>Forecast:</strong> <span data-cmxdata="forecast"></span></p>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>	<!--	End of panel content -->
 		</div>	<!--	End of content	-->
-		<p><strong>Previsión:</strong> 
-  <span id="zForecast" data-cmxdata="forecast"></span>
-</p><div id="Footer" class="w3-row w3-bottom w3-theme-dark w3-theme-bdr">
-  <div class="w3-row-padding site-width">
-    <p><em>Cumulus MX Template by Neil Thomas 
-    <script>document.write(new Date().getFullYear());</script>
-    <span class="w3-right">
-      Powered by <span class="w3-theme-txt">Cumulus MX</span> 
-      v:<span data-cmxdata="version"></span>, 
-      b:<span data-cmxdata="build"></span>
-    </span></em></p>
-  </div>
-</div>
-
-<script>
-window.addEventListener("load", function () {
-
-  function translateForecast() {
-    var el = document.getElementById("zForecast");
-    if (!el) return;
-
-    var raw = (el.textContent || "").trim();
-    if (!raw) return;
-
-    raw = raw.toLowerCase();
-
-    if (raw.includes("fine")) el.textContent = "Tiempo estable";
-    else if (raw.includes("changeable")) el.textContent = "Tiempo variable";
-    else if (raw.includes("unsettled")) el.textContent = "Tiempo inestable";
-    else if (raw.includes("rain")) el.textContent = "Lluvia";
-    else if (raw.includes("storm")) el.textContent = "Tormentoso";
-  }
-
-  // Espera a que Cumulus rellene el texto
-  setTimeout(translateForecast, 2000);
-  setInterval(translateForecast, 5000);
-
-});
-</script>
-
-</body>
+		<div id="Footer" class="w3-row w3-bottom w3-theme-dark w3-theme-bdr">
+			<div class="w3-row-padding site-width">
+				<p><em>Cumulus MX Template by Neil Thomas <script>document.write(new Date().getFullYear());</script>
+				<span class="w3-right">Powered by <span class="w3-theme-txt">Cumulus MX</span> v:<span data-cmxdata="version"></span>, b:<span data-cmxdata="build"></span></span></em></p>
+			</div>
+		</div>
+	</body>
 </html>
