@@ -67,7 +67,7 @@ gauges = (function () {
                                                          // The realtime files should be absolute paths, "/xxx.txt" refers to the public root of your web server
             realTimeUrlLongPoll: 'realtimegauges-longpoll.php',     // *** ALL Users: If using long polling, change to your location of the PHP long poll realtime file ***
                                                                     // *** the supplied file is for Cumulus only
-            realTimeUrlCumulus : 'realtimegauges.txt',     // *** Cumulus Users: Change to your location of the realtime file ***
+            realTimeUrlCumulus : '../realtimegauges.txt',     // *** Cumulus Users: Change to your location of the realtime file ***
             realTimeUrlWD      : 'customclientraw.txt',    // *** WD Users: Change to your location of the ccr file ***
             realTimeUrlVWS     : 'steelseriesVWSjson.php', // *** VWS Users: Change to your location of the JSON script generator ***
             realTimeUrlWC      : 'realtimegaugesWC.txt',   // *** WeatherCat Users: Change to your location of the JSON script generator ***
