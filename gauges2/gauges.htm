@@ -6,7 +6,15 @@
   <title>Instruments Meteorològics - El Masnou NE</title>
   <link rel="stylesheet" href="css/gauges-ss.css">
 </head>
-
+<script>
+window.addEventListener("load", function() {
+  try {
+    if (window.gauges && gauges.setUnits) {
+      gauges.setUnits({ cloudbase: "m" });
+    }
+  } catch(e) {}
+});
+</script>
 <body>
 <div style="max-width:1200px; margin:0 auto; padding:14px 10px 6px 10px;">
   <div style="background:#0b3d91; color:white; border-radius:12px; padding:22px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.18);">
