@@ -274,12 +274,12 @@ window.addEventListener("load", function () {
     else if (raw.includes("storm")) el.textContent = "Tormentoso";
   }
 
-  // Espera a que Cumulus rellene el texto
   setTimeout(translateForecast, 2000);
   setInterval(translateForecast, 5000);
 
 });
 </script>
+
 <div style="width:100%; margin-top:20px;">
   <h2>Instrumentos de la estación</h2>
   <iframe src="./gauges2/gauges.htm"
@@ -289,5 +289,6 @@ window.addEventListener("load", function () {
           style="border:none; display:block;">
   </iframe>
 </div>
+
 </body>
 </html>
