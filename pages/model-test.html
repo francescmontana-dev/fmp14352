@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <title>Prova del model El Masnou NE</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #model-banner {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f7f7f7;
+      max-width: 900px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>PROVA NOVA MODEL EL MASNOU NE</h1>
+
+  <div id="model-banner">
+    <strong>Model El Masnou NE</strong><br>
+    <span id="mb-temp-real">--</span> ·
+    <span id="mb-temp-forecast">--</span> ·
+    <span id="mb-temp-dev">--</span> ·
+    <span id="mb-temp-quality">--</span>
+  </div>
+
+  <script>
+    async function loadModelBanner() {
+      try {
+        const response = await fetch('/fmp14352/model/banner.json?_=' + Date.now());
+        if (!response.ok) {
+          throw new Error('No s’ha pogut carregar banner.json');
+        }
+
+        const data = await response.json();
+
+        const realTemp = data.real.temperature_c;
+        const forecastTemp = data.forecast.temperature_c;
+        const devTemp = data.deviation.temperature_c;
+        const qualityTemp = (data.quality.temperature || '').trim();
+
+        let qualityText = qualityTemp;
+        if (qualityTemp === 'baja') qualityText = 'baix';
+        if (qualityTemp === 'media') qualityText = 'mitjà';
+        if (qualityTemp === 'alta') qualityText = 'alt';
+
+        document.getElementById('mb-temp-real').textContent =
+          `Real: ${realTemp} °C`;
+
+        document.getElementById('mb-temp-forecast').textContent =
+          `Previst: ${forecastTemp} °C`;
+
+        document.getElementById('mb-temp-dev').textContent =
+          `Desviació: ${devTemp} °C`;
+
+        document.getElementById('mb-temp-quality').textContent =
+          `Error model: ${qualityText}`;
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('model-banner').textContent =
+          'Model El Masnou NE no disponible';
+      }
+    }
+
+    loadModelBanner();
+  </script>
+</body>
+</html>
