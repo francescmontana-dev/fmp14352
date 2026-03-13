@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-03-13T15:33:12.369942+00:00",
+  "generated_at_utc": "2026-03-13T15:43:12.393878+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "Europe/Madrid",
@@ -52,17 +52,17 @@
     },
     {
       "date": "2026-03-18",
-      "temp_max_c": 17.2,
-      "temp_min_c": 6.4,
+      "temp_max_c": 17.3,
+      "temp_min_c": 5.9,
       "precipitation_sum_mm": 0.0,
-      "wind_speed_max_kmh": 15.0
+      "wind_speed_max_kmh": 15.3
     },
     {
       "date": "2026-03-19",
-      "temp_max_c": 16.2,
-      "temp_min_c": 10.0,
-      "precipitation_sum_mm": 0.0,
-      "wind_speed_max_kmh": 14.2
+      "temp_max_c": 15.7,
+      "temp_min_c": 7.0,
+      "precipitation_sum_mm": 0.3,
+      "wind_speed_max_kmh": 22.3
     }
   ]
 }
