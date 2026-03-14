@@ -152,7 +152,7 @@ border-left:4px solid #2563eb;
 <script>
 
 const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
-
+let modelTempCorrection = 0;
 function loadJSONP(url){
 const s=document.createElement("script");
 s.src=url+"&_="+Date.now();
@@ -199,19 +199,21 @@ setText("modelRain",`Pluja real ${obs.rain_day_mm??"--"} mm · prevista 3h ${der
 
 function cbForecast(data){
 
-if(!data||!data.ok)return;
-
-const rows=data.hourly;
-
 function r(n){
 
-if(!rows[n])return"--";
+if(!rows[n]) return "--";
 
-const t=rows[n].temp??"--";
-const w=rows[n].wind_kmh??"--";
-const rain=rows[n].rain_mm??"--";
+const t = rows[n].temp ?? "--";
+const w = rows[n].wind_kmh ?? "--";
+const rain = rows[n].rain_mm ?? "--";
 
-return`${t} °C · vent ${w} km/h · pluja ${rain} mm`;
+let tLocal = t;
+
+if(typeof t === "number"){
+tLocal = (t + modelTempCorrection).toFixed(1);
+}
+
+return `${tLocal} °C · vent ${w} km/h · pluja ${rain} mm`;
 
 }
 
@@ -228,7 +230,7 @@ if(!data||!data.ok)return;
 const realT=data.real?.temperature_c??"--";
 const prevT=data.forecast?.temperature_c??"--";
 const devT=data.deviation?.temperature_c??"--";
-
+if(typeof devT==="number") modelTempCorrection = devT;
 const realW=data.real?.wind_speed_kmh??"--";
 const prevW=data.forecast?.wind_speed_kmh??"--";
 
