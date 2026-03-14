@@ -115,15 +115,15 @@
     </div>
 
     <div class="card model">
-      <h2>Model El Masnou NE</h2>
-      <div class="line" id="modelTemp">Real -- °C · Previst -- °C</div>
-      <div class="line" id="modelDev">Desviació: -- °C</div>
-      <div class="line" id="modelWind">Vent real -- / previst -- km/h</div>
-      <div class="line" id="modelHum">Humitat real -- / prevista -- %</div>
-      <div class="line" id="modelHumDev">Desviació humitat: -- %</div>
-      <div class="line" id="modelErr">Error model: --</div>
-      <div class="line small" id="modelTime">Hora model: --</div>
-    </div>
+  <h2>Model El Masnou NE</h2>
+  <div class="line" id="modelTemp">Real -- °C · Previst -- °C</div>
+  <div class="line" id="modelDev">Desviació: -- °C</div>
+  <div class="line" id="modelWind">Vent real -- / previst -- km/h</div>
+  <div class="line" id="modelHum">Humitat real -- / prevista -- %</div>
+  <div class="line" id="modelHumDev">Desviació humitat: -- %</div>
+  <div class="line" id="modelRain">Pluja real -- mm · prevista 3h -- mm</div>
+  <div class="line" id="modelErr">Error model: --</div>
+  <div class="line small" id="modelTime">Hora model: --</div>
   </div>
 
   <canvas id="forecastChart" height="110"></canvas>
@@ -213,6 +213,10 @@ function cbCurrent(data) {
   setText("prevDir", `Direcció: ${now.wdir_deg ?? "--"} °`);
   setText("rain3h", `Pluja 3h: ${der.rain_3h_mm ?? "--"} mm`);
   setText("wind6", `Vent màx. 6h: ${der.wind6_max_kmh ?? "--"} km/h (${der.wind6_peak_hhmm ?? "--"})`);
+
+  const rainReal = obs.rain_day_mm ?? "--";
+  const rainPrev = der.rain_3h_mm ?? "--";
+  setText("modelRain", `Pluja real ${rainReal} mm · prevista 3h ${rainPrev} mm`);
 }
 
 function cbForecast(data) {
