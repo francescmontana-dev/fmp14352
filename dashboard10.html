@@ -331,6 +331,7 @@ function cbModel(data) {
   if (!data || !data.ok) return;
 
   const realT = data.real?.temperature_c ?? "--";
+  setText("obsTemp", `${realT} °C`);
   const prevT = data.forecast?.temperature_c ?? "--";
   const devT = data.deviation?.temperature_c ?? "--";
 
