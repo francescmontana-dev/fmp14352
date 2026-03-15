@@ -210,10 +210,11 @@ const rain = rows[n].rain_mm ?? "--";
 let tLocal = t;
 
 if(typeof t === "number"){
-tLocal = (t + modelTempCorrection).toFixed(1);
+tLocal = (t + modelTempCorrection * 0.6).toFixed(1);
 }
 
 return `${tLocal} °C · vent ${w} km/h · pluja ${rain} mm`;
+
 
 }
 
