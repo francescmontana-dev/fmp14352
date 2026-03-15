@@ -199,28 +199,49 @@ setText("modelRain",`Pluja real ${obs.rain_day_mm??"--"} mm · prevista 3h ${der
 
 function cbForecast(data){
 
-function r(n){
+  if(!data || !data.ok) return;
 
-if(!rows[n]) return "--";
+  console.log("FORECAST DATA", data);
 
-const t = rows[n].temp ?? "--";
-const w = rows[n].wind_kmh ?? "--";
-const rain = rows[n].rain_mm ?? "--";
+  let rows = data.rows || data.hours || data.forecast || data.data || [];
 
-let tLocal = t;
+  if (Array.isArray(rows)) {
+    const map = {};
+    rows.forEach(row => {
+      const h = Number(row.hour ?? row.h ?? row.offset_h ?? row.horizon ?? row.hours_ahead);
+      if (Number.isFinite(h)) map[h] = row;
+    });
+    rows = map;
+  }
 
-if(typeof t === "number"){
-tLocal = (t + modelTempCorrection * 0.6).toFixed(1);
-}
+  function pick(row, keys, fallback="--"){
+    for(const k of keys){
+      if(row && row[k] !== undefined && row[k] !== null && row[k] !== "") return row[k];
+    }
+    return fallback;
+  }
 
-return `${tLocal} °C · vent ${w} km/h · pluja ${rain} mm`;
+  function r(n){
+    const row = rows[n];
+    if(!row) return "--";
 
+    const t = pick(row, ["temp", "temperature_c", "temp_c"]);
+    const w = pick(row, ["wind_kmh", "wind_speed_kmh"]);
+    const rain = pick(row, ["rain_mm", "precip_mm", "rain"]);
 
-}
+    let tLocal = t;
 
-setText("p6","+6 h · "+r(6));
-setText("p12","+12 h · "+r(12));
-setText("p24","+24 h · "+r(24));
+    const tNum = asNumber(t, null);
+    if(tNum !== null){
+      tLocal = (tNum + modelTempCorrection * 0.6).toFixed(1);
+    }
+
+    return `${tLocal} °C · vent ${w} km/h · pluja ${rain} mm`;
+  }
+
+  setText("p6", "+6 h · " + r(6));
+  setText("p12", "+12 h · " + r(12));
+  setText("p24", "+24 h · " + r(24));
 
 }
 
