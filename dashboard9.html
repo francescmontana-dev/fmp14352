@@ -1,237 +1,78 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard 9 — El Masnou</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-
-body{
-font-family:Arial, Helvetica, sans-serif;
-margin:0;
-padding:20px;
-background:#f4f7fb;
-color:#1f2937;
-}
-
-.wrap{
-max-width:1100px;
-margin:0 auto;
-}
-
-h1{
-margin:0 0 10px 0;
-font-size:28px;
-}
-
-.meta{
-color:#4b5563;
-margin-bottom:18px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:14px;
-margin-bottom:18px;
-}
-
-.card{
-background:#fff;
-border-radius:12px;
-padding:16px;
-box-shadow:0 2px 10px rgba(0,0,0,.06);
-}
-
-.card h2{
-margin:0 0 12px 0;
-font-size:18px;
-}
-
-.line{
-margin:6px 0;
-font-size:15px;
-}
-
-.big{
-font-size:30px;
-font-weight:700;
-}
-
-.model{
-background:#eef6ff;
-border-left:4px solid #2563eb;
-}
-
-.ok{color:#15803d;font-weight:700;}
-.mid{color:#b45309;font-weight:700;}
-.bad{color:#b91c1c;font-weight:700;}
-
-</style>
-</head>
-
-<body>
-
-<div class="wrap">
-
-<h1>Tauler Meteo — El Masnou</h1>
-
-<div class="meta" id="metaLine">Carregant dades…</div>
-
-<div class="grid">
-
-<div class="card">
-
-<h2>Observació actual</h2>
-
-<div class="line big" id="obsTemp">-- °C</div>
-
-<div class="line" id="obsHum">Humitat: -- %</div>
-
-<div class="line" id="obsWind">Vent: -- km/h</div>
-
-<div class="line" id="obsRain">Pluja dia: -- mm</div>
-
-</div>
-
-<div class="card">
-
-<h2>Previsió general</h2>
-
-<div class="line big" id="prevTemp">-- °C</div>
-
-<div class="line" id="prevHum">Humitat: -- %</div>
-
-<div class="line" id="prevWind">Vent: -- km/h</div>
-
-<div class="line" id="rain3h">Pluja 3h: -- mm</div>
-
-</div>
-
-<div class="card model">
-
-<h2>Model El Masnou NE</h2>
-
-<div class="line" id="modelTemp">Real -- °C · Previst -- °C</div>
-
-<div class="line" id="modelDev">Desviació: -- °C</div>
-
-<div class="line" id="modelWind">Vent real -- / previst -- km/h</div>
-
-<div class="line" id="modelHum">Humitat real -- / prevista -- %</div>
-
-<div class="line" id="modelHumDev">Desviació humitat: -- %</div>
-
-<div class="line" id="modelRain">Pluja real -- mm · prevista 3h -- mm</div>
-
-<div class="line" id="modelErr">Error model: --</div>
-
-<div class="line small" id="modelTime">Hora model: --</div>
-
-</div>
-
-<div class="card">
-
-<h2>Previsió pròpia 24 h</h2>
-
-<div class="line" id="p6">+6 h · --</div>
-
-<div class="line" id="p12">+12 h · --</div>
-
-<div class="line" id="p24">+24 h · --</div>
-
-</div>
-
-</div>
-
-</div>
-
 <script>
-
 const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
 let modelTempCorrection = 0;
+
 function loadJSONP(url){
-const s=document.createElement("script");
-s.src=url+"&_="+Date.now();
-document.body.appendChild(s);
+  const s = document.createElement("script");
+  s.src = url + "&_=" + Date.now();
+  s.onerror = function(){
+    console.error("Error carregant JSONP:", url);
+  };
+  document.body.appendChild(s);
 }
 
-function setText(id,txt){
-const el=document.getElementById(id);
-if(el)el.textContent=txt;
+function setText(id, txt){
+  const el = document.getElementById(id);
+  if(el) el.textContent = txt;
+}
+
+function asNumber(v, fallback = null){
+  if(v === null || v === undefined || v === "") return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
 }
 
 function qText(q){
+  const v = (q || "").toLowerCase();
 
-const v=(q||"").toLowerCase();
+  if(v === "baja") return { text:"bona precisió", cls:"ok" };
+  if(v === "media") return { text:"precisió mitjana", cls:"mid" };
+  if(v === "alta") return { text:"precisió baixa", cls:"bad" };
 
-if(v==="baja")return{text:"bona precisió",cls:"ok"};
-if(v==="media")return{text:"precisió mitjana",cls:"mid"};
-if(v==="alta")return{text:"precisió baixa",cls:"bad"};
-
-return{text:"--",cls:""};
+  return { text:"--", cls:"" };
 }
 
 function cbCurrent(data){
-
-if(!data||!data.ok)return;
-
-const obs=data.obs||{};
-const now=data.prev_now||{};
-const der=data.derived||{};
-
-setText("obsTemp",`${obs.temp??"--"} °C`);
-setText("obsHum",`Humitat: ${obs.rh??"--"} %`);
-setText("obsWind",`Vent: ${obs.wind_kmh??"--"} km/h`);
-setText("obsRain",`Pluja dia: ${obs.rain_day_mm??"--"} mm`);
-
-setText("prevTemp",`${now.temp??"--"} °C`);
-setText("prevHum",`Humitat: ${now.rh??"--"} %`);
-setText("prevWind",`Vent: ${now.wind_kmh??"--"} km/h`);
-setText("rain3h",`Pluja 3h: ${der.rain_3h_mm??"--"} mm`);
-
-setText("modelRain",`Pluja real ${obs.rain_day_mm??"--"} mm · prevista 3h ${der.rain_3h_mm??"--"} mm`);
-
-}
-
-function cbForecast(data){
+  console.log("CURRENT", data);
 
   if(!data || !data.ok) return;
 
-  console.log("FORECAST DATA", data);
+  const obs = data.obs || {};
+  const now = data.prev_now || {};
+  const der = data.derived || {};
 
-  let rows = data.rows || data.hours || data.forecast || data.data || [];
+  setText("obsTemp", `${obs.temp ?? "--"} °C`);
+  setText("obsHum", `Humitat: ${obs.rh ?? "--"} %`);
+  setText("obsWind", `Vent: ${obs.wind_kmh ?? "--"} km/h`);
+  setText("obsRain", `Pluja dia: ${obs.rain_day_mm ?? "--"} mm`);
 
-  if (Array.isArray(rows)) {
-    const map = {};
-    rows.forEach(row => {
-      const h = Number(row.hour ?? row.h ?? row.offset_h ?? row.horizon ?? row.hours_ahead);
-      if (Number.isFinite(h)) map[h] = row;
-    });
-    rows = map;
-  }
+  setText("prevTemp", `${now.temp ?? "--"} °C`);
+  setText("prevHum", `Humitat: ${now.rh ?? "--"} %`);
+  setText("prevWind", `Vent: ${now.wind_kmh ?? "--"} km/h`);
+  setText("rain3h", `Pluja 3h: ${der.rain_3h_mm ?? "--"} mm`);
 
-  function pick(row, keys, fallback="--"){
-    for(const k of keys){
-      if(row && row[k] !== undefined && row[k] !== null && row[k] !== "") return row[k];
-    }
-    return fallback;
-  }
+  setText("modelRain", `Pluja real ${obs.rain_day_mm ?? "--"} mm · prevista 3h ${der.rain_3h_mm ?? "--"} mm`);
+  setText("metaLine", "Dades carregades");
+}
+
+function cbForecast(data){
+  console.log("FORECAST", data);
+
+  if(!data || !data.ok) return;
+
+  const rows = data.rows || {};
 
   function r(n){
     const row = rows[n];
     if(!row) return "--";
 
-    const t = pick(row, ["temp", "temperature_c", "temp_c"]);
-    const w = pick(row, ["wind_kmh", "wind_speed_kmh"]);
-    const rain = pick(row, ["rain_mm", "precip_mm", "rain"]);
+    const t = row.temp ?? "--";
+    const w = row.wind_kmh ?? "--";
+    const rain = row.rain_mm ?? "--";
 
     let tLocal = t;
-
     const tNum = asNumber(t, null);
+
     if(tNum !== null){
       tLocal = (tNum + modelTempCorrection * 0.6).toFixed(1);
     }
@@ -242,48 +83,45 @@ function cbForecast(data){
   setText("p6", "+6 h · " + r(6));
   setText("p12", "+12 h · " + r(12));
   setText("p24", "+24 h · " + r(24));
-
 }
 
 function cbModel(data){
+  console.log("MODEL", data);
 
-if(!data||!data.ok)return;
+  if(!data || !data.ok) return;
 
-const realT=data.real?.temperature_c??"--";
-const prevT=data.forecast?.temperature_c??"--";
-const devT=data.deviation?.temperature_c??"--";
-if(typeof devT==="number") modelTempCorrection = devT;
-const realW=data.real?.wind_speed_kmh??"--";
-const prevW=data.forecast?.wind_speed_kmh??"--";
+  const realT = data.real?.temperature_c ?? "--";
+  const prevT = data.forecast?.temperature_c ?? "--";
+  const devT = data.deviation?.temperature_c ?? "--";
 
-const realH=data.real?.humidity_pct??"--";
-const prevH=data.forecast?.humidity_pct??"--";
-const devH=data.deviation?.humidity_pct??"--";
+  if(typeof devT === "number"){
+    modelTempCorrection = devT;
+  }
 
-const q=qText(data.quality?.temperature);
+  const realW = data.real?.wind_speed_kmh ?? "--";
+  const prevW = data.forecast?.wind_speed_kmh ?? "--";
 
-setText("modelTemp",`Real ${realT} °C · Previst ${prevT} °C`);
-setText("modelDev",`Desviació: ${devT} °C`);
-setText("modelWind",`Vent real ${realW} / previst ${prevW} km/h`);
-setText("modelHum",`Humitat real ${realH} / prevista ${prevH} %`);
-setText("modelHumDev",`Desviació humitat: ${devH} %`);
+  const realH = data.real?.humidity_pct ?? "--";
+  const prevH = data.forecast?.humidity_pct ?? "--";
+  const devH = data.deviation?.humidity_pct ?? "--";
 
-const err=document.getElementById("modelErr");
+  const q = qText(data.quality?.temperature);
 
-if(err){
-err.textContent=`Error model: ${q.text}`;
-err.className="line "+q.cls;
+  setText("modelTemp", `Real ${realT} °C · Previst ${prevT} °C`);
+  setText("modelDev", `Desviació: ${devT} °C`);
+  setText("modelWind", `Vent real ${realW} / previst ${prevW} km/h`);
+  setText("modelHum", `Humitat real ${realH} / prevista ${prevH} %`);
+  setText("modelHumDev", `Desviació humitat: ${devH} %`);
+  setText("modelTime", `Hora model: ${data.matched_model_time ?? "--"}`);
+
+  const err = document.getElementById("modelErr");
+  if(err){
+    err.textContent = `Error model: ${q.text}`;
+    err.className = "line " + q.cls;
+  }
 }
 
-setText("modelTime",`Hora model: ${data.matched_model_time??"--"}`);
-
-}
-
-loadJSONP(API+"?out=current&callback=cbCurrent");
-loadJSONP(API+"?out=forecast&callback=cbForecast");
-loadJSONP(API+"?out=model&callback=cbModel");
-
+loadJSONP(API + "?out=current&callback=cbCurrent");
+loadJSONP(API + "?out=forecast&callback=cbForecast");
+loadJSONP(API + "?out=model&callback=cbModel");
 </script>
-
-</body>
-</html>
