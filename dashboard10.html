@@ -1,0 +1,127 @@
+<script>
+const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
+let modelTempCorrection = 0;
+
+function loadJSONP(url){
+  const s = document.createElement("script");
+  s.src = url + "&_=" + Date.now();
+  s.onerror = function(){
+    console.error("Error carregant JSONP:", url);
+  };
+  document.body.appendChild(s);
+}
+
+function setText(id, txt){
+  const el = document.getElementById(id);
+  if(el) el.textContent = txt;
+}
+
+function asNumber(v, fallback = null){
+  if(v === null || v === undefined || v === "") return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function qText(q){
+  const v = (q || "").toLowerCase();
+
+  if(v === "baja") return { text:"bona precisió", cls:"ok" };
+  if(v === "media") return { text:"precisió mitjana", cls:"mid" };
+  if(v === "alta") return { text:"precisió baixa", cls:"bad" };
+
+  return { text:"--", cls:"" };
+}
+
+function cbCurrent(data){
+  console.log("CURRENT", data);
+
+  if(!data || !data.ok) return;
+
+  const obs = data.obs || {};
+  const now = data.prev_now || {};
+  const der = data.derived || {};
+
+  setText("obsTemp", `${obs.temp ?? "--"} °C`);
+  setText("obsHum", `Humitat: ${obs.rh ?? "--"} %`);
+  setText("obsWind", `Vent: ${obs.wind_kmh ?? "--"} km/h`);
+  setText("obsRain", `Pluja dia: ${obs.rain_day_mm ?? "--"} mm`);
+
+  setText("prevTemp", `${now.temp ?? "--"} °C`);
+  setText("prevHum", `Humitat: ${now.rh ?? "--"} %`);
+  setText("prevWind", `Vent: ${now.wind_kmh ?? "--"} km/h`);
+  setText("rain3h", `Pluja 3h: ${der.rain_3h_mm ?? "--"} mm`);
+
+  setText("modelRain", `Pluja real ${obs.rain_day_mm ?? "--"} mm · prevista 3h ${der.rain_3h_mm ?? "--"} mm`);
+  setText("metaLine", "Dades carregades");
+}
+
+function cbForecast(data){
+  console.log("FORECAST", data);
+
+  if(!data || !data.ok) return;
+
+  const rows = data.rows || {};
+
+  function r(n){
+    const row = rows[n];
+    if(!row) return "--";
+
+    const t = row.temp ?? "--";
+    const w = row.wind_kmh ?? "--";
+    const rain = row.rain_mm ?? "--";
+
+    let tLocal = t;
+    const tNum = asNumber(t, null);
+
+    if(tNum !== null){
+      tLocal = (tNum + modelTempCorrection * 0.6).toFixed(1);
+    }
+
+    return `${tLocal} °C · vent ${w} km/h · pluja ${rain} mm`;
+  }
+
+  setText("p6", "+6 h · " + r(6));
+  setText("p12", "+12 h · " + r(12));
+  setText("p24", "+24 h · " + r(24));
+}
+
+function cbModel(data){
+  console.log("MODEL", data);
+
+  if(!data || !data.ok) return;
+
+  const realT = data.real?.temperature_c ?? "--";
+  const prevT = data.forecast?.temperature_c ?? "--";
+  const devT = data.deviation?.temperature_c ?? "--";
+
+  if(typeof devT === "number"){
+    modelTempCorrection = devT;
+  }
+
+  const realW = data.real?.wind_speed_kmh ?? "--";
+  const prevW = data.forecast?.wind_speed_kmh ?? "--";
+
+  const realH = data.real?.humidity_pct ?? "--";
+  const prevH = data.forecast?.humidity_pct ?? "--";
+  const devH = data.deviation?.humidity_pct ?? "--";
+
+  const q = qText(data.quality?.temperature);
+
+  setText("modelTemp", `Real ${realT} °C · Previst ${prevT} °C`);
+  setText("modelDev", `Desviació: ${devT} °C`);
+  setText("modelWind", `Vent real ${realW} / previst ${prevW} km/h`);
+  setText("modelHum", `Humitat real ${realH} / prevista ${prevH} %`);
+  setText("modelHumDev", `Desviació humitat: ${devH} %`);
+  setText("modelTime", `Hora model: ${data.matched_model_time ?? "--"}`);
+
+  const err = document.getElementById("modelErr");
+  if(err){
+    err.textContent = `Error model: ${q.text}`;
+    err.className = "line " + q.cls;
+  }
+}
+
+loadJSONP(API + "?out=current&callback=cbCurrent");
+loadJSONP(API + "?out=forecast&callback=cbForecast");
+loadJSONP(API + "?out=model&callback=cbModel");
+</script>
