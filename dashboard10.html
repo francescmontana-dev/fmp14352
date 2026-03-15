@@ -228,8 +228,8 @@ function updateOwnForecast() {
 
   const rows = lastForecastData.hourly;
 
-  setText("p6", ownLine("+6 h", rows[6], 6));
-  setText("p12", ownLine("+12 h", rows[12], 12));
+  setText("p6", ownLine("+6 h", rows[12], 6));
+  setText("p12", ownLine("+12 h", rows[6], 12));
   setText("p24", ownLine("+24 h", rows[24], 24));
 }
 
@@ -241,7 +241,7 @@ function cbCurrent(data) {
   const der = data.derived || {};
 
   setText("metaLine", "Dades carregades correctament");
-  setText("obsTemp", `${obs.temp ?? "--"} °C`);
+
   setText("obsHum", `Humitat: ${obs.rh ?? "--"} %`);
   setText("obsWind", `Vent: ${obs.wind_kmh ?? "--"} km/h`);
   setText("obsGust", `Ratxa: ${obs.gust_kmh ?? "--"} km/h`);
@@ -249,7 +249,6 @@ function cbCurrent(data) {
   setText("obsPress", `Pressió: ${obs.press_hpa ?? "--"} hPa`);
   setText("obsRain", `Pluja dia: ${obs.rain_day_mm ?? "--"} mm`);
 
-  setText("prevTemp", `${now.temp ?? "--"} °C`);
   setText("prevHum", `Humitat: ${now.rh ?? "--"} %`);
   setText("prevWind", `Vent: ${now.wind_kmh ?? "--"} km/h`);
   setText("prevDir", `Direcció: ${now.wdir_deg ?? "--"} °`);
@@ -331,9 +330,11 @@ function cbModel(data) {
   if (!data || !data.ok) return;
 
   const realT = data.real?.temperature_c ?? "--";
-  setText("obsTemp", `${realT} °C`);
   const prevT = data.forecast?.temperature_c ?? "--";
   const devT = data.deviation?.temperature_c ?? "--";
+
+  setText("obsTemp", `${realT} °C`);
+  setText("prevTemp", `${prevT} °C`);
 
   const realW = data.real?.wind_speed_kmh ?? "--";
   const prevW = data.forecast?.wind_speed_kmh ?? "--";
