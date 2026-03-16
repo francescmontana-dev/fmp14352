@@ -414,9 +414,13 @@ function cbModel(data) {
     errEl.className = `line ${q.cls}`;
   }
 
-  setText("modelTime", `Hora model: ${data.matched_model_time ?? "--"}`);
+    setText("modelTime", `Hora model: ${data.matched_model_time ?? "--"}`);
 
   updateOwnForecast();
+
+  if (lastForecastData) {
+    cbForecast(lastForecastData);
+  }
 }
 
 loadJSONP(API + "?out=current&callback=cbCurrent");
