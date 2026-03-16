@@ -297,19 +297,49 @@ function cbForecast(data) {
     type: "line",
     data: {
       labels,
-      datasets: [
-        {
-          label: "Temperatura (°C)",
-          data: temps,
-          yAxisID: "y"
-        },
-        {
-          label: "Pluja (mm)",
-          data: rain,
-          yAxisID: "y1",
-          type: "bar"
-        }
-      ]
+      const tempsOwn = rows.map((r,i)=>{
+  const t = Number(r.temp);
+  if(!Number.isFinite(t)) return null;
+
+  let h = i;
+  if(h<=6) w = 1.0;
+  else if(h<=12) w = 0.8;
+  else w = 0.6;
+
+  return t + modelTempCorrection * w;
+});
+
+const tempsOwn = rows.map((r,i)=>{
+  const t = Number(r.temp);
+  if(!Number.isFinite(t)) return null;
+
+  let h = i;
+  if(h<=6) w = 1.0;
+  else if(h<=12) w = 0.8;
+  else w = 0.6;
+
+  return t + modelTempCorrection * w;
+});
+
+datasets: [
+  {
+    label: "Temperatura model (°C)",
+    data: temps,
+    yAxisID: "y"
+  },
+  {
+    label: "Temperatura pròpia (°C)",
+    data: tempsOwn,
+    borderDash: [6,4],
+    yAxisID: "y"
+  },
+  {
+    label: "Pluja (mm)",
+    data: rain,
+    yAxisID: "y1",
+    type: "bar"
+  }
+]
     },
     options: {
       responsive: true,
