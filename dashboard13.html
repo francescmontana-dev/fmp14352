@@ -259,98 +259,239 @@ setText("wind6","Vent màx. 6h: "+(der.wind6_max_kmh??"--")+" km/h");
 refreshTemps();
 }
 
+<script>
+const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
+
+let forecastChart=null;
+let modelTempCorrection=0;
+let lastForecastData=null;
+
+let modelRealTemp="--";
+let modelForecastTemp="--";
+
+function loadJSONP(url){
+  const s=document.createElement("script");
+  s.src=url+"&_="+Date.now();
+  s.async=true;
+  document.body.appendChild(s);
+}
+
+function setText(id,txt){
+  const el=document.getElementById(id);
+  if(el) el.textContent=txt;
+}
+
+function hhmm(iso){
+  if(!iso) return "--";
+  const d=new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleTimeString("ca-ES",{hour:"2-digit",minute:"2-digit"});
+}
+
+function qText(q){
+  const v=(q||"").trim().toLowerCase();
+  if(v==="baja") return {text:"bona precisió",cls:"ok"};
+  if(v==="media") return {text:"precisió mitjana",cls:"mid"};
+  if(v==="alta") return {text:"precisió baixa",cls:"bad"};
+  return {text:"--",cls:""};
+}
+
+function asNumber(v, fallback=null){
+  if(v===null || v===undefined || v==="") return fallback;
+  const n=Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function refreshTemps(){
+  setText("obsTemp", modelRealTemp + " °C");
+  setText("prevTemp", modelForecastTemp + " °C");
+}
+
+function getHorizonWeight(h){
+  if(h<=6) return 1.00;
+  if(h<=12) return 0.80;
+  if(h<=24) return 0.60;
+  return 0.50;
+}
+
+function ownLine(hourLabel,row,horizonHours){
+  if(!row) return `${hourLabel} · --`;
+
+  const t=asNumber(row.temp,null);
+  const w=row.wind_kmh ?? "--";
+  const rain=row.rain_mm ?? "--";
+
+  if(t===null) return `${hourLabel} · --`;
+
+  const ownTemp=t + modelTempCorrection * getHorizonWeight(horizonHours);
+  const txt=Number.isFinite(ownTemp) ? ownTemp.toFixed(1) : "--";
+
+  return `${hourLabel} · ${txt} °C · vent ${w} km/h · pluja ${rain} mm`;
+}
+
+function updateOwnForecast(){
+  if(!lastForecastData || !lastForecastData.ok || !Array.isArray(lastForecastData.hourly)){
+    setText("p6","+6 h · --");
+    setText("p12","+12 h · --");
+    setText("p24","+24 h · --");
+    return;
+  }
+
+  const rows=lastForecastData.hourly;
+
+  setText("p6", ownLine("+6 h", rows[12], 6));
+  setText("p12", ownLine("+12 h", rows[6], 12));
+  setText("p24", ownLine("+24 h", rows[24], 24));
+}
+
+function cbCurrent(data){
+  if(!data || !data.ok) return;
+
+  const obs=data.obs||{};
+  const now=data.prev_now||{};
+  const der=data.derived||{};
+
+  setText("metaLine","Dades carregades correctament");
+
+  setText("obsHum","Humitat: "+(obs.rh??"--")+" %");
+  setText("obsWind","Vent: "+(obs.wind_kmh??"--")+" km/h");
+  setText("obsGust","Ratxa: "+(obs.gust_kmh??"--")+" km/h");
+  setText("obsDir","Direcció: "+(obs.wdir_deg??"--")+" °");
+  setText("obsPress","Pressió: "+(obs.press_hpa??"--")+" hPa");
+  setText("obsRain","Pluja dia: "+(obs.rain_day_mm??"--")+" mm");
+
+  setText("prevHum","Humitat: "+(now.rh??"--")+" %");
+  setText("prevWind","Vent: "+(now.wind_kmh??"--")+" km/h");
+  setText("prevDir","Direcció: "+(now.wdir_deg??"--")+" °");
+  setText("rain3h","Pluja 3h: "+(der.rain_3h_mm??"--")+" mm");
+  setText("wind6","Vent màx. 6h: "+(der.wind6_max_kmh??"--")+" km/h ("+(der.wind6_peak_hhmm??"--")+")");
+
+  const rainReal=obs.rain_day_mm ?? "--";
+  const rainPrev=der.rain_3h_mm ?? "--";
+  setText("modelRain","Pluja real "+rainReal+" mm · prevista 3h "+rainPrev+" mm");
+
+  refreshTemps();
+}
+
 function cbForecast(data){
+  if(!data || !data.ok || !Array.isArray(data.hourly)) return;
 
-if(!data||!data.ok||!Array.isArray(data.hourly))return;
+  lastForecastData=data;
 
-lastForecastData=data;
+  const rows=data.hourly.slice(0,12);
+  const tbody=document.getElementById("forecastTable");
 
-const rows=data.hourly.slice(0,12);
+  if(tbody){
+    tbody.innerHTML=rows.map(r => `
+      <tr>
+        <td>${hhmm(r.t)}</td>
+        <td>${r.temp ?? "--"} °C</td>
+        <td>${r.rh ?? "--"} %</td>
+        <td>${r.wind_kmh ?? "--"} km/h</td>
+        <td>${r.wdir_deg ?? "--"} °</td>
+        <td>${r.rain_mm ?? "--"} mm</td>
+        <td>${r.symbol ?? "--"}</td>
+      </tr>
+    `).join("");
+  }
 
-const labels=rows.map(r=>hhmm(r.t));
-const temps=rows.map(r=>r.temp);
-const rain=rows.map(r=>r.rain_mm);
+  const labels=rows.map(r=>hhmm(r.t));
+  const temps=rows.map(r=>r.temp);
+  const rain=rows.map(r=>r.rain_mm);
 
-const tempsOwn=rows.map((r,i)=>{
-const t=Number(r.temp);
-if(!Number.isFinite(t))return null;
+  const tempsOwn=rows.map((r,i)=>{
+    const t=asNumber(r.temp,null);
+    if(t===null) return null;
 
-let w=0.6;
+    let w=0.6;
+    if(i<=6) w=1.0;
+    else if(i<=12) w=0.8;
 
-if(i<=6)w=1;
-else if(i<=12)w=0.8;
+    return t + modelTempCorrection*w;
+  });
 
-return t+modelTempCorrection*w;
-});
+  const ctx=document.getElementById("forecastChart").getContext("2d");
 
-const ctx=document.getElementById("forecastChart").getContext("2d");
+  if(forecastChart) forecastChart.destroy();
 
-if(forecastChart)forecastChart.destroy();
+  forecastChart=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels,
+      datasets:[
+        {
+          label:"Temperatura model",
+          data:temps,
+          yAxisID:"y"
+        },
+        {
+          label:"Temperatura pròpia",
+          data:tempsOwn,
+          yAxisID:"y",
+          borderDash:[6,4]
+        },
+        {
+          label:"Pluja",
+          data:rain,
+          yAxisID:"y1",
+          type:"bar"
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:"index",intersect:false},
+      scales:{
+        y:{position:"left"},
+        y1:{position:"right",grid:{drawOnChartArea:false}}
+      }
+    }
+  });
 
-forecastChart=new Chart(ctx,{
-type:"line",
-data:{
-labels,
-datasets:[
-{
-label:"Temperatura model",
-data:temps,
-yAxisID:"y"
-},
-{
-label:"Temperatura pròpia",
-data:tempsOwn,
-yAxisID:"y",
-borderDash:[6,4]
-},
-{
-label:"Pluja",
-data:rain,
-yAxisID:"y1",
-type:"bar"
-}
-]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-scales:{
-y:{position:"left"},
-y1:{position:"right",grid:{drawOnChartArea:false}}
-}
-}
-});
-
+  updateOwnForecast();
 }
 
 function cbModel(data){
+  if(!data || !data.ok) return;
 
-if(!data||!data.ok)return;
+  const realT=data.real?.temperature_c ?? "--";
+  const prevT=data.forecast?.temperature_c ?? "--";
+  const devT=data.deviation?.temperature_c ?? "--";
 
-const realT=data.real?.temperature_c??"--";
-const prevT=data.forecast?.temperature_c??"--";
+  modelRealTemp=realT;
+  modelForecastTemp=prevT;
+  refreshTemps();
 
-modelRealTemp=realT;
-modelForecastTemp=prevT;
+  const realW=data.real?.wind_speed_kmh ?? "--";
+  const prevW=data.forecast?.wind_speed_kmh ?? "--";
 
-refreshTemps();
+  const realH=data.real?.humidity_pct ?? "--";
+  const prevH=data.forecast?.humidity_pct ?? "--";
+  const devH=data.deviation?.humidity_pct ?? "--";
 
-const devT=data.deviation?.temperature_c??"--";
+  if(typeof devT==="number") modelTempCorrection=devT;
 
-if(typeof devT==="number")modelTempCorrection=devT;
+  const q=qText(data.quality?.temperature);
 
-setText("modelTemp","Real "+realT+" °C · Previst "+prevT+" °C");
-setText("modelDev","Desviació: "+devT+" °C");
+  setText("modelTemp","Real "+realT+" °C · Previst "+prevT+" °C");
+  setText("modelDev","Desviació: "+devT+" °C");
+  setText("modelWind","Vent real "+realW+" / previst "+prevW+" km/h");
+  setText("modelHum","Humitat real "+realH+" / prevista "+prevH+" %");
+  setText("modelHumDev","Desviació humitat: "+devH+" %");
 
-setText("modelTime","Hora model: "+(data.matched_model_time??"--"));
+  const errEl=document.getElementById("modelErr");
+  if(errEl){
+    errEl.textContent="Error model: "+q.text;
+    errEl.className="line "+q.cls;
+  }
 
+  setText("modelTime","Hora model: "+(data.matched_model_time ?? "--"));
+
+  updateOwnForecast();
 }
 
 loadJSONP(API+"?out=current&callback=cbCurrent");
 loadJSONP(API+"?out=forecast&callback=cbForecast");
 loadJSONP(API+"?out=model&callback=cbModel");
-
 </script>
-
-</body>
-</html>
