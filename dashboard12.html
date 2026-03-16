@@ -290,8 +290,67 @@ function cbForecast(data) {
   const temps = rows.map(r => r.temp);
   const rain = rows.map(r => r.rain_mm);
 
+  const tempsOwn = rows.map((r, i) => {
+    const t = Number(r.temp);
+    if (!Number.isFinite(t)) return null;
+
+    let h = i;
+    let w = 0.6;
+
+    if (h <= 6) w = 1.0;
+    else if (h <= 12) w = 0.8;
+    else w = 0.6;
+
+    return t + modelTempCorrection * w;
+  });
+
   const ctx = document.getElementById("forecastChart").getContext("2d");
   if (forecastChart) forecastChart.destroy();
+
+  forecastChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Temperatura model (°C)",
+          data: temps,
+          yAxisID: "y"
+        },
+        {
+          label: "Temperatura pròpia (°C)",
+          data: tempsOwn,
+          yAxisID: "y",
+          borderDash: [6, 4]
+        },
+        {
+          label: "Pluja (mm)",
+          data: rain,
+          yAxisID: "y1",
+          type: "bar"
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        y: {
+          type: "linear",
+          position: "left"
+        },
+        y1: {
+          type: "linear",
+          position: "right",
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+
+  updateOwnForecast();
+}
 
   forecastChart = new Chart(ctx, {
     type: "line",
