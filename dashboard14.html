@@ -233,10 +233,10 @@ function parseObservedUtc(s) {
 }
 
 function getHorizonWeight(h) {
-  if (h <= 6) return 1.00;
-  if (h <= 12) return 0.80;
-  if (h <= 24) return 0.60;
-  return 0.50;
+  if (h <= 6) return 0.45;
+  if (h <= 12) return 0.30;
+  if (h <= 24) return 0.20;
+  return 0.15;
 }
 
 function findNearestRow(rows, targetDate) {
