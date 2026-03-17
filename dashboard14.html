@@ -265,16 +265,77 @@ function updateOwnForecast() {
   }
 
   const rows = lastForecastData.hourly;
+
+  function getRowTime(row) {
+    return row?.t || row?.time || row?.datetime || null;
+  }
+
+  function getRowTemp(row) {
+    return asNumber(row?.temp ?? row?.temperature_c ?? row?.temperature ?? null, null);
+  }
+
+  function getRowWind(row) {
+    return row?.wind_kmh ?? row?.wind_speed_kmh ?? row?.wind ?? "--";
+  }
+
+  function getRowRain(row) {
+    return row?.rain_mm ?? row?.precipitation_mm ?? row?.precipitation ?? "--";
+  }
+
+  function parseForecastDate(s) {
+    if (!s) return null;
+
+    let d = new Date(s);
+    if (!isNaN(d)) return d;
+
+    d = new Date(s + "Z");
+    if (!isNaN(d)) return d;
+
+    return null;
+  }
+
+  function parseObservedUtc(s) {
+    if (!s) return null;
+    try {
+      const p = s.split(",").map(Number);
+      return new Date(Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]));
+    } catch (e) {
+      return null;
+    }
+  }
+
   let baseTime = parseObservedUtc(window.modelObservedTimeUtc);
   if (!baseTime) baseTime = new Date();
 
+  function findNearestRow(targetDate) {
+    let best = null;
+    let bestDiff = Infinity;
+
+    for (const row of rows) {
+      const dt = parseForecastDate(getRowTime(row));
+      if (!dt) continue;
+
+      const diff = Math.abs(dt - targetDate);
+      if (diff < bestDiff) {
+        best = row;
+        bestDiff = diff;
+      }
+    }
+
+    return best;
+  }
+
   function calc(h) {
     const target = new Date(baseTime.getTime() + h * 3600 * 1000);
-    const row = findNearestRow(rows, target);
+
+    let row = findNearestRow(target);
+
+    // fallback si no troba per hora
+    if (!row && rows[h]) row = rows[h];
 
     if (!row) return "--";
 
-    const t = asNumber(row.temp, null);
+    const t = getRowTemp(row);
     if (t === null) return "--";
 
     let bias = 0;
@@ -285,8 +346,8 @@ function updateOwnForecast() {
     bias = Math.max(-2, Math.min(2, bias));
 
     const tLocal = t + modelTempCorrection * getHorizonWeight(h) + bias;
-    const w = row.wind_kmh ?? "--";
-    const rain = row.rain_mm ?? "--";
+    const w = getRowWind(row);
+    const rain = getRowRain(row);
 
     return `${tLocal.toFixed(1)} °C · vent ${w} km/h · pluja ${rain} mm`;
   }
@@ -305,7 +366,7 @@ function cbCurrent(data) {
 
   setText("metaLine", "Dades carregades correctament");
 
-  setText("obsTemp", `${obs.temp ?? "--"} °C`);
+  // setText("obsTemp", `${obs.temp ?? "--"} °C`);
   setText("obsHum", `Humitat: ${obs.rh ?? "--"} %`);
   setText("obsWind", `Vent: ${obs.wind_kmh ?? "--"} km/h`);
   setText("obsGust", `Ratxa: ${obs.gust_kmh ?? "--"} km/h`);
@@ -415,6 +476,8 @@ function cbModel(data) {
   const devT = data.deviation?.temperature_c ?? "--";
   window.modelObservedTimeUtc = data.observed_time_utc || null;
 
+  setText("obsTemp", `${realT} °C`);
+
   modelForecastTemp = prevT;
   refreshTemps();
 
@@ -470,6 +533,7 @@ function cbModel(data) {
     cbForecast(lastForecastData);
   }
 }
+
 
 loadJSONP(API + "?out=current&callback=cbCurrent");
 loadJSONP(API + "?out=forecast&callback=cbForecast");
