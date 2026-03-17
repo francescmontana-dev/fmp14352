@@ -139,6 +139,8 @@
 
     <div class="card model">
       <h2>Model El Masnou NE</h2>
+	  <div class="line" id="modelLearn">Aprenentatge: --</div>
+<div class="line small" id="modelBias">Bias: --</div>
       <div class="line" id="modelTemp">Real -- °C · Previst -- °C</div>
       <div class="line" id="modelDev">Desviació: -- °C</div>
       <div class="line" id="modelWind">Vent real -- / previst -- km/h</div>
@@ -398,6 +400,20 @@ function cbModel(data) {
 
   if (typeof devT === "number") {
     modelTempCorrection = devT;
+	const learn = data.learning;
+
+if (learn) {
+  const s6 = learn.samples?.h6 ?? 0;
+  const s12 = learn.samples?.h12 ?? 0;
+  const s24 = learn.samples?.h24 ?? 0;
+
+  const b6 = learn.bias_temperature_c?.h6 ?? 0;
+  const b12 = learn.bias_temperature_c?.h12 ?? 0;
+  const b24 = learn.bias_temperature_c?.h24 ?? 0;
+
+  setText("modelLearn", `Aprenentatge: h6=${s6} · h12=${s12} · h24=${s24}`);
+  setText("modelBias", `Bias: ${b6} / ${b12} / ${b24} °C`);
+}
   }
 
   const q = qText(data.quality?.temperature);
