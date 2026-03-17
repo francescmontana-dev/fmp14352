@@ -340,17 +340,17 @@ function updateOwnForecast() {
 
     let bias = 0;
 
-    if (h === 6 && learningSamples.h6 >= 3) {
-      bias = Math.max(-1.5, Math.min(1.5, learningBias.h6));
-    }
+    if (h === 6 && learningSamples.h6 >= 6) {
+  bias = Math.max(-0.8, Math.min(0.8, learningBias.h6));
+}
 
-    if (h === 12 && learningSamples.h12 >= 3) {
-      bias = Math.max(-1.5, Math.min(1.5, learningBias.h12));
-    }
+if (h === 12 && learningSamples.h12 >= 5) {
+  bias = Math.max(-0.8, Math.min(0.8, learningBias.h12));
+}
 
-    if (h === 24 && learningSamples.h24 >= 4) {
-      bias = Math.max(-1.0, Math.min(1.0, learningBias.h24));
-    }
+if (h === 24 && learningSamples.h24 >= 5) {
+  bias = Math.max(-0.8, Math.min(0.8, learningBias.h24));
+}
 
     const tLocal = t + modelTempCorrection * getHorizonWeight(h) + bias;
 
