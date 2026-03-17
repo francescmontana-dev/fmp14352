@@ -352,7 +352,13 @@ if (h === 24 && learningSamples.h24 >= 5) {
   bias = Math.max(-0.8, Math.min(0.8, learningBias.h24));
 }
 
-    const tLocal = t + modelTempCorrection * getHorizonWeight(h) + bias;
+    let localAdjust = 0;
+
+if (h === 6) localAdjust = 2.0;
+if (h === 12) localAdjust = 0.5;
+if (h === 24) localAdjust = 0.0;
+
+const tLocal = t + modelTempCorrection * getHorizonWeight(h) + bias + localAdjust;
 
     const w = getRowWind(row);
     const rain = getRowRain(row);
