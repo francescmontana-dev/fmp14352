@@ -226,7 +226,6 @@ function asNumber(v, fallback = null) {
 }
 
 function refreshTemps() {
-  setText("obsTemp", modelRealTemp + " °C");
   setText("prevTemp", modelForecastTemp + " °C");
 }
 
@@ -262,31 +261,68 @@ function updateOwnForecast() {
 
   const rows = lastForecastData.hourly;
 
-  function calc(h) {
-    if (!rows[h]) return "--";
+  function parseUtcForecastTime(s) {
+    if (!s) return null;
+    const d = new Date(s + "Z");   // forecast ve en UTC
+    return isNaN(d) ? null : d;
+  }
 
-    const t = Number(rows[h].temp);
+  function parseObservedUtc(s) {
+    // format: "2026,3,17,12,13,4"
+    if (!s) return null;
+    try {
+      const p = s.split(",").map(Number);
+      return new Date(Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // agafem com a referència l'hora observada del model si existeix
+  let baseTime = parseObservedUtc(window.modelObservedTimeUtc);
+  if (!baseTime) baseTime = new Date();
+
+  function findNearestRow(targetDate) {
+    let best = null;
+    let bestDiff = Infinity;
+
+    for (const row of rows) {
+      const dt = parseUtcForecastTime(row.t || row.time);
+      if (!dt) continue;
+
+      const diff = Math.abs(dt - targetDate);
+      if (diff < bestDiff) {
+        best = row;
+        bestDiff = diff;
+      }
+    }
+    return best;
+  }
+
+  function calc(h) {
+    const target = new Date(baseTime.getTime() + h * 3600 * 1000);
+    const row = findNearestRow(target);
+
+    if (!row) return "--";
+
+    const t = Number(row.temp);
     if (!Number.isFinite(t)) return "--";
 
-    // PES segons horitzó
     let weight = 0.6;
     if (h <= 6) weight = 1.0;
     else if (h <= 12) weight = 0.8;
 
-    // 🔥 ARA AFEGIM EL LEARNING
     let bias = 0;
-
     if (h === 6 && learningSamples.h6 >= 2) bias = learningBias.h6;
     if (h === 12 && learningSamples.h12 >= 2) bias = learningBias.h12;
     if (h === 24 && learningSamples.h24 >= 2) bias = learningBias.h24;
 
-    // límit de seguretat
     bias = Math.max(-2, Math.min(2, bias));
 
     const tLocal = t + modelTempCorrection * weight + bias;
 
-    const w = rows[h].wind_kmh ?? "--";
-    const rain = rows[h].rain_mm ?? "--";
+    const w = row.wind_kmh ?? "--";
+    const rain = row.rain_mm ?? "--";
 
     return `${tLocal.toFixed(1)} °C · vent ${w} km/h · pluja ${rain} mm`;
   }
@@ -294,7 +330,7 @@ function updateOwnForecast() {
   setText("p6", "+6 h · " + calc(6));
   setText("p12", "+12 h · " + calc(12));
   setText("p24", "+24 h · " + calc(24));
-
+}
 }
 
 function cbCurrent(data) {
@@ -418,6 +454,7 @@ function cbModel(data) {
   const realT = data.real?.temperature_c ?? "--";
   const prevT = data.forecast?.temperature_c ?? "--";
   const devT = data.deviation?.temperature_c ?? "--";
+  window.modelObservedTimeUtc = data.observed_time_utc || null;
 
   modelRealTemp = realT;
   modelForecastTemp = prevT;
@@ -432,24 +469,23 @@ function cbModel(data) {
 
   if (typeof devT === "number") {
     modelTempCorrection = devT;
-	const learn = data.learning;
-	if (learn) {
-  learningBias = learn.bias_temperature_c || learningBias;
-  learningSamples = learn.samples || learningSamples;
-}
+  }
 
-if (learn) {
-  const s6 = learn.samples?.h6 ?? 0;
-  const s12 = learn.samples?.h12 ?? 0;
-  const s24 = learn.samples?.h24 ?? 0;
+  const learn = data.learning;
+  if (learn) {
+    learningBias = learn.bias_temperature_c || learningBias;
+    learningSamples = learn.samples || learningSamples;
 
-  const b6 = learn.bias_temperature_c?.h6 ?? 0;
-  const b12 = learn.bias_temperature_c?.h12 ?? 0;
-  const b24 = learn.bias_temperature_c?.h24 ?? 0;
+    const s6 = learningSamples.h6 ?? 0;
+    const s12 = learningSamples.h12 ?? 0;
+    const s24 = learningSamples.h24 ?? 0;
 
-  setText("modelLearn", `Aprenentatge: h6=${s6} · h12=${s12} · h24=${s24}`);
-  setText("modelBias", `Bias: ${b6} / ${b12} / ${b24} °C`);
-}
+    const b6 = learningBias.h6 ?? 0;
+    const b12 = learningBias.h12 ?? 0;
+    const b24 = learningBias.h24 ?? 0;
+
+    setText("modelLearn", `Aprenentatge: h6=${s6} · h12=${s12} · h24=${s24}`);
+    setText("modelBias", `Bias: ${b6} / ${b12} / ${b24} °C`);
   }
 
   const q = qText(data.quality?.temperature);
@@ -466,7 +502,7 @@ if (learn) {
     errEl.className = `line ${q.cls}`;
   }
 
-    setText("modelTime", `Hora model: ${data.matched_model_time ?? "--"}`);
+  setText("modelTime", `Hora model: ${data.matched_model_time ?? "--"}`);
 
   updateOwnForecast();
 
