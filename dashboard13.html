@@ -251,6 +251,10 @@ function ownLine(hourLabel, row, horizonHours) {
   return `${hourLabel} · ${txt} °C · vent ${w} km/h · pluja ${rain} mm`;
 }
 
+function refreshTemps() {
+  setText("prevTemp", modelForecastTemp + " °C");
+}
+
 function updateOwnForecast() {
   if (!lastForecastData || !lastForecastData.ok || !Array.isArray(lastForecastData.hourly)) {
     setText("p6", "+6 h · --");
@@ -258,6 +262,77 @@ function updateOwnForecast() {
     setText("p24", "+24 h · --");
     return;
   }
+
+  const rows = lastForecastData.hourly;
+
+  function parseUtcForecastTime(s) {
+    if (!s) return null;
+    const d = new Date(s + "Z");
+    return isNaN(d) ? null : d;
+  }
+
+  function parseObservedUtc(s) {
+    if (!s) return null;
+    try {
+      const p = s.split(",").map(Number);
+      return new Date(Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  let baseTime = parseObservedUtc(window.modelObservedTimeUtc);
+  if (!baseTime) baseTime = new Date();
+
+  function findNearestRow(targetDate) {
+    let best = null;
+    let bestDiff = Infinity;
+
+    for (const row of rows) {
+      const dt = parseUtcForecastTime(row.t || row.time);
+      if (!dt) continue;
+
+      const diff = Math.abs(dt - targetDate);
+      if (diff < bestDiff) {
+        best = row;
+        bestDiff = diff;
+      }
+    }
+    return best;
+  }
+
+  function calc(h) {
+    const target = new Date(baseTime.getTime() + h * 3600 * 1000);
+    const row = findNearestRow(target);
+
+    if (!row) return "--";
+
+    const t = Number(row.temp);
+    if (!Number.isFinite(t)) return "--";
+
+    let weight = 0.6;
+    if (h <= 6) weight = 1.0;
+    else if (h <= 12) weight = 0.8;
+
+    let bias = 0;
+    if (h === 6 && learningSamples.h6 >= 2) bias = learningBias.h6;
+    if (h === 12 && learningSamples.h12 >= 2) bias = learningBias.h12;
+    if (h === 24 && learningSamples.h24 >= 2) bias = learningBias.h24;
+
+    bias = Math.max(-2, Math.min(2, bias));
+
+    const tLocal = t + modelTempCorrection * weight + bias;
+
+    const w = row.wind_kmh ?? "--";
+    const rain = row.rain_mm ?? "--";
+
+    return `${tLocal.toFixed(1)} °C · vent ${w} km/h · pluja ${rain} mm`;
+  }
+
+  setText("p6", "+6 h · " + calc(6));
+  setText("p12", "+12 h · " + calc(12));
+  setText("p24", "+24 h · " + calc(24));
+}
 
   const rows = lastForecastData.hourly;
 
@@ -511,7 +586,7 @@ function cbModel(data) {
 
   if (lastForecastData) {
     cbForecast(lastForecastData);
-  }
+   }
 }
 
 loadJSONP(API + "?out=current&callback=cbCurrent");
