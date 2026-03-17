@@ -486,6 +486,9 @@ function cbModel(data) {
 
     setText("modelLearn", `Aprenentatge: h6=${s6} · h12=${s12} · h24=${s24}`);
     setText("modelBias", `Bias: ${b6} / ${b12} / ${b24} °C`);
+  } else {
+    setText("modelLearn", "Aprenentatge: --");
+    setText("modelBias", "Bias: --");
   }
 
   const q = qText(data.quality?.temperature);
