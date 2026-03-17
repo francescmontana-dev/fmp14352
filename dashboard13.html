@@ -189,6 +189,8 @@ let modelTempCorrection = 0;
 let lastForecastData = null;
 let modelRealTemp = "--";
 let modelForecastTemp = "--";
+let learningBias = { h6: 0, h12: 0, h24: 0 };
+let learningSamples = { h6: 0, h12: 0, h24: 0 };
 
 function loadJSONP(url) {
   const s = document.createElement("script");
@@ -260,9 +262,39 @@ function updateOwnForecast() {
 
   const rows = lastForecastData.hourly;
 
-  setText("p6", ownLine("+6 h", rows[12], 6));
-  setText("p12", ownLine("+12 h", rows[6], 12));
-  setText("p24", ownLine("+24 h", rows[24], 24));
+  function calc(h) {
+    if (!rows[h]) return "--";
+
+    const t = Number(rows[h].temp);
+    if (!Number.isFinite(t)) return "--";
+
+    // PES segons horitzó
+    let weight = 0.6;
+    if (h <= 6) weight = 1.0;
+    else if (h <= 12) weight = 0.8;
+
+    // 🔥 ARA AFEGIM EL LEARNING
+    let bias = 0;
+
+    if (h === 6 && learningSamples.h6 >= 2) bias = learningBias.h6;
+    if (h === 12 && learningSamples.h12 >= 2) bias = learningBias.h12;
+    if (h === 24 && learningSamples.h24 >= 2) bias = learningBias.h24;
+
+    // límit de seguretat
+    bias = Math.max(-2, Math.min(2, bias));
+
+    const tLocal = t + modelTempCorrection * weight + bias;
+
+    const w = rows[h].wind_kmh ?? "--";
+    const rain = rows[h].rain_mm ?? "--";
+
+    return `${tLocal.toFixed(1)} °C · vent ${w} km/h · pluja ${rain} mm`;
+  }
+
+  setText("p6", "+6 h · " + calc(6));
+  setText("p12", "+12 h · " + calc(12));
+  setText("p24", "+24 h · " + calc(24));
+
 }
 
 function cbCurrent(data) {
@@ -401,6 +433,10 @@ function cbModel(data) {
   if (typeof devT === "number") {
     modelTempCorrection = devT;
 	const learn = data.learning;
+	if (learn) {
+  learningBias = learn.bias_temperature_c || learningBias;
+  learningSamples = learn.samples || learningSamples;
+}
 
 if (learn) {
   const s6 = learn.samples?.h6 ?? 0;
