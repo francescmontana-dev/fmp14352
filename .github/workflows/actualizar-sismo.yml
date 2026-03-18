@@ -28,4 +28,3 @@ jobs:
           git add data/sismo.json
           git diff --cached --quiet || git commit -m "Actualiza datos sísmicos"
           git push
-          
