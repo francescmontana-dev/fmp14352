@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sismo cerca de El Masnou</title>
+  <title>Terratrèmols prop del Masnou</title>
   <style>
     body {
       margin: 0;
@@ -57,8 +57,8 @@
 </head>
 <body>
   <div class="widget" id="sismoMasnou">
-    <div class="titulo">🌍 Cerca de El Masnou</div>
-    <div class="zona">Cargando datos…</div>
+    <div class="titulo">🌍 A prop del Masnou</div>
+    <div class="zona">Carregant dades…</div>
   </div>
 
   <script>
@@ -95,8 +95,8 @@
 
         if (!Array.isArray(data) || data.length === 0) {
           box.innerHTML = `
-            <div class="titulo">🌍 Cerca de El Masnou</div>
-            <div class="zona">Sin datos sísmicos disponibles</div>
+            <div class="titulo">🌍 A prop del Masnou</div>
+            <div class="zona">Sense dades sísmiques disponibles</div>
           `;
           return;
         }
@@ -117,8 +117,8 @@
 
         if (eventos.length === 0) {
           box.innerHTML = `
-            <div class="titulo">🌍 Cerca de El Masnou</div>
-            <div class="zona">Sin coordenadas válidas</div>
+            <div class="titulo">🌍 A prop del Masnou</div>
+            <div class="zona">Sense coordenades vàlides</div>
           `;
           return;
         }
@@ -128,20 +128,20 @@
 
         const mag = parseFloat(eq.magnitud || 0);
         const aviso = dentroRadio
-          ? `Dentro de ${RADIO_KM} km`
-          : `Más cercano disponible`;
+          ? `Dins de ${RADIO_KM} km`
+          : `Més proper disponible`;
 
         box.innerHTML = `
-          <div class="titulo">🌍 Cerca de El Masnou</div>
+          <div class="titulo">🌍 A prop del Masnou</div>
           <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
           <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
           <div class="fecha">${eq.fecha || ""}</div>
-          <div class="extra">${eq.distancia.toFixed(1)} km de El Masnou · ${aviso}</div>
+          <div class="extra">${eq.distancia.toFixed(1)} km del Masnou · ${aviso}</div>
         `;
       } catch (error) {
         box.innerHTML = `
-          <div class="titulo">🌍 Cerca de El Masnou</div>
-          <div class="zona">No se pudo cargar el widget</div>
+          <div class="titulo">🌍 A prop del Masnou</div>
+          <div class="zona">No s'han pogut carregar les dades</div>
         `;
       }
     }
@@ -150,4 +150,3 @@
   </script>
 </body>
 </html>
-<!-- update 301 -->
