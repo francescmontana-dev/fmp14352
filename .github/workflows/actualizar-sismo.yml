@@ -16,11 +16,24 @@ jobs:
       - name: Clonar repo
         uses: actions/checkout@v5
 
-      - name: Generar JSON local
+      - name: Generar JSON de prueba con un sismo cercano
         run: |
           mkdir -p data
           cat > data/sismo.json <<'EOF'
-          []
+          [
+            {
+              "id": "test-elmasnou-001",
+              "fecha": "18/03/2026 14:32",
+              "fecha_utc": "18/03/2026 13:32",
+              "latitud": "41.5000",
+              "longitud": "2.3500",
+              "profundidad": "10.0",
+              "magnitud": "2.3",
+              "tipo_magnitud": "mb",
+              "intensidad": "",
+              "localizacion": "Costa de Barcelona"
+            }
+          ]
           EOF
 
       - name: Commit si hay cambios
@@ -30,4 +43,3 @@ jobs:
           git add data/sismo.json
           git diff --cached --quiet || git commit -m "Actualiza datos sísmicos"
           git push
-          
