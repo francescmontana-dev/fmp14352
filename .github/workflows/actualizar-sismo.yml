@@ -1,68 +1,30 @@
-<script>
-  const LAT_MASNOU = 41.48;
-  const LON_MASNOU = 2.31;
-  const RADIO_KM = 100;
+name: Actualizar sismo El Masnou
 
-  function distanciaKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
 
-  function colorMagnitud(m) {
-    if (m >= 4) return "#d9534f";
-    if (m >= 3) return "#f0ad4e";
-    return "#5cb85c";
-  }
+permissions:
+  contents: write
 
-  async function cargarSismo() {
-    const box = document.getElementById("sismoMasnou");
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
 
-    try {
-      const r = await fetch("./data/sismo.json");
-      const data = await r.json();
+    steps:
+      - name: Clonar repo
+        uses: actions/checkout@v4
 
-      const cercanos = data.filter(eq => {
-        const lat = parseFloat(eq.latitud);
-        const lon = parseFloat(eq.longitud);
-        if (isNaN(lat) || isNaN(lon)) return false;
-        return distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon) <= RADIO_KM;
-      });
+      - name: Descargar JSON de IGN
+        run: |
+          mkdir -p data
+          curl -L "https://www.ign.es/web/resources/terremotos/tproximos/prox.json" -o data/sismo.json
 
-      if (!cercanos.length) {
-        box.innerHTML = `
-          <div class="titulo">🌍 Cerca de El Masnou</div>
-          <div class="zona">Sin eventos recientes &lt; 100 km</div>
-        `;
-        return;
-      }
-
-      const eq = cercanos[0];
-      const mag = parseFloat(eq.magnitud || 0);
-      const lat = parseFloat(eq.latitud);
-      const lon = parseFloat(eq.longitud);
-      const dist = distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon).toFixed(1);
-
-      box.innerHTML = `
-        <div class="titulo">🌍 Cerca de El Masnou</div>
-        <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
-        <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
-        <div class="fecha">${eq.fecha || ""}</div>
-        <div class="extra">${dist} km de El Masnou</div>
-      `;
-    } catch (e) {
-      box.innerHTML = `
-        <div class="titulo">🌍 Cerca de El Masnou</div>
-        <div class="zona">No se pudo cargar el widget</div>
-      `;
-    }
-  }
-
-  cargarSismo();
-</script>
+      - name: Commit si hay cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/sismo.json
+          git diff --cached --quiet || git commit -m "Actualiza datos sísmicos"
+          git push
