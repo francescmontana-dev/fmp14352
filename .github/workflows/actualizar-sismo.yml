@@ -16,25 +16,59 @@ jobs:
       - name: Clonar repo
         uses: actions/checkout@v5
 
-      - name: Generar JSON de prueba con un sismo cercano
+      - name: Generar JSON real desde IGN
         run: |
           mkdir -p data
-          cat > data/sismo.json <<'EOF'
-          [
-            {
-              "id": "test-elmasnou-001",
-              "fecha": "18/03/2026 14:32",
-              "fecha_utc": "18/03/2026 13:32",
-              "latitud": "41.5000",
-              "longitud": "2.3500",
-              "profundidad": "10.0",
-              "magnitud": "2.3",
-              "tipo_magnitud": "mb",
-              "intensidad": "",
-              "localizacion": "Costa de Barcelona"
-            }
-          ]
-          EOF
+          python3 << 'PY'
+          import json
+          import re
+          from urllib.request import Request, urlopen
+
+          url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/get10dias?_IGNGFSSismoSismicidadReciente_WAR_IGNGFSSismoSismicidadRecienteportlet_dias=10&_IGNGFSSismoSismicidadReciente_WAR_IGNGFSSismoSismicidadRecienteportlet_formDate=1493933598514"
+          req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+          html = urlopen(req, timeout=30).read().decode("utf-8", errors="ignore")
+
+          patron = re.compile(
+              r'(es\d+[a-z]+)\s+'
+              r'(\d{2}/\d{2}/\d{4})\s+'
+              r'(\d{2}:\d{2}:\d{2})\s+'
+              r'(-?\d+\.\d+)\s+'
+              r'(-?\d+\.\d+)\s+'
+              r'(\d+\.\d+)\s+'
+              r'([IVX\- ]*?)\s*'
+              r'(\d+\.\d+)\s+'
+              r'([A-Za-z]+)\s+'
+              r'([A-ZÁÉÍÓÚÜÑ0-9\.\- ,/()]+)',
+              re.MULTILINE
+          )
+
+          datos = []
+          vistos = set()
+
+          for m in patron.finditer(html):
+              evid, fecha, hora_utc, lat, lon, prof, inten, mag, tipo, loc = m.groups()
+
+              clave = (evid, fecha, hora_utc)
+              if clave in vistos:
+                  continue
+              vistos.add(clave)
+
+              datos.append({
+                  "id": evid,
+                  "fecha": f"{fecha} {hora_utc}",
+                  "fecha_utc": f"{fecha} {hora_utc}",
+                  "latitud": lat,
+                  "longitud": lon,
+                  "profundidad": prof,
+                  "magnitud": mag,
+                  "tipo_magnitud": tipo,
+                  "intensidad": (inten or "").strip(),
+                  "localizacion": " ".join(loc.split())[:120]
+              })
+
+          with open("data/sismo.json", "w", encoding="utf-8") as f:
+              json.dump(datos, f, ensure_ascii=False, indent=2)
+          PY
 
       - name: Commit si hay cambios
         run: |
