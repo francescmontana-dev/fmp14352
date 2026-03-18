@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terratrèmols a prop del Masnou</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
+
+    .widget {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #cfcfcf;
+      border-radius: 10px;
+      text-align: center;
+      background: #ffffff;
+    }
+
+    .titulo {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .mag {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 4px 0;
+    }
+
+    .zona {
+      font-size: 12px;
+      color: #222;
+      line-height: 1.2;
+    }
+
+    .fecha {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .extra {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget" id="sismoMasnou">
+    <div class="titulo">🌍 A prop del Masnou</div>
+    <div class="zona">Carregant dades…</div>
+  </div>
+
+  <script>
+    const LAT_MASNOU = 41.48;
+    const LON_MASNOU = 2.31;
+    const RADIO_KM = 300;
+
+    function distanciaKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function colorMagnitud(m) {
+      if (m >= 4) return "#d9534f";
+      if (m >= 3) return "#f0ad4e";
+      return "#5cb85c";
+    }
+
+    async function carregarSisme() {
+      const box = document.getElementById("sismoMasnou");
+
+      try {
+        const resposta = await fetch("./data/sismo.json");
+        const data = await resposta.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          box.innerHTML = `
+            <div class="titulo">🌍 A prop del Masnou</div>
+            <div class="zona">Sense dades sísmiques disponibles</div>
+          `;
+          return;
+        }
+
+        const esdeveniments = data
+          .map(eq => {
+            const lat = parseFloat(eq.latitud);
+            const lon = parseFloat(eq.longitud);
+            if (isNaN(lat) || isNaN(lon)) return null;
+
+            return {
+              ...eq,
+              distancia: distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon)
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.distancia - b.distancia);
+
+        if (esdeveniments.length === 0) {
+          box.innerHTML = `
+            <div class="titulo">🌍 A prop del Masnou</div>
+            <div class="zona">Sense coordenades vàlides</div>
+          `;
+          return;
+        }
+
+        const dinsRadi = esdeveniments.find(eq => eq.distancia <= RADIO_KM);
+        const eq = dinsRadi || esdeveniments[0];
+
+        const mag = parseFloat(eq.magnitud || 0);
+        const avis = dinsRadi
+          ? `Dins de ${RADIO_KM} km`
+          : `Més proper disponible`;
+
+        box.innerHTML = `
+          <div class="titulo">🌍 A prop del Masnou</div>
+          <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
+          <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
+          <div class="fecha">${eq.fecha || ""}</div>
+          <div class="extra">${eq.distancia.toFixed(1)} km del Masnou · ${avis}</div>
+        `;
+      } catch (error) {
+        box.innerHTML = `
+          <div class="titulo">🌍 A prop del Masnou</div>
+          <div class="zona">No s'han pogut carregar les dades</div>
+        `;
+      }
+    }
+
+    carregarSisme();
+  </script>
+</body>
+</html>
