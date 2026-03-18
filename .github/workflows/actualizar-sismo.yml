@@ -1,80 +1,152 @@
-name: Actualizar sismo El Masnou
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sismo cerca de El Masnou</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"
+    .widget {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #cfcfcf;
+      border-radius: 10px;
+      text-align: center;
+      background: #ffffff;
+    }
 
-permissions:
-  contents: write
+    .titulo {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
 
-jobs:
-  actualizar:
-    runs-on: ubuntu-latest
+    .mag {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 4px 0;
+    }
 
-    steps:
-      - name: Clonar repo
-        uses: actions/checkout@v5
+    .zona {
+      font-size: 12px;
+      color: #222;
+      line-height: 1.2;
+    }
 
-      - name: Generar JSON real desde IGN
-        run: |
-          mkdir -p data
-          python3 << 'PY'
-          import json
-          import re
-          from urllib.request import Request, urlopen
+    .fecha {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
 
-          url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/get10dias"
-          req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-          html = urlopen(req, timeout=30).read().decode("utf-8", errors="ignore")
+    .extra {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget" id="sismoMasnou">
+    <div class="titulo">🌍 Cerca de El Masnou</div>
+    <div class="zona">Cargando datos…</div>
+  </div>
 
-          patron = re.compile(
-              r'(es\d+[a-z]+)\s+'
-              r'(\d{2}/\d{2}/\d{4})\s+'
-              r'(\d{2}:\d{2}:\d{2})\s+'
-              r'(\d{2}:\d{2}:\d{2})\s+'
-              r'(-?\d+\.\d+)\s+'
-              r'(-?\d+\.\d+)\s+'
-              r'(\d+\.\d+)\s+'
-              r'(\d+\.\d+)\s+'
-              r'([A-Za-z()]+)\s+'
-              r'([IVX\- ]*?)\s+'
-              r'([A-ZÁÉÍÓÚÜÑ0-9\.\- ,/()]+?)\s+\+\s+info:',
-              re.MULTILINE
-          )
+  <script>
+    const LAT_MASNOU = 41.48;
+    const LON_MASNOU = 2.31;
+    const RADIO_KM = 300;
 
-          datos = []
-          vistos = set()
+    function distanciaKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
 
-          for m in patron.finditer(html):
-              evid, fecha, hora_utc, hora_local, lat, lon, prof, mag, tipo, inten, loc = m.groups()
-              clave = (evid, fecha, hora_utc)
-              if clave in vistos:
-                  continue
-              vistos.add(clave)
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
 
-              datos.append({
-                  "id": evid,
-                  "fecha": f"{fecha} {hora_local}",
-                  "fecha_utc": f"{fecha} {hora_utc}",
-                  "latitud": lat,
-                  "longitud": lon,
-                  "profundidad": prof,
-                  "magnitud": mag,
-                  "tipo_magnitud": tipo,
-                  "intensidad": (inten or "").strip(),
-                  "localizacion": " ".join(loc.split())
-              })
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
 
-          with open("data/sismo.json", "w", encoding="utf-8") as f:
-              json.dump(datos, f, ensure_ascii=False, indent=2)
-          PY
+    function colorMagnitud(m) {
+      if (m >= 4) return "#d9534f";
+      if (m >= 3) return "#f0ad4e";
+      return "#5cb85c";
+    }
 
-      - name: Commit si hay cambios
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/sismo.json
-          git diff --cached --quiet || git commit -m "Actualiza datos sísmicos"
-          git push
-          
+    async function cargarSismo() {
+      const box = document.getElementById("sismoMasnou");
+
+      try {
+        const respuesta = await fetch("./data/sismo.json");
+        const data = await respuesta.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          box.innerHTML = `
+            <div class="titulo">🌍 Cerca de El Masnou</div>
+            <div class="zona">Sin datos sísmicos disponibles</div>
+          `;
+          return;
+        }
+
+        const eventos = data
+          .map(eq => {
+            const lat = parseFloat(eq.latitud);
+            const lon = parseFloat(eq.longitud);
+            if (isNaN(lat) || isNaN(lon)) return null;
+
+            return {
+              ...eq,
+              distancia: distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon)
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.distancia - b.distancia);
+
+        if (eventos.length === 0) {
+          box.innerHTML = `
+            <div class="titulo">🌍 Cerca de El Masnou</div>
+            <div class="zona">Sin coordenadas válidas</div>
+          `;
+          return;
+        }
+
+        const dentroRadio = eventos.find(eq => eq.distancia <= RADIO_KM);
+        const eq = dentroRadio || eventos[0];
+
+        const mag = parseFloat(eq.magnitud || 0);
+        const aviso = dentroRadio
+          ? `Dentro de ${RADIO_KM} km`
+          : `Más cercano disponible`;
+
+        box.innerHTML = `
+          <div class="titulo">🌍 Cerca de El Masnou</div>
+          <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
+          <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
+          <div class="fecha">${eq.fecha || ""}</div>
+          <div class="extra">${eq.distancia.toFixed(1)} km de El Masnou · ${aviso}</div>
+        `;
+      } catch (error) {
+        box.innerHTML = `
+          <div class="titulo">🌍 Cerca de El Masnou</div>
+          <div class="zona">No se pudo cargar el widget</div>
+        `;
+      }
+    }
+
+    cargarSismo();
+  </script>
+</body>
+</html>
