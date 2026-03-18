@@ -16,10 +16,53 @@ jobs:
       - name: Clonar repo
         uses: actions/checkout@v5
 
-      - name: Descargar JSON de IGN
+      - name: Generar JSON desde IGN
         run: |
           mkdir -p data
-          curl -L "https://www.ign.es/web/resources/terremotos/tproximos/prox.json" -o data/sismo.json
+          python3 << 'PY'
+          import json
+          import re
+          from urllib.request import urlopen
+
+          url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/getAnio"
+          html = urlopen(url).read().decode("utf-8", errors="ignore")
+
+          # Extrae filas tipo:
+          # es2026fivwd 17/03/2026 23:24:56 00:24:56 36.0265 -4.6581 92.0 4.4 mb III-IV ALBORÁN OESTE
+          patron = re.compile(
+              r'(es\d+[a-z]+)\s+'
+              r'(\d{2}/\d{2}/\d{4})\s+'
+              r'(\d{2}:\d{2}:\d{2})\s+'
+              r'(\d{2}:\d{2}:\d{2})\s+'
+              r'(-?\d+\.\d+)\s+'
+              r'(-?\d+\.\d+)\s+'
+              r'(\d+\.\d+)\s+'
+              r'(\d+\.\d+)\s+'
+              r'([A-Za-z]+)\s+'
+              r'([IVX\-]+)?\s*'
+              r'([A-ZÁÉÍÓÚÜÑ0-9\.\- ,/()]+?)\s+\+\s+info:',
+              re.MULTILINE
+          )
+
+          datos = []
+          for m in patron.finditer(html):
+              evid, fecha, hora_utc, hora_local, lat, lon, prof, mag, tipo, inten, loc = m.groups()
+              datos.append({
+                  "id": evid,
+                  "fecha": f"{fecha} {hora_local}",
+                  "fecha_utc": f"{fecha} {hora_utc}",
+                  "latitud": lat,
+                  "longitud": lon,
+                  "profundidad": prof,
+                  "magnitud": mag,
+                  "tipo_magnitud": tipo,
+                  "intensidad": inten or "",
+                  "localizacion": " ".join(loc.split())
+              })
+
+          with open("data/sismo.json", "w", encoding="utf-8") as f:
+              json.dump(datos, f, ensure_ascii=False, indent=2)
+          PY
 
       - name: Commit si hay cambios
         run: |
