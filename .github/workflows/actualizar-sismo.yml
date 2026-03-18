@@ -127,7 +127,7 @@
         const eq = dinsRadi || esdeveniments[0];
 
         const mag = parseFloat(eq.magnitud || 0);
-        const avís = dinsRadi
+        const avis = dinsRadi
           ? `Dins de ${RADIO_KM} km`
           : `Més proper disponible`;
 
@@ -136,7 +136,7 @@
           <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
           <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
           <div class="fecha">${eq.fecha || ""}</div>
-          <div class="extra">${eq.distancia.toFixed(1)} km del Masnou · ${avís}</div>
+          <div class="extra">${eq.distancia.toFixed(1)} km del Masnou · ${avis}</div>
         `;
       } catch (error) {
         box.innerHTML = `
