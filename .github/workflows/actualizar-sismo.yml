@@ -27,8 +27,6 @@ jobs:
           url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/getAnio"
           html = urlopen(url).read().decode("utf-8", errors="ignore")
 
-          # Extrae filas tipo:
-          # es2026fivwd 17/03/2026 23:24:56 00:24:56 36.0265 -4.6581 92.0 4.4 mb III-IV ALBORÁN OESTE
           patron = re.compile(
               r'(es\d+[a-z]+)\s+'
               r'(\d{2}/\d{2}/\d{4})\s+'
@@ -39,8 +37,8 @@ jobs:
               r'(\d+\.\d+)\s+'
               r'(\d+\.\d+)\s+'
               r'([A-Za-z]+)\s+'
-              r'([IVX\-]+)?\s*'
-              r'([A-ZÁÉÍÓÚÜÑ0-9\.\- ,/()]+?)\s+\+\s+info:',
+              r'([IVX\\-]+)?\s*'
+              r'([A-ZÁÉÍÓÚÜÑ0-9\\.\\- ,/()]+?)\\s+\\+\\s+info:',
               re.MULTILINE
           )
 
