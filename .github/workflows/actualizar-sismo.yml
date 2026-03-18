@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Terratrèmols prop del Masnou</title>
+  <title>Terratrèmols a prop del Masnou</title>
   <style>
     body {
       margin: 0;
@@ -86,12 +86,12 @@
       return "#5cb85c";
     }
 
-    async function cargarSismo() {
+    async function carregarSisme() {
       const box = document.getElementById("sismoMasnou");
 
       try {
-        const respuesta = await fetch("./data/sismo.json");
-        const data = await respuesta.json();
+        const resposta = await fetch("./data/sismo.json");
+        const data = await resposta.json();
 
         if (!Array.isArray(data) || data.length === 0) {
           box.innerHTML = `
@@ -101,7 +101,7 @@
           return;
         }
 
-        const eventos = data
+        const esdeveniments = data
           .map(eq => {
             const lat = parseFloat(eq.latitud);
             const lon = parseFloat(eq.longitud);
@@ -115,7 +115,7 @@
           .filter(Boolean)
           .sort((a, b) => a.distancia - b.distancia);
 
-        if (eventos.length === 0) {
+        if (esdeveniments.length === 0) {
           box.innerHTML = `
             <div class="titulo">🌍 A prop del Masnou</div>
             <div class="zona">Sense coordenades vàlides</div>
@@ -123,11 +123,11 @@
           return;
         }
 
-        const dentroRadio = eventos.find(eq => eq.distancia <= RADIO_KM);
-        const eq = dentroRadio || eventos[0];
+        const dinsRadi = esdeveniments.find(eq => eq.distancia <= RADIO_KM);
+        const eq = dinsRadi || esdeveniments[0];
 
         const mag = parseFloat(eq.magnitud || 0);
-        const aviso = dentroRadio
+        const avís = dinsRadi
           ? `Dins de ${RADIO_KM} km`
           : `Més proper disponible`;
 
@@ -136,7 +136,7 @@
           <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
           <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
           <div class="fecha">${eq.fecha || ""}</div>
-          <div class="extra">${eq.distancia.toFixed(1)} km del Masnou · ${aviso}</div>
+          <div class="extra">${eq.distancia.toFixed(1)} km del Masnou · ${avís}</div>
         `;
       } catch (error) {
         box.innerHTML = `
@@ -146,8 +146,7 @@
       }
     }
 
-    cargarSismo();
+    carregarSisme();
   </script>
 </body>
-<!-- actualitzacio 401 -->
 </html>
