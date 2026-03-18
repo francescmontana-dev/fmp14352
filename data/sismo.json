@@ -1,14 +1,1 @@
-[
-  {
-    "id": "test-elmasnou-001",
-    "fecha": "18/03/2026 14:32",
-    "fecha_utc": "18/03/2026 13:32",
-    "latitud": "41.5000",
-    "longitud": "2.3500",
-    "profundidad": "10.0",
-    "magnitud": "2.3",
-    "tipo_magnitud": "mb",
-    "intensidad": "",
-    "localizacion": "Costa de Barcelona"
-  }
-]
+[]
