@@ -1,68 +1,137 @@
-<script>
-  const LAT_MASNOU = 41.48;
-  const LON_MASNOU = 2.31;
-  const RADIO_KM = 300;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sismo cerca de El Masnou</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
 
-  function distanciaKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
+    .widget {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #cfcfcf;
+      border-radius: 10px;
+      text-align: center;
+      background: #ffffff;
+    }
 
-  function colorMagnitud(m) {
-    if (m >= 4) return "#d9534f";
-    if (m >= 3) return "#f0ad4e";
-    return "#5cb85c";
-  }
+    .titulo {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
 
-  async function cargarSismo() {
-    const box = document.getElementById("sismoMasnou");
+    .mag {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 4px 0;
+    }
 
-    try {
-      const r = await fetch("./data/sismo.json");
-      const data = await r.json();
+    .zona {
+      font-size: 12px;
+      color: #222;
+      line-height: 1.2;
+    }
 
-      const cercanos = data.filter(eq => {
+    .fecha {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .extra {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget" id="sismoMasnou">
+    <div class="titulo">🌍 Cerca de El Masnou</div>
+    <div class="zona">Cargando datos…</div>
+  </div>
+
+  <script>
+    const LAT_MASNOU = 41.48;
+    const LON_MASNOU = 2.31;
+    const RADIO_KM = 300;
+
+    function distanciaKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function colorMagnitud(m) {
+      if (m >= 4) return "#d9534f";
+      if (m >= 3) return "#f0ad4e";
+      return "#5cb85c";
+    }
+
+    async function cargarSismo() {
+      const box = document.getElementById("sismoMasnou");
+
+      try {
+        const respuesta = await fetch("./data/sismo.json");
+        const data = await respuesta.json();
+
+        const cercanos = data.filter(eq => {
+          const lat = parseFloat(eq.latitud);
+          const lon = parseFloat(eq.longitud);
+
+          if (isNaN(lat) || isNaN(lon)) return false;
+
+          return distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon) <= RADIO_KM;
+        });
+
+        if (!cercanos.length) {
+          box.innerHTML = `
+            <div class="titulo">🌍 Cerca de El Masnou</div>
+            <div class="zona">Sin eventos recientes &lt; ${RADIO_KM} km</div>
+          `;
+          return;
+        }
+
+        const eq = cercanos[0];
+        const mag = parseFloat(eq.magnitud || 0);
         const lat = parseFloat(eq.latitud);
         const lon = parseFloat(eq.longitud);
-        if (isNaN(lat) || isNaN(lon)) return false;
-        return distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon) <= RADIO_KM;
-      });
+        const dist = distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon).toFixed(1);
 
-      if (!cercanos.length) {
         box.innerHTML = `
           <div class="titulo">🌍 Cerca de El Masnou</div>
-          <div class="zona">Sin eventos recientes &lt; ${RADIO_KM} km</div>
+          <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
+          <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
+          <div class="fecha">${eq.fecha || ""}</div>
+          <div class="extra">${dist} km de El Masnou</div>
         `;
-        return;
+      } catch (error) {
+        box.innerHTML = `
+          <div class="titulo">🌍 Cerca de El Masnou</div>
+          <div class="zona">No se pudo cargar el widget</div>
+        `;
       }
-
-      const eq = cercanos[0];
-      const mag = parseFloat(eq.magnitud || 0);
-      const lat = parseFloat(eq.latitud);
-      const lon = parseFloat(eq.longitud);
-      const dist = distanciaKm(LAT_MASNOU, LON_MASNOU, lat, lon).toFixed(1);
-
-      box.innerHTML = `
-        <div class="titulo">🌍 Cerca de El Masnou</div>
-        <div class="mag" style="color:${colorMagnitud(mag)}">M ${mag.toFixed(1)}</div>
-        <div class="zona">${eq.localizacion || "Zona no disponible"}</div>
-        <div class="fecha">${eq.fecha || ""}</div>
-        <div class="extra">${dist} km de El Masnou</div>
-      `;
-    } catch (e) {
-      box.innerHTML = `
-        <div class="titulo">🌍 Cerca de El Masnou</div>
-        <div class="zona">No se pudo cargar el widget</div>
-      `;
     }
-  }
 
-  cargarSismo();
-</script>
+    cargarSismo();
+  </script>
+</body>
+</html>
