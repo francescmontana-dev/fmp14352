@@ -16,51 +16,12 @@ jobs:
       - name: Clonar repo
         uses: actions/checkout@v5
 
-      - name: Generar JSON desde IGN
+      - name: Generar JSON local
         run: |
           mkdir -p data
-          python3 << 'PY'
-          import json
-          import re
-          from urllib.request import urlopen
-
-          url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/getAnio"
-          html = urlopen(url).read().decode("utf-8", errors="ignore")
-
-          patron = re.compile(
-              r'(es\d+[a-z]+)\s+'
-              r'(\d{2}/\d{2}/\d{4})\s+'
-              r'(\d{2}:\d{2}:\d{2})\s+'
-              r'(\d{2}:\d{2}:\d{2})\s+'
-              r'(-?\d+\.\d+)\s+'
-              r'(-?\d+\.\d+)\s+'
-              r'(\d+\.\d+)\s+'
-              r'(\d+\.\d+)\s+'
-              r'([A-Za-z]+)\s+'
-              r'([IVX\\-]+)?\s*'
-              r'([A-ZÁÉÍÓÚÜÑ0-9\\.\\- ,/()]+?)\\s+\\+\\s+info:',
-              re.MULTILINE
-          )
-
-          datos = []
-          for m in patron.finditer(html):
-              evid, fecha, hora_utc, hora_local, lat, lon, prof, mag, tipo, inten, loc = m.groups()
-              datos.append({
-                  "id": evid,
-                  "fecha": f"{fecha} {hora_local}",
-                  "fecha_utc": f"{fecha} {hora_utc}",
-                  "latitud": lat,
-                  "longitud": lon,
-                  "profundidad": prof,
-                  "magnitud": mag,
-                  "tipo_magnitud": tipo,
-                  "intensidad": inten or "",
-                  "localizacion": " ".join(loc.split())
-              })
-
-          with open("data/sismo.json", "w", encoding="utf-8") as f:
-              json.dump(datos, f, ensure_ascii=False, indent=2)
-          PY
+          cat > data/sismo.json <<'EOF'
+          []
+          EOF
 
       - name: Commit si hay cambios
         run: |
@@ -69,4 +30,4 @@ jobs:
           git add data/sismo.json
           git diff --cached --quiet || git commit -m "Actualiza datos sísmicos"
           git push
-          <!-- rebuild 2026-03-18 -->
+          
