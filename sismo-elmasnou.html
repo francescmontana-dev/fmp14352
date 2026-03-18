@@ -62,7 +62,7 @@
       const box = document.getElementById("sismoMasnou");
 
       try {
-        const r = await fetch("https://www.ign.es/web/resources/terremotos/tproximos/prox.json");
+        const r = await fetch("./data/sismo.json");
         const data = await r.json();
 
         const cercanos = data.filter(eq => {
