@@ -1,8 +1,10 @@
 <!doctype html>
-<html>
+<html lang="es">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>El Masnou NE - ECMWF</title>
 
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 
@@ -11,13 +13,13 @@
       margin:0;
       padding:10px;
       font-family: Arial, Helvetica, sans-serif;
-      background:#fff;
+      background:#ffffff;
+      color:#222;
     }
 
     .wrap{
       max-width:1100px;
       margin:0 auto;
-      background:#fff;
     }
 
     .headerBox{
@@ -39,6 +41,12 @@
       margin:0;
     }
 
+    .sub{
+      margin:6px 0 0;
+      font-size:12px;
+      color:#555;
+    }
+
     .btn{
       appearance:none;
       border:1px solid #ddd;
@@ -47,6 +55,10 @@
       border-radius:10px;
       font-weight:700;
       cursor:pointer;
+    }
+
+    .btn:hover{
+      background:#f7f7f7;
     }
 
     .controls{
@@ -59,9 +71,15 @@
       border-radius:12px;
       background:#fff;
       margin-bottom:12px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.05);
     }
 
-    select{ padding:6px 8px; }
+    select{
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid #ccc;
+      background:#fff;
+    }
 
     .sectionTitle{
       font-weight:800;
@@ -80,6 +98,18 @@
       box-shadow:0 2px 8px rgba(0,0,0,0.10);
       margin-bottom:18px;
       overflow:hidden;
+      touch-action: manipulation;
+    }
+
+    .note{
+      display:none;
+      margin:8px 0 0;
+      font-size:12px;
+      color:#444;
+      background:#fff;
+      border:1px solid #eee;
+      padding:8px 10px;
+      border-radius:12px;
     }
 
     .err{
@@ -89,9 +119,12 @@
       padding:10px;
       border-radius:12px;
       margin-top:10px;
+      display:none;
     }
 
     @media (max-width: 600px){
+      body{ padding:8px; }
+      .title{ font-size:18px; }
       .chart{ height:320px; }
     }
   </style>
@@ -101,86 +134,219 @@
   <div class="wrap">
 
     <div class="headerBox">
-      <div class="title">El Masnou - ECMWF</div>
-      <button class="btn" onclick="location.reload()">Actualizar</button>
+      <div>
+        <div class="title">El Masnou NE - ECMWF -</div>
+        <div class="sub" id="subtitle">Temperatura, lluvia y viento · Open-Meteo</div>
+      </div>
+      <button class="btn" id="openFull">Abrir aparte</button>
     </div>
 
     <div class="controls">
-      <label><b>Rango:</b></label>
+      <label for="range"><b>Rango:</b></label>
       <select id="range">
-        <option value="24">24h</option>
-        <option value="72">72h</option>
+        <option value="24">Últimas 24h + próximas 24h</option>
+        <option value="72">Últimas 72h + próximas 72h</option>
         <option value="168" selected>7 días</option>
       </select>
-      <span id="status">Cargando…</span>
+      <button class="btn" id="reloadBtn">Actualizar</button>
+      <span id="status" style="font-size:12px;color:#444;">Cargando…</span>
     </div>
 
-    <div class="sectionTitle">🌡 Temperatura</div>
+    <div class="note" id="mobileNote">En móvil dentro de una página incrustada, los gestos pueden ser más limitados.</div>
+
+    <div class="sectionTitle">🌡 Temperatura / Sensación / Rocío (°C)</div>
     <div id="c1" class="chart"></div>
 
-    <div class="sectionTitle">🌧 Lluvia</div>
+    <div class="sectionTitle">🌧 Lluvia (mm)</div>
     <div id="c2" class="chart"></div>
 
-    <div class="sectionTitle">💨 Viento</div>
+    <div class="sectionTitle">💨 Viento / Racha (km/h)</div>
     <div id="c3" class="chart"></div>
 
-    <div id="errors" class="err" style="display:none;"></div>
+    <div id="errors" class="err"></div>
   </div>
 
 <script>
-const LAT = 41.485;
-const LON = 2.32;
+  const LAT = 41.485291;
+  const LON = 2.327532;
 
-const API =
-  "https://api.open-meteo.com/v1/ecmwf" +
-  "?latitude=" + LAT +
-  "&longitude=" + LON +
-  "&hourly=temperature_2m,rain,wind_speed_10m,wind_gusts_10m" +
-  "&timezone=Europe%2FMadrid&past_days=7&forecast_days=7";
+  const isMobile = window.matchMedia && window.matchMedia("(max-width: 600px)").matches;
+  const inIframe = (window.self !== window.top);
 
-function showError(msg){
-  const box = document.getElementById("errors");
-  box.style.display = "block";
-  box.textContent = msg;
-}
-
-function layout(yTitle){
-  return {
-    margin:{l:50,r:20,t:10,b:60},
-    xaxis:{type:"date"},
-    yaxis:{title:yTitle},
-    paper_bgcolor:"#fff",
-    plot_bgcolor:"#fff"
-  };
-}
-
-async function run(){
-  try{
-    const res = await fetch(API);
-    const j = await res.json();
-
-    const t = j.hourly.time.map(x=>new Date(x));
-
-    Plotly.newPlot("c1",[
-      {x:t,y:j.hourly.temperature_2m,name:"Temp"}
-    ],layout("°C"));
-
-    Plotly.newPlot("c2",[
-      {x:t,y:j.hourly.rain,type:"bar",name:"Lluvia"}
-    ],layout("mm"));
-
-    Plotly.newPlot("c3",[
-      {x:t,y:j.hourly.wind_speed_10m,name:"Viento"},
-      {x:t,y:j.hourly.wind_gusts_10m,name:"Racha"}
-    ],layout("km/h"));
-
-    document.getElementById("status").textContent = "OK";
-  }catch(e){
-    showError(e);
+  if (isMobile && inIframe) {
+    document.getElementById("mobileNote").style.display = "block";
   }
-}
 
-run();
+  document.getElementById("openFull").addEventListener("click", () => {
+    window.open(window.location.href, "_blank");
+  });
+
+  document.getElementById("reloadBtn").addEventListener("click", () => {
+    run();
+  });
+
+  function buildApiUrl() {
+    return "https://api.open-meteo.com/v1/ecmwf" +
+      "?latitude=" + LAT +
+      "&longitude=" + LON +
+      "&hourly=temperature_2m,apparent_temperature,dew_point_2m,rain,wind_speed_10m,wind_gusts_10m" +
+      "&temperature_unit=celsius" +
+      "&wind_speed_unit=kmh" +
+      "&precipitation_unit=mm" +
+      "&timezone=Europe%2FMadrid" +
+      "&past_days=7" +
+      "&forecast_days=7";
+  }
+
+  function showError(msg){
+    const box = document.getElementById("errors");
+    box.style.display = "block";
+    box.textContent = String(msg);
+  }
+
+  function clearError(){
+    const box = document.getElementById("errors");
+    box.style.display = "none";
+    box.textContent = "";
+  }
+
+  const DRAGMODE = (isMobile && inIframe) ? false : "pan";
+
+  function layout(yTitle){
+    return {
+      dragmode: DRAGMODE,
+      margin:{l:55,r:20,t:10,b:95},
+      xaxis:{
+        type:"date",
+        tickangle:30,
+        rangeslider:{visible:false}
+      },
+      yaxis:{
+        title:yTitle,
+        showgrid:true
+      },
+      hovermode:"x unified",
+      legend:{
+        orientation:"h",
+        x:0,
+        y:-0.30,
+        xanchor:"left",
+        yanchor:"top",
+        font:{size:11},
+        itemsizing:"constant"
+      },
+      paper_bgcolor:"#ffffff",
+      plot_bgcolor:"#ffffff"
+    };
+  }
+
+  function nearestIndex(arrDates){
+    const now = new Date();
+    let idx = 0;
+    let best = Infinity;
+
+    for(let i = 0; i < arrDates.length; i++){
+      const d = Math.abs(arrDates[i] - now);
+      if(d < best){
+        best = d;
+        idx = i;
+      }
+    }
+    return idx;
+  }
+
+  function sliceByHours(data, hours){
+    const iNow = nearestIndex(data.t);
+    const half = Math.floor(hours / 2);
+    const start = Math.max(0, iNow - half);
+    const end = Math.min(data.t.length, iNow + half);
+    const cut = (a) => a.slice(start, end);
+
+    return {
+      t: cut(data.t),
+      temp: cut(data.temp),
+      feel: cut(data.feel),
+      dew: cut(data.dew),
+      rain: cut(data.rain),
+      wind: cut(data.wind),
+      gust: cut(data.gust)
+    };
+  }
+
+  let DATA = null;
+
+  function render(hours){
+    if(!DATA) return;
+
+    const d = sliceByHours(DATA, hours);
+
+    const CFG = {
+      responsive:true,
+      displaylogo:false,
+      scrollZoom: !(isMobile && inIframe),
+      displayModeBar:true
+    };
+
+    Plotly.react("c1", [
+      {x:d.t, y:d.temp, name:"Temp", mode:"lines"},
+      {x:d.t, y:d.feel, name:"Sens.", mode:"lines"},
+      {x:d.t, y:d.dew,  name:"Rocío", mode:"lines"}
+    ], layout("°C"), CFG);
+
+    Plotly.react("c2", [
+      {x:d.t, y:d.rain, name:"Lluvia", type:"bar"}
+    ], layout("mm"), CFG);
+
+    Plotly.react("c3", [
+      {x:d.t, y:d.wind, name:"Viento", mode:"lines"},
+      {x:d.t, y:d.gust, name:"Racha", mode:"lines"}
+    ], layout("km/h"), CFG);
+
+    const from = d.t[0];
+    const to = d.t[d.t.length - 1];
+
+    document.getElementById("status").textContent =
+      "Mostrando " + hours + "h: " +
+      from.toLocaleString("es-ES") + " → " +
+      to.toLocaleString("es-ES");
+  }
+
+  async function run(){
+    clearError();
+    document.getElementById("status").textContent = "Cargando…";
+
+    try{
+      const res = await fetch(buildApiUrl(), { cache: "no-store" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+
+      const j = await res.json();
+      if(!j || !j.hourly || !j.hourly.time){
+        throw new Error("Respuesta inesperada de Open-Meteo");
+      }
+
+      DATA = {
+        t: j.hourly.time.map(x => new Date(x)),
+        temp: j.hourly.temperature_2m || [],
+        feel: j.hourly.apparent_temperature || [],
+        dew:  j.hourly.dew_point_2m || [],
+        rain: j.hourly.rain || [],
+        wind: j.hourly.wind_speed_10m || [],
+        gust: j.hourly.wind_gusts_10m || []
+      };
+
+      const hours = parseInt(document.getElementById("range").value, 10);
+      render(hours);
+    }catch(err){
+      document.getElementById("status").textContent = "Error";
+      showError(err);
+    }
+  }
+
+  document.getElementById("range").addEventListener("change", (e) => {
+    render(parseInt(e.target.value, 10));
+  });
+
+  run();
 </script>
 
 </body>
