@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <style>
+    body{
+      margin:0;
+      padding:10px;
+      font-family: Arial, Helvetica, sans-serif;
+      background:#fff;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      background:#fff;
+    }
+
+    .headerBox{
+      background:#fff;
+      padding:12px;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.15);
+      margin-bottom:10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-weight:800;
+      font-size:20px;
+      margin:0;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid #ddd;
+      background:#fff;
+      padding:8px 10px;
+      border-radius:10px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      padding:10px;
+      border:1px solid #e1e1e1;
+      border-radius:12px;
+      background:#fff;
+      margin-bottom:12px;
+    }
+
+    select{ padding:6px 8px; }
+
+    .sectionTitle{
+      font-weight:800;
+      margin:14px 0 6px;
+      display:inline-block;
+      background:#fff;
+      padding:6px 10px;
+      border-radius:12px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .chart{
+      height:420px;
+      background:#fff;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.10);
+      margin-bottom:18px;
+      overflow:hidden;
+    }
+
+    .err{
+      white-space:pre-wrap;
+      background:#fff3f3;
+      border:1px solid #ffd0d0;
+      padding:10px;
+      border-radius:12px;
+      margin-top:10px;
+    }
+
+    @media (max-width: 600px){
+      .chart{ height:320px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="headerBox">
+      <div class="title">El Masnou - ECMWF</div>
+      <button class="btn" onclick="location.reload()">Actualizar</button>
+    </div>
+
+    <div class="controls">
+      <label><b>Rango:</b></label>
+      <select id="range">
+        <option value="24">24h</option>
+        <option value="72">72h</option>
+        <option value="168" selected>7 días</option>
+      </select>
+      <span id="status">Cargando…</span>
+    </div>
+
+    <div class="sectionTitle">🌡 Temperatura</div>
+    <div id="c1" class="chart"></div>
+
+    <div class="sectionTitle">🌧 Lluvia</div>
+    <div id="c2" class="chart"></div>
+
+    <div class="sectionTitle">💨 Viento</div>
+    <div id="c3" class="chart"></div>
+
+    <div id="errors" class="err" style="display:none;"></div>
+  </div>
+
+<script>
+const LAT = 41.485;
+const LON = 2.32;
+
+const API =
+  "https://api.open-meteo.com/v1/ecmwf" +
+  "?latitude=" + LAT +
+  "&longitude=" + LON +
+  "&hourly=temperature_2m,rain,wind_speed_10m,wind_gusts_10m" +
+  "&timezone=Europe%2FMadrid&past_days=7&forecast_days=7";
+
+function showError(msg){
+  const box = document.getElementById("errors");
+  box.style.display = "block";
+  box.textContent = msg;
+}
+
+function layout(yTitle){
+  return {
+    margin:{l:50,r:20,t:10,b:60},
+    xaxis:{type:"date"},
+    yaxis:{title:yTitle},
+    paper_bgcolor:"#fff",
+    plot_bgcolor:"#fff"
+  };
+}
+
+async function run(){
+  try{
+    const res = await fetch(API);
+    const j = await res.json();
+
+    const t = j.hourly.time.map(x=>new Date(x));
+
+    Plotly.newPlot("c1",[
+      {x:t,y:j.hourly.temperature_2m,name:"Temp"}
+    ],layout("°C"));
+
+    Plotly.newPlot("c2",[
+      {x:t,y:j.hourly.rain,type:"bar",name:"Lluvia"}
+    ],layout("mm"));
+
+    Plotly.newPlot("c3",[
+      {x:t,y:j.hourly.wind_speed_10m,name:"Viento"},
+      {x:t,y:j.hourly.wind_gusts_10m,name:"Racha"}
+    ],layout("km/h"));
+
+    document.getElementById("status").textContent = "OK";
+  }catch(e){
+    showError(e);
+  }
+}
+
+run();
+</script>
+
+</body>
+</html>
