@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gràfiques mòbil</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f7fb;
+  text-align: center;
+}
+
+h1 {
+  margin: 15px 0;
+  font-size: 22px;
+}
+
+canvas {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.botons {
+  padding: 10px;
+}
+
+button {
+  width: 90%;
+  max-width: 320px;
+  margin: 8px auto;
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #1e73be;
+  color: white;
+  font-weight: bold;
+}
+
+.volver {
+  display: block;
+  margin: 20px auto;
+  max-width: 320px;
+  padding: 12px;
+  background: #555;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Gràfiques meteorològiques</h1>
+
+<canvas id="grafica"></canvas>
+
+<div class="botons">
+  <button onclick="carrega('temp')">Temperatura</button>
+  <button onclick="carrega('press')">Pressió</button>
+  <button onclick="carrega('wind')">Vent</button>
+  <button onclick="carrega('rain')">Pluja</button>
+</div>
+
+<a href="inicio.html" class="volver">⬅ Tornar</a>
+
+<script>
+let chart;
+
+async function carrega(tipus) {
+  const resposta = await fetch('dayfile.txt');
+  const text = await resposta.text();
+
+  const files = text.trim().split("\n");
+
+  let labels = [];
+  let dades = [];
+
+  files.forEach(l => {
+    const parts = l.split(",");
+    labels.push(parts[0]);
+
+    if (tipus === 'temp') dades.push(parseFloat(parts[2]));
+    if (tipus === 'press') dades.push(parseFloat(parts[10]));
+    if (tipus === 'wind') dades.push(parseFloat(parts[5]));
+    if (tipus === 'rain') dades.push(parseFloat(parts[6]));
+  });
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById('grafica'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: tipus,
+        data: dades,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+}
+
+// carregar temperatura per defecte
+carrega('temp');
+</script>
+
+</body>
+</html>
