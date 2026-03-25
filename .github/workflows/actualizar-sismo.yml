@@ -1,0 +1,17 @@
+name: Test sismo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Crear JSON simple
+        run: |
+          mkdir -p data
+          echo '[{"localizacion":"RIUDARENES","magnitud":"1.7","latitud":"41.82","longitud":"2.71","fecha":"26/03/2026"}]' > data/sismo.json
+
+      - name: Mostrar contenido
+        run: cat data/sismo.json
