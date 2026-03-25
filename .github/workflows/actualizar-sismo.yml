@@ -25,11 +25,9 @@ jobs:
 
           url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/get10dias"
           req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-          html = urlopen(req).read().decode("utf-8", errors="ignore")
+          html = urlopen(req, timeout=30).read().decode("utf-8", errors="ignore")
 
-          # Captura más flexible
           filas = re.findall(r'es\d+.*?\+\s+info:', html, re.DOTALL)
-
           datos = []
 
           for f in filas:
@@ -39,12 +37,10 @@ jobs:
                   evid = partes[0]
                   fecha = partes[1]
                   hora = partes[2]
-
                   lat = partes[4]
                   lon = partes[5]
                   prof = partes[6]
                   mag = partes[7]
-
                   loc = " ".join(partes[9:-2])
 
                   datos.append({
@@ -59,18 +55,18 @@ jobs:
                       "intensidad": "",
                       "localizacion": loc.strip()
                   })
-
               except:
                   continue
 
-          with open("data/sismo.json", "w") as f:
-              json.dump(datos, f, indent=2)
+          with open("data/sismo.json", "w", encoding="utf-8") as f:
+              json.dump(datos, f, ensure_ascii=False, indent=2)
           PY
 
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "bot@github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/sismo.json
           git commit -m "Update sismo" || echo "No changes"
           git push
+          
