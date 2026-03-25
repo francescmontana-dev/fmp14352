@@ -90,7 +90,7 @@
       const box = document.getElementById("sismoMasnou");
 
       try {
-        const resposta = await fetch("./data/sismo.json");
+        const resposta = await fetch("./data/sismo.json?v=" + Date.now());
         const data = await resposta.json();
 
         if (!Array.isArray(data) || data.length === 0) {
