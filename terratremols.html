@@ -12,99 +12,81 @@ body{
   background: transparent;
 }
 
-.container{
-  max-width: 640px;
-  margin: 20px auto;
-  padding: 10px;
-}
-
 .card{
-  border-radius: 20px;
-  padding: 22px 24px;
-  background: linear-gradient(135deg, #eef6ff 0%, #ffffff 100%);
-  border: 1px solid rgba(0,0,0,.08);
-  box-shadow: 0 10px 26px rgba(0,0,0,.12);
-  text-align: center;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:#f8fafc;
+  border:1px solid rgba(0,0,0,.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  max-width:100%;
 }
 
-.title{
-  font-size: 20px;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 14px;
-}
-
+/* magnitud */
 .mag{
-  font-size: 54px;
-  font-weight: 900;
-  line-height: 1;
-  margin-bottom: 8px;
+  font-size:26px;
+  font-weight:800;
 }
 
+/* colors per magnitud */
 .mag.molt-debil{ color:#2563eb; }
 .mag.debil{ color:#0891b2; }
 .mag.lleu{ color:#d97706; }
 .mag.moderat{ color:#b91c1c; }
 
-.label{
-  display: inline-block;
-  margin-bottom: 10px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  background: #e5eefc;
-  color: #1e3a8a;
+/* text */
+.info{
+  flex:1;
+  min-width:0;
 }
 
 .region{
-  font-size: 18px;
-  font-weight: 700;
-  color: #111827;
-  margin-top: 4px;
+  font-size:14px;
+  font-weight:600;
+  color:#111827;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .meta{
-  font-size: 14px;
-  color: #4b5563;
-  margin-top: 10px;
-  line-height: 1.5;
+  font-size:12px;
+  color:#6b7280;
 }
 
-.foot{
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0,0,0,.08);
-}
-
-.error{
-  font-size: 16px;
-  color: #b91c1c;
-  font-weight: 700;
-}
-
-.small{
-  font-size: 13px;
-  color: #6b7280;
+/* etiqueta */
+.label{
+  font-size:11px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#e5eefc;
+  color:#1e3a8a;
+  white-space:nowrap;
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-  <div class="card">
-    <div class="title">Terratrèmol més fort · últim mes</div>
-    <div id="content">Carregant dades…</div>
-    <div id="foot" class="foot"></div>
+<div class="card">
+  <div id="mag" class="mag">--</div>
+  <div class="info">
+    <div id="region" class="region">Carregant…</div>
+    <div id="meta" class="meta"></div>
   </div>
+  <div id="label" class="label"></div>
 </div>
 
 <script>
 (async function () {
-  const el = document.getElementById("content");
-  const foot = document.getElementById("foot");
+
+  const magEl = document.getElementById("mag");
+  const regionEl = document.getElementById("region");
+  const metaEl = document.getElementById("meta");
+  const labelEl = document.getElementById("label");
 
   const minLat = 40.5;
   const maxLat = 42.9;
@@ -115,117 +97,77 @@ body{
   const start = new Date();
   start.setMonth(start.getMonth() - 1);
 
-  function pad(n) {
-    return String(n).padStart(2, "0");
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function toISO(d){
+    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
   }
 
-  function toISODate(d) {
-    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-  }
-
-  function formatDate(s) {
-    const d = new Date(s);
-    return d.toLocaleString("ca-ES");
-  }
-
-  function tradueixZona(zona) {
+  function tradueixZona(zona){
     if (!zona) return "Catalunya";
+    zona = zona.toUpperCase();
 
-    const z = zona.toUpperCase().trim();
+    if (zona.includes("PYRENEES")) return "Pirineus";
+    if (zona.includes("BARCELONA")) return "Barcelona";
+    if (zona.includes("GIRONA")) return "Girona";
+    if (zona.includes("TARRAGONA")) return "Tarragona";
+    if (zona.includes("LLEIDA")) return "Lleida";
+    if (zona.includes("MEDITERRANEAN")) return "Mediterrani";
 
-    if (z.includes("PYRENEES")) return "Pirineus";
-    if (z.includes("BARCELONA")) return "Barcelona";
-    if (z.includes("GIRONA")) return "Girona";
-    if (z.includes("TARRAGONA")) return "Tarragona";
-    if (z.includes("LLEIDA")) return "Lleida";
-    if (z.includes("CATALONIA")) return "Catalunya";
-    if (z.includes("CATALUNYA")) return "Catalunya";
-    if (z.includes("SPAIN")) return "Espanya";
-    if (z.includes("FRANCE")) return "França";
-    if (z.includes("ANDORRA")) return "Andorra";
-    if (z.includes("MEDITERRANEAN")) return "Mar Mediterrani";
-    if (z.includes("BALEARIC")) return "Mar Balear";
-    if (z.includes("NEAR COAST OF CATALONIA")) return "Costa de Catalunya";
-    if (z.includes("EASTERN PYRENEES")) return "Pirineus orientals";
-    if (z.includes("WESTERN PYRENEES")) return "Pirineus occidentals";
-
-    return zona
-      .toLowerCase()
-      .replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+    return zona.charAt(0)+zona.slice(1).toLowerCase();
   }
 
-  function textMagnitud(mag) {
-    if (mag < 2) return "Molt dèbil";
-    if (mag < 3) return "Dèbil";
-    if (mag < 4) return "Lleu";
-    return "Moderat";
+  function textMag(m){
+    if (m < 2) return "molt dèbil";
+    if (m < 3) return "dèbil";
+    if (m < 4) return "lleu";
+    return "moderat";
   }
 
-  function classeMagnitud(mag) {
-    if (mag < 2) return "molt-debil";
-    if (mag < 3) return "debil";
-    if (mag < 4) return "lleu";
+  function classMag(m){
+    if (m < 2) return "molt-debil";
+    if (m < 3) return "debil";
+    if (m < 4) return "lleu";
     return "moderat";
   }
 
   try {
     const url =
       "https://www.seismicportal.eu/fdsnws/event/1/query?format=json" +
-      "&starttime=" + encodeURIComponent(toISODate(start)) +
-      "&endtime=" + encodeURIComponent(toISODate(end)) +
-      "&minlat=" + encodeURIComponent(minLat) +
-      "&maxlat=" + encodeURIComponent(maxLat) +
-      "&minlon=" + encodeURIComponent(minLon) +
-      "&maxlon=" + encodeURIComponent(maxLon);
+      "&starttime=" + toISO(start) +
+      "&endtime=" + toISO(end) +
+      "&minlat=" + minLat +
+      "&maxlat=" + maxLat +
+      "&minlon=" + minLon +
+      "&maxlon=" + maxLon;
 
     const res = await fetch(url);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-
     const data = await res.json();
-    const features = Array.isArray(data.features) ? data.features : [];
+    const features = data.features || [];
 
     if (!features.length) {
-      el.innerHTML = `
-        <div class="error">No hi ha sismes aquest mes</div>
-        <div class="small">No consta cap esdeveniment dins la zona definida.</div>
-      `;
-      foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
+      regionEl.textContent = "Sense sismes aquest mes";
       return;
     }
 
-    const maxEvent = features.reduce((a, b) => {
-      const magA = Number(a?.properties?.mag) || -999;
-      const magB = Number(b?.properties?.mag) || -999;
-      return magB > magA ? b : a;
-    });
+    const max = features.reduce((a,b) =>
+      Number(a.properties.mag) > Number(b.properties.mag) ? a : b
+    );
 
-    const p = maxEvent.properties || {};
+    const p = max.properties;
     const mag = Number(p.mag);
-    const zona = tradueixZona(p.flynn_region || p.region || "Catalunya");
-    const profunditat = (p.depth ?? "?");
-    const hora = p.time ? formatDate(p.time) : "?";
-    const etiqueta = textMagnitud(mag);
-    const classe = classeMagnitud(mag);
 
-    el.innerHTML = `
-      <div class="mag ${classe}">M${Number.isFinite(mag) ? mag.toFixed(1) : "?"}</div>
-      <div class="label">${etiqueta}</div>
-      <div class="region">${zona}</div>
-      <div class="meta">
-        Profunditat: ${profunditat} km<br>
-        Data i hora: ${hora}
-      </div>
-    `;
+    magEl.textContent = "M" + mag.toFixed(1);
+    magEl.classList.add(classMag(mag));
 
-    foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
+    regionEl.textContent = tradueixZona(p.flynn_region);
+    metaEl.textContent = new Date(p.time).toLocaleDateString("ca-ES");
 
-  } catch (e) {
-    el.innerHTML = `
-      <div class="error">Error carregant dades</div>
-      <div class="small">No s'ha pogut consultar EMSC en aquest moment.</div>
-    `;
-    foot.textContent = "Torna-ho a provar d'aquí una estona.";
+    labelEl.textContent = textMag(mag);
+
+  } catch {
+    regionEl.textContent = "Error carregant dades";
   }
+
 })();
 </script>
 </body>
