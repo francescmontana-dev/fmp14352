@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terratrèmols Catalunya</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:#f5f7fa;
+}
+
+.container{
+  max-width:600px;
+  margin:20px auto;
+  padding:10px;
+}
+
+.card{
+  border-radius:18px;
+  padding:22px;
+  background: linear-gradient(135deg, #eef6ff, #ffffff);
+  box-shadow: 0 10px 25px rgba(0,0,0,.12);
+  text-align:center;
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse{
+  0%{ transform: scale(1); }
+  50%{ transform: scale(1.02); }
+  100%{ transform: scale(1); }
+}
+
+.title{
+  font-size:20px;
+  font-weight:700;
+  color:#1f2937;
+  margin-bottom:10px;
+}
+
+.mag{
+  font-size:52px;
+  font-weight:900;
+  color:#b91c1c;
+  animation: glow 2s infinite;
+}
+
+@keyframes glow{
+  0%{opacity:0.7;}
+  50%{opacity:1;}
+  100%{opacity:0.7;}
+}
+
+.region{
+  font-size:17px;
+  font-weight:600;
+  margin-top:6px;
+}
+
+.meta{
+  font-size:14px;
+  color:#555;
+  margin-top:8px;
+}
+
+.foot{
+  font-size:12px;
+  color:#6b7280;
+  margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="card">
+    <div class="title">Terratrèmol més fort · últim mes</div>
+    <div id="content">Carregant dades…</div>
+    <div id="foot" class="foot"></div>
+  </div>
+</div>
+
+<script>
+(async function () {
+  const el = document.getElementById("content");
+  const foot = document.getElementById("foot");
+
+  const minLat = 40.5;
+  const maxLat = 42.9;
+  const minLon = 0.1;
+  const maxLon = 3.5;
+
+  const end = new Date();
+  const start = new Date();
+  start.setMonth(start.getMonth() - 1);
+
+  function pad(n){ return String(n).padStart(2, "0"); }
+  function toISO(d){
+    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  }
+
+  try {
+    const url =
+      "https://www.seismicportal.eu/fdsnws/event/1/query?format=json" +
+      "&starttime=" + toISO(start) +
+      "&endtime=" + toISO(end) +
+      "&minlat=" + minLat +
+      "&maxlat=" + maxLat +
+      "&minlon=" + minLon +
+      "&maxlon=" + maxLon;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    const features = data.features || [];
+
+    if (!features.length) {
+      el.innerHTML = "No hi ha sismes aquest mes";
+      return;
+    }
+
+    const max = features.reduce((a, b) =>
+      (Number(a.properties.mag) > Number(b.properties.mag)) ? a : b
+    );
+
+    const p = max.properties;
+    const date = new Date(p.time).toLocaleString("ca-ES");
+
+    el.innerHTML = `
+      <div class="mag">M${Number(p.mag).toFixed(1)}</div>
+      <div class="region">${p.flynn_region || "Catalunya"}</div>
+      <div class="meta">
+        Profunditat: ${p.depth ?? "?"} km · ${date}
+      </div>
+    `;
+
+    foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
+
+  } catch (e) {
+    el.innerHTML = "Error carregant dades";
+  }
+})();
+</script>
+
+</body>
+</html>
