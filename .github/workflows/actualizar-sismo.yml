@@ -3,10 +3,14 @@ name: Actualizar sismo El Masnou
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/30 * * * *"
 
 permissions:
   contents: write
+
+concurrency:
+  group: actualizar-sismo-main
+  cancel-in-progress: true
 
 jobs:
   actualizar:
@@ -36,7 +40,6 @@ jobs:
           for f in filas:
               try:
                   partes = f.split()
-
                   evid = partes[0]
                   fecha = partes[1]
                   hora = partes[2]
@@ -79,8 +82,6 @@ jobs:
 
           git commit -m "Update sismo"
 
-          for i in 1 2 3; do
-            git pull --rebase origin main && git push origin HEAD:main && break
-            echo "Reintent $i..."
-            sleep 5
-          done
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
