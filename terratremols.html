@@ -9,66 +9,85 @@
 body{
   margin:0;
   font-family: Arial, Helvetica, sans-serif;
-  background:#f5f7fa;
+  background: transparent;
 }
 
 .container{
-  max-width:600px;
-  margin:20px auto;
-  padding:10px;
+  max-width: 640px;
+  margin: 20px auto;
+  padding: 10px;
 }
 
 .card{
-  border-radius:18px;
-  padding:22px;
-  background: linear-gradient(135deg, #eef6ff, #ffffff);
-  box-shadow: 0 10px 25px rgba(0,0,0,.12);
-  text-align:center;
-  animation: pulse 2.5s infinite;
-}
-
-@keyframes pulse{
-  0%{ transform: scale(1); }
-  50%{ transform: scale(1.02); }
-  100%{ transform: scale(1); }
+  border-radius: 20px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, #eef6ff 0%, #ffffff 100%);
+  border: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 10px 26px rgba(0,0,0,.12);
+  text-align: center;
 }
 
 .title{
-  font-size:20px;
-  font-weight:700;
-  color:#1f2937;
-  margin-bottom:10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 14px;
 }
 
 .mag{
-  font-size:52px;
-  font-weight:900;
-  color:#b91c1c;
-  animation: glow 2s infinite;
+  font-size: 54px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 
-@keyframes glow{
-  0%{opacity:0.7;}
-  50%{opacity:1;}
-  100%{opacity:0.7;}
+.mag.molt-debil{ color:#2563eb; }
+.mag.debil{ color:#0891b2; }
+.mag.lleu{ color:#d97706; }
+.mag.moderat{ color:#b91c1c; }
+
+.label{
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #e5eefc;
+  color: #1e3a8a;
 }
 
 .region{
-  font-size:17px;
-  font-weight:600;
-  margin-top:6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 4px;
 }
 
 .meta{
-  font-size:14px;
-  color:#555;
-  margin-top:8px;
+  font-size: 14px;
+  color: #4b5563;
+  margin-top: 10px;
+  line-height: 1.5;
 }
 
 .foot{
-  font-size:12px;
-  color:#6b7280;
-  margin-top:12px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+
+.error{
+  font-size: 16px;
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.small{
+  font-size: 13px;
+  color: #6b7280;
 }
 </style>
 </head>
@@ -96,52 +115,118 @@ body{
   const start = new Date();
   start.setMonth(start.getMonth() - 1);
 
-  function pad(n){ return String(n).padStart(2, "0"); }
-  function toISO(d){
-    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  function pad(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function toISODate(d) {
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+
+  function formatDate(s) {
+    const d = new Date(s);
+    return d.toLocaleString("ca-ES");
+  }
+
+  function tradueixZona(zona) {
+    if (!zona) return "Catalunya";
+
+    const z = zona.toUpperCase().trim();
+
+    if (z.includes("PYRENEES")) return "Pirineus";
+    if (z.includes("BARCELONA")) return "Barcelona";
+    if (z.includes("GIRONA")) return "Girona";
+    if (z.includes("TARRAGONA")) return "Tarragona";
+    if (z.includes("LLEIDA")) return "Lleida";
+    if (z.includes("CATALONIA")) return "Catalunya";
+    if (z.includes("CATALUNYA")) return "Catalunya";
+    if (z.includes("SPAIN")) return "Espanya";
+    if (z.includes("FRANCE")) return "França";
+    if (z.includes("ANDORRA")) return "Andorra";
+    if (z.includes("MEDITERRANEAN")) return "Mar Mediterrani";
+    if (z.includes("BALEARIC")) return "Mar Balear";
+    if (z.includes("NEAR COAST OF CATALONIA")) return "Costa de Catalunya";
+    if (z.includes("EASTERN PYRENEES")) return "Pirineus orientals";
+    if (z.includes("WESTERN PYRENEES")) return "Pirineus occidentals";
+
+    return zona
+      .toLowerCase()
+      .replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+  }
+
+  function textMagnitud(mag) {
+    if (mag < 2) return "Molt dèbil";
+    if (mag < 3) return "Dèbil";
+    if (mag < 4) return "Lleu";
+    return "Moderat";
+  }
+
+  function classeMagnitud(mag) {
+    if (mag < 2) return "molt-debil";
+    if (mag < 3) return "debil";
+    if (mag < 4) return "lleu";
+    return "moderat";
   }
 
   try {
     const url =
       "https://www.seismicportal.eu/fdsnws/event/1/query?format=json" +
-      "&starttime=" + toISO(start) +
-      "&endtime=" + toISO(end) +
-      "&minlat=" + minLat +
-      "&maxlat=" + maxLat +
-      "&minlon=" + minLon +
-      "&maxlon=" + maxLon;
+      "&starttime=" + encodeURIComponent(toISODate(start)) +
+      "&endtime=" + encodeURIComponent(toISODate(end)) +
+      "&minlat=" + encodeURIComponent(minLat) +
+      "&maxlat=" + encodeURIComponent(maxLat) +
+      "&minlon=" + encodeURIComponent(minLon) +
+      "&maxlon=" + encodeURIComponent(maxLon);
 
     const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+
     const data = await res.json();
-    const features = data.features || [];
+    const features = Array.isArray(data.features) ? data.features : [];
 
     if (!features.length) {
-      el.innerHTML = "No hi ha sismes aquest mes";
+      el.innerHTML = `
+        <div class="error">No hi ha sismes aquest mes</div>
+        <div class="small">No consta cap esdeveniment dins la zona definida.</div>
+      `;
+      foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
       return;
     }
 
-    const max = features.reduce((a, b) =>
-      (Number(a.properties.mag) > Number(b.properties.mag)) ? a : b
-    );
+    const maxEvent = features.reduce((a, b) => {
+      const magA = Number(a?.properties?.mag) || -999;
+      const magB = Number(b?.properties?.mag) || -999;
+      return magB > magA ? b : a;
+    });
 
-    const p = max.properties;
-    const date = new Date(p.time).toLocaleString("ca-ES");
+    const p = maxEvent.properties || {};
+    const mag = Number(p.mag);
+    const zona = tradueixZona(p.flynn_region || p.region || "Catalunya");
+    const profunditat = (p.depth ?? "?");
+    const hora = p.time ? formatDate(p.time) : "?";
+    const etiqueta = textMagnitud(mag);
+    const classe = classeMagnitud(mag);
 
     el.innerHTML = `
-      <div class="mag">M${Number(p.mag).toFixed(1)}</div>
-      <div class="region">${p.flynn_region || "Catalunya"}</div>
+      <div class="mag ${classe}">M${Number.isFinite(mag) ? mag.toFixed(1) : "?"}</div>
+      <div class="label">${etiqueta}</div>
+      <div class="region">${zona}</div>
       <div class="meta">
-        Profunditat: ${p.depth ?? "?"} km · ${date}
+        Profunditat: ${profunditat} km<br>
+        Data i hora: ${hora}
       </div>
     `;
 
     foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
 
   } catch (e) {
-    el.innerHTML = "Error carregant dades";
+    el.innerHTML = `
+      <div class="error">Error carregant dades</div>
+      <div class="small">No s'ha pogut consultar EMSC en aquest moment.</div>
+    `;
+    foot.textContent = "Torna-ho a provar d'aquí una estona.";
   }
 })();
 </script>
-
 </body>
 </html>
