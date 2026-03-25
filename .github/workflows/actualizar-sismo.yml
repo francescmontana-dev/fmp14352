@@ -3,7 +3,7 @@ name: Actualizar sismo El Masnou
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/15 * * * *"
 
 permissions:
   contents: write
@@ -13,10 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar repo
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-      - name: Generar JSON real desde IGN
+      - name: Generar JSON robusto
         run: |
           mkdir -p data
           python3 << 'PY'
@@ -26,54 +25,52 @@ jobs:
 
           url = "https://www.ign.es/web/ultimos-terremotos/-/ultimos-terremotos/get10dias"
           req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-          html = urlopen(req, timeout=30).read().decode("utf-8", errors="ignore")
+          html = urlopen(req).read().decode("utf-8", errors="ignore")
 
-          patron = re.compile(
-              r'(es\d+[a-z]+)\s+'
-              r'(\d{2}/\d{2}/\d{4})\s+'
-              r'(\d{2}:\d{2}:\d{2})\s+'
-              r'(\d{2}:\d{2}:\d{2})\s+'
-              r'(-?\d+\.\d+)\s+'
-              r'(-?\d+\.\d+)\s+'
-              r'(\d+\.\d+)\s+'
-              r'(\d+\.\d+)\s+'
-              r'([A-Za-z()]+)\s+'
-              r'([IVX\- ]*?)\s+'
-              r'([A-ZÁÉÍÓÚÜÑ0-9\.\- ,/()]+?)\s+\+\s+info:',
-              re.MULTILINE
-          )
+          # Captura más flexible
+          filas = re.findall(r'es\d+.*?\+\s+info:', html, re.DOTALL)
 
           datos = []
-          vistos = set()
 
-          for m in patron.finditer(html):
-              evid, fecha, hora_utc, hora_local, lat, lon, prof, mag, tipo, inten, loc = m.groups()
-              clave = (evid, fecha, hora_utc)
-              if clave in vistos:
+          for f in filas:
+              try:
+                  partes = f.split()
+
+                  evid = partes[0]
+                  fecha = partes[1]
+                  hora = partes[2]
+
+                  lat = partes[4]
+                  lon = partes[5]
+                  prof = partes[6]
+                  mag = partes[7]
+
+                  loc = " ".join(partes[9:-2])
+
+                  datos.append({
+                      "id": evid,
+                      "fecha": f"{fecha} {hora}",
+                      "fecha_utc": f"{fecha} {hora}",
+                      "latitud": lat,
+                      "longitud": lon,
+                      "profundidad": prof,
+                      "magnitud": mag,
+                      "tipo_magnitud": "mb",
+                      "intensidad": "",
+                      "localizacion": loc.strip()
+                  })
+
+              except:
                   continue
-              vistos.add(clave)
 
-              datos.append({
-                  "id": evid,
-                  "fecha": f"{fecha} {hora_local}",
-                  "fecha_utc": f"{fecha} {hora_utc}",
-                  "latitud": lat,
-                  "longitud": lon,
-                  "profundidad": prof,
-                  "magnitud": mag,
-                  "tipo_magnitud": tipo,
-                  "intensidad": (inten or "").strip(),
-                  "localizacion": " ".join(loc.split())
-              })
-
-          with open("data/sismo.json", "w", encoding="utf-8") as f:
-              json.dump(datos, f, ensure_ascii=False, indent=2)
+          with open("data/sismo.json", "w") as f:
+              json.dump(datos, f, indent=2)
           PY
 
-      - name: Commit si hay cambios
+      - name: Commit
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "bot@github.com"
           git add data/sismo.json
-          git diff --cached --quiet || git commit -m "Actualiza datos sísmicos"
+          git commit -m "Update sismo" || echo "No changes"
           git push
