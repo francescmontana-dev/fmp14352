@@ -13,7 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout complet
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Generar JSON robusto
         run: |
@@ -62,11 +65,22 @@ jobs:
               json.dump(datos, f, ensure_ascii=False, indent=2)
           PY
 
-      - name: Commit
+      - name: Commit i push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add data/sismo.json
-          git commit -m "Update sismo" || echo "No changes"
-          git pull --rebase origin main
-          git push origin main
+
+          if git diff --cached --quiet; then
+            echo "No hi ha canvis"
+            exit 0
+          fi
+
+          git commit -m "Update sismo"
+
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && break
+            echo "Reintent $i..."
+            sleep 5
+          done
