@@ -12,32 +12,31 @@ body{
 }
 
 .container{
-  max-width:420px;
-  margin:10px auto;
-  padding:6px;
+  max-width:320px;
+  margin:6px auto;
 }
 
 .card{
-  border-radius:14px;
-  padding:14px 16px;
-  background: linear-gradient(135deg, #f5f9ff, #ffffff);
+  border-radius:12px;
+  padding:10px 12px;
+  background:#f8fafc;
   border:1px solid rgba(0,0,0,.08);
-  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  box-shadow: 0 3px 10px rgba(0,0,0,.07);
   text-align:center;
 }
 
 .title{
-  font-size:14px;
+  font-size:11px;
   font-weight:600;
-  color:#374151;
-  margin-bottom:6px;
+  color:#6b7280;
+  margin-bottom:4px;
 }
 
 .mag{
-  font-size:34px;
+  font-size:26px;
   font-weight:800;
   line-height:1;
-  margin-bottom:4px;
+  margin-bottom:2px;
 }
 
 .mag.molt-debil{ color:#2563eb; }
@@ -46,22 +45,21 @@ body{
 .mag.moderat{ color:#dc2626; }
 
 .label{
-  font-size:11px;
-  font-weight:600;
+  font-size:10px;
   color:#6b7280;
-  margin-bottom:6px;
+  margin-bottom:4px;
 }
 
 .region{
-  font-size:14px;
+  font-size:12px;
   font-weight:600;
   color:#111827;
 }
 
 .meta{
-  font-size:11px;
-  color:#6b7280;
-  margin-top:6px;
+  font-size:10px;
+  color:#9ca3af;
+  margin-top:3px;
 }
 </style>
 </head>
@@ -108,7 +106,6 @@ body{
     if (z.includes("GIRONA")) return "Girona";
     if (z.includes("TARRAGONA")) return "Tarragona";
     if (z.includes("LLEIDA")) return "Lleida";
-    if (z.includes("MEDITERRANEAN")) return "Mediterrani";
 
     return z.charAt(0)+z.slice(1).toLowerCase();
   }
@@ -142,7 +139,7 @@ body{
     const features = data.features || [];
 
     if (!features.length) {
-      regionEl.textContent = "Sense sismes aquest mes";
+      regionEl.textContent = "Sense sismes";
       return;
     }
 
@@ -161,7 +158,7 @@ body{
     metaEl.textContent = new Date(p.time).toLocaleDateString("ca-ES");
 
   } catch {
-    regionEl.textContent = "Error carregant dades";
+    regionEl.textContent = "Error";
   }
 
 })();
