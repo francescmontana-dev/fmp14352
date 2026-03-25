@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terratrèmols Catalunya</title>
 
 <style>
 body{
@@ -11,151 +12,99 @@ body{
   background: transparent;
 }
 
-.wrap{
-  padding: 4px;
+.container{
+  max-width: 640px;
+  margin: 20px auto;
+  padding: 10px;
 }
 
-.bar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-height:42px;
-  padding:8px 10px;
-  border-radius:12px;
-  background:#f8fafc;
-  border:1px solid rgba(0,0,0,.06);
-  box-shadow:0 3px 10px rgba(0,0,0,.06);
-  overflow:hidden;
+.card{
+  border-radius: 20px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, #eef6ff 0%, #ffffff 100%);
+  border: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 10px 26px rgba(0,0,0,.12);
+  text-align: center;
 }
 
-.accent{
-  width:4px;
-  align-self:stretch;
-  border-radius:999px;
-  background:#2563eb;
-  flex:0 0 4px;
-}
-
-.main{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  min-width:0;
-  flex:1;
+.title{
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 14px;
 }
 
 .mag{
-  font-size:18px;
-  font-weight:800;
-  letter-spacing:-0.3px;
-  white-space:nowrap;
+  font-size: 54px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 
-.info{
-  min-width:0;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  flex:1;
-  overflow:hidden;
-  font-size:13px;
-  color:#111827;
+.mag.molt-debil{ color:#2563eb; }
+.mag.debil{ color:#0891b2; }
+.mag.lleu{ color:#d97706; }
+.mag.moderat{ color:#b91c1c; }
+
+.label{
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #e5eefc;
+  color: #1e3a8a;
 }
 
 .region{
-  font-weight:600;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 4px;
 }
 
-.sep{
-  color:#9ca3af;
-  flex:0 0 auto;
+.meta{
+  font-size: 14px;
+  color: #4b5563;
+  margin-top: 10px;
+  line-height: 1.5;
 }
 
-.label{
-  color:#6b7280;
-  white-space:nowrap;
-  flex:0 0 auto;
+.foot{
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,.08);
 }
 
-.dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#dc2626;
-  flex:0 0 8px;
-  display:none;
+.error{
+  font-size: 16px;
+  color: #b91c1c;
+  font-weight: 700;
 }
 
-.dot.live{
-  display:block;
-  animation:blink 1.4s infinite;
-}
-
-@keyframes blink{
-  0%{opacity:1}
-  50%{opacity:.25}
-  100%{opacity:1}
-}
-
-/* colors per magnitud */
-.molt-debil .accent{ background:#2563eb; }
-.molt-debil .mag{ color:#2563eb; }
-
-.debil .accent{ background:#0891b2; }
-.debil .mag{ color:#0891b2; }
-
-.lleu .accent{ background:#d97706; }
-.lleu .mag{ color:#d97706; }
-
-.moderat .accent{ background:#dc2626; }
-.moderat .mag{ color:#dc2626; }
-
-.error .accent{ background:#6b7280; }
-.error .mag{ color:#6b7280; }
-
-@media (max-width: 480px){
-  .bar{
-    padding:7px 9px;
-    min-height:38px;
-    gap:8px;
-  }
-  .mag{
-    font-size:17px;
-  }
-  .info{
-    font-size:12px;
-    gap:5px;
-  }
+.small{
+  font-size: 13px;
+  color: #6b7280;
 }
 </style>
 </head>
 
 <body>
-<div class="wrap">
-  <div id="bar" class="bar">
-    <div class="accent"></div>
-    <div class="main">
-      <div id="mag" class="mag">--</div>
-      <div class="info">
-        <span id="region" class="region">Carregant…</span>
-        <span class="sep">·</span>
-        <span id="label" class="label"></span>
-      </div>
-    </div>
-    <div id="dot" class="dot"></div>
+<div class="container">
+  <div class="card">
+    <div class="title">Terratrèmol més fort · últim mes</div>
+    <div id="content">Carregant dades…</div>
+    <div id="foot" class="foot"></div>
   </div>
 </div>
 
 <script>
 (async function () {
-  const barEl = document.getElementById("bar");
-  const magEl = document.getElementById("mag");
-  const regionEl = document.getElementById("region");
-  const labelEl = document.getElementById("label");
-  const dotEl = document.getElementById("dot");
+  const el = document.getElementById("content");
+  const foot = document.getElementById("foot");
 
   const minLat = 40.5;
   const maxLat = 42.9;
@@ -166,55 +115,64 @@ body{
   const start = new Date();
   start.setMonth(start.getMonth() - 1);
 
-  function pad(n){
+  function pad(n) {
     return String(n).padStart(2, "0");
   }
 
-  function toISO(d){
+  function toISODate(d) {
     return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
   }
 
-  function tradueixZona(z){
-    if (!z) return "Catalunya";
-    const t = z.toUpperCase().trim();
-
-    if (t.includes("EASTERN PYRENEES")) return "Pirineus orientals";
-    if (t.includes("WESTERN PYRENEES")) return "Pirineus occidentals";
-    if (t.includes("PYRENEES")) return "Pirineus";
-    if (t.includes("NEAR COAST OF CATALONIA")) return "Costa de Catalunya";
-    if (t.includes("BARCELONA")) return "Barcelona";
-    if (t.includes("GIRONA")) return "Girona";
-    if (t.includes("TARRAGONA")) return "Tarragona";
-    if (t.includes("LLEIDA")) return "Lleida";
-    if (t.includes("CATALONIA") || t.includes("CATALUNYA")) return "Catalunya";
-    if (t.includes("MEDITERRANEAN")) return "Mediterrani";
-    if (t.includes("BALEARIC")) return "Mar Balear";
-    if (t.includes("ANDORRA")) return "Andorra";
-    if (t.includes("FRANCE")) return "França";
-    if (t.includes("SPAIN")) return "Espanya";
-
-    return z.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  function formatDate(s) {
+    const d = new Date(s);
+    return d.toLocaleString("ca-ES");
   }
 
-  function textMag(m){
-    if (m < 2) return "molt dèbil";
-    if (m < 3) return "dèbil";
-    if (m < 4) return "lleu";
-    return "moderat";
+  function tradueixZona(zona) {
+    if (!zona) return "Catalunya";
+
+    const z = zona.toUpperCase().trim();
+
+    if (z.includes("PYRENEES")) return "Pirineus";
+    if (z.includes("BARCELONA")) return "Barcelona";
+    if (z.includes("GIRONA")) return "Girona";
+    if (z.includes("TARRAGONA")) return "Tarragona";
+    if (z.includes("LLEIDA")) return "Lleida";
+    if (z.includes("CATALONIA")) return "Catalunya";
+    if (z.includes("CATALUNYA")) return "Catalunya";
+    if (z.includes("SPAIN")) return "Espanya";
+    if (z.includes("FRANCE")) return "França";
+    if (z.includes("ANDORRA")) return "Andorra";
+    if (z.includes("MEDITERRANEAN")) return "Mar Mediterrani";
+    if (z.includes("BALEARIC")) return "Mar Balear";
+    if (z.includes("NEAR COAST OF CATALONIA")) return "Costa de Catalunya";
+    if (z.includes("EASTERN PYRENEES")) return "Pirineus orientals";
+    if (z.includes("WESTERN PYRENEES")) return "Pirineus occidentals";
+
+    return zona
+      .toLowerCase()
+      .replace(/\b\w/g, function(l){ return l.toUpperCase(); });
   }
 
-  function classMag(m){
-    if (m < 2) return "molt-debil";
-    if (m < 3) return "debil";
-    if (m < 4) return "lleu";
+  function textMagnitud(mag) {
+    if (mag < 2) return "Molt dèbil";
+    if (mag < 3) return "Dèbil";
+    if (mag < 4) return "Lleu";
+    return "Moderat";
+  }
+
+  function classeMagnitud(mag) {
+    if (mag < 2) return "molt-debil";
+    if (mag < 3) return "debil";
+    if (mag < 4) return "lleu";
     return "moderat";
   }
 
   try {
     const url =
       "https://www.seismicportal.eu/fdsnws/event/1/query?format=json" +
-      "&starttime=" + encodeURIComponent(toISO(start)) +
-      "&endtime=" + encodeURIComponent(toISO(end)) +
+      "&starttime=" + encodeURIComponent(toISODate(start)) +
+      "&endtime=" + encodeURIComponent(toISODate(end)) +
       "&minlat=" + encodeURIComponent(minLat) +
       "&maxlat=" + encodeURIComponent(maxLat) +
       "&minlon=" + encodeURIComponent(minLon) +
@@ -227,10 +185,11 @@ body{
     const features = Array.isArray(data.features) ? data.features : [];
 
     if (!features.length) {
-      barEl.className = "bar error";
-      magEl.textContent = "—";
-      regionEl.textContent = "Sense sismes";
-      labelEl.textContent = "últim mes";
+      el.innerHTML = `
+        <div class="error">No hi ha sismes aquest mes</div>
+        <div class="small">No consta cap esdeveniment dins la zona definida.</div>
+      `;
+      foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
       return;
     }
 
@@ -242,20 +201,30 @@ body{
 
     const p = maxEvent.properties || {};
     const mag = Number(p.mag);
+    const zona = tradueixZona(p.flynn_region || p.region || "Catalunya");
+    const profunditat = (p.depth ?? "?");
+    const hora = p.time ? formatDate(p.time) : "?";
+    const etiqueta = textMagnitud(mag);
+    const classe = classeMagnitud(mag);
 
-    barEl.className = "bar " + classMag(mag);
-    magEl.textContent = Number.isFinite(mag) ? ("M" + mag.toFixed(1)) : "M?";
-    regionEl.textContent = tradueixZona(p.flynn_region || p.region || "Catalunya");
-    labelEl.textContent = textMag(mag);
+    el.innerHTML = `
+      <div class="mag ${classe}">M${Number.isFinite(mag) ? mag.toFixed(1) : "?"}</div>
+      <div class="label">${etiqueta}</div>
+      <div class="region">${zona}</div>
+      <div class="meta">
+        Profunditat: ${profunditat} km<br>
+        Data i hora: ${hora}
+      </div>
+    `;
 
-    if (mag >= 3) {
-      dotEl.classList.add("live");
-    }
+    foot.textContent = "Font: EMSC · Actualitzat: " + new Date().toLocaleString("ca-ES");
+
   } catch (e) {
-    barEl.className = "bar error";
-    magEl.textContent = "!";
-    regionEl.textContent = "Error carregant dades";
-    labelEl.textContent = "";
+    el.innerHTML = `
+      <div class="error">Error carregant dades</div>
+      <div class="small">No s'ha pogut consultar EMSC en aquest moment.</div>
+    `;
+    foot.textContent = "Torna-ho a provar d'aquí una estona.";
   }
 })();
 </script>
