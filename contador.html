@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comptador Meteo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
+
+    .contador-meteo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border: 1px solid #bcd3e6;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #eef7ff 0%, #dfeffc 100%);
+      color: #1f4e79;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .icono {
+      font-size: 22px;
+    }
+
+    .texto {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: normal;
+      color: #4f6f8f;
+    }
+
+    .numero {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contador-meteo">
+    <div class="icono">🌤️</div>
+    <div class="texto">
+      <div class="label">Visites a la meteo</div>
+      <div class="numero" id="visites">Carregant...</div>
+    </div>
+  </div>
+
+  <script>
+    const namespace = "elmasnou_meteo";
+    const key = "visites_web";
+
+    fetch(`https://countapi.mileshilliard.com/hit/${namespace}/${key}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("visites").textContent = data.value;
+      })
+      .catch(() => {
+        document.getElementById("visites").textContent = "Error";
+      });
+  </script>
+</body>
+</html>
