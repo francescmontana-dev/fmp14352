@@ -7,7 +7,7 @@
     "nom": "Plàtan d'ombra",
     "text": "Concentració rellevant en fase principal de temporada."
   },
-  "comentari": "Situació compatible amb un nivell moderat. Si augmenta el vent sec i es manté l'ambient estable, el risc podria pujar durant les pròximes hores.",
+  "comentari": "Situació compatible amb un nivell moderat.",
   "tipus": [
     { "nom": "Plàtan", "valor": 72 },
     { "nom": "Cupressàcies", "valor": 43 },
@@ -15,7 +15,7 @@
     { "nom": "Olivera", "valor": 8 }
   ],
   "historic": [
-    { "data": "27/03", "index": 54, "risc": "moderat" },
+    { "data": "27/03", "index": 80, "risc": "moderat" },
     { "data": "26/03", "index": 48, "risc": "moderat" },
     { "data": "25/03", "index": 37, "risc": "baix" },
     { "data": "24/03", "index": 62, "risc": "alt" },
