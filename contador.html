@@ -15,16 +15,17 @@
 const namespace = "elmasnou_ne";
 const key = "visites_web";
 
-fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+<script>
+const namespace = "elmasnou_ne";
+const key = "visites_web";
+
+fetch(`https://counterapi.dev/api/${namespace}/${key}/up`)
   .then(response => response.json())
   .then(data => {
-    document.getElementById("visites").textContent = data.value;
+    document.getElementById("visites").textContent = data.count;
   })
   .catch(error => {
     console.error(error);
     document.getElementById("visites").textContent = "Error";
   });
 </script>
-
-</body>
-</html>
