@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "27/03/2026 17:49",
-  "indexTotal": 43,
+  "data": "27/03/2026 18:04",
+  "indexTotal": 40,
   "risc": "moderat",
   "dominant": {
     "nom": "Plàtan",
@@ -11,23 +11,23 @@
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 92
+      "valor": 86
     },
     {
       "nom": "Cupressàcies",
-      "valor": 54
+      "valor": 51
     },
     {
       "nom": "Parietària",
-      "valor": 49
+      "valor": 42
     },
     {
       "nom": "Pi",
-      "valor": 37
+      "valor": 35
     },
     {
       "nom": "Gramínies",
-      "valor": 23
+      "valor": 20
     },
     {
       "nom": "Olivera",
@@ -37,39 +37,39 @@
   "historic": [
     {
       "data": "27/03",
-      "index": 43,
+      "index": 40,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 34,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 29,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 44,
       "risc": "moderat"
     },
     {
       "data": "--/--",
       "index": 37,
       "risc": "moderat"
-    },
-    {
-      "data": "--/--",
-      "index": 32,
-      "risc": "moderat"
-    },
-    {
-      "data": "--/--",
-      "index": 47,
-      "risc": "moderat"
-    },
-    {
-      "data": "--/--",
-      "index": 40,
-      "risc": "moderat"
     }
   ],
   "previsio": [
     {
       "dia": "Demà",
-      "index": 43,
+      "index": 40,
       "risc": "moderat"
     },
     {
       "dia": "Demà passat",
-      "index": 43,
+      "index": 40,
       "risc": "moderat"
     }
   ]
