@@ -1,4 +1,3 @@
-<!-- PROVA VISUAL PREVISIO -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -210,6 +209,14 @@
       background: #eef2ff;
     }
 
+    .dot-mini {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
     .history {
       width: 100%;
       border-collapse: collapse;
@@ -239,14 +246,6 @@
     .moderate .dot, .moderate .fill, .moderate.previsio-risc .dot-mini { background: var(--mid); }
     .high .dot, .high .fill, .high.previsio-risc .dot-mini { background: var(--high); }
     .very-high .dot, .very-high .fill, .very-high.previsio-risc .dot-mini { background: var(--very-high); }
-
-    .dot-mini {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: inline-block;
-    }
 
     @media (max-width: 760px) {
       body { padding: 10px; }
@@ -289,28 +288,7 @@
         <div class="forecast">
           <strong>Comentari:</strong>
           <span id="comentari">Carregant comentari...</span>
-<div style="margin-top:14px; padding:12px 14px; border:1px solid #e5e7eb; border-radius:12px; background:#f9fafb;">
-  <strong>Previsió nova:</strong>
-  <div style="margin-top:10px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;">
-    <div style="border:1px solid #e5e7eb; border-radius:12px; background:#fff; padding:14px;">
-      <div style="font-size:.92rem; color:#6b7280; margin-bottom:8px; font-weight:600;">Demà</div>
-      <div style="font-size:2rem; font-weight:700; line-height:1; margin-bottom:10px;">48</div>
-      <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border-radius:999px; font-size:.9rem; font-weight:700; color:#111827; background:#eef2ff;">
-        <span style="width:10px; height:10px; border-radius:50%; background:#eab308; display:inline-block;"></span>
-        <span>Moderat</span>
-      </div>
-    </div>
 
-    <div style="border:1px solid #e5e7eb; border-radius:12px; background:#fff; padding:14px;">
-      <div style="font-size:.92rem; color:#6b7280; margin-bottom:8px; font-weight:600;">Demà passat</div>
-      <div style="font-size:2rem; font-weight:700; line-height:1; margin-bottom:10px;">53</div>
-      <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border-radius:999px; font-size:.9rem; font-weight:700; color:#111827; background:#eef2ff;">
-        <span style="width:10px; height:10px; border-radius:50%; background:#f97316; display:inline-block;"></span>
-        <span>Alt</span>
-      </div>
-    </div>
-  </div>
-</div>
           <div class="forecast-block">
             <strong>Previsió:</strong>
             <div class="previsio-grid" id="previsio">
@@ -375,16 +353,18 @@
       const nivells = document.getElementById('nivellsPolen');
       nivells.innerHTML = '';
 
-      dades.tipus.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'level';
-        row.innerHTML = `
-          <div>${item.nom}</div>
-          <div class="bar"><div class="fill" style="width:${item.valor}%"></div></div>
-          <div>${item.valor}</div>
-        `;
-        nivells.appendChild(row);
-      });
+      if (dades.tipus && dades.tipus.length > 0) {
+        dades.tipus.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'level';
+          row.innerHTML = `
+            <div>${item.nom}</div>
+            <div class="bar"><div class="fill" style="width:${item.valor}%"></div></div>
+            <div>${item.valor}</div>
+          `;
+          nivells.appendChild(row);
+        });
+      }
 
       const taula = document.getElementById('taulaHistoric');
       taula.innerHTML = '';
