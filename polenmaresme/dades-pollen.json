@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "27/03/2026 11:34",
-  "indexTotal": 48,
+  "data": "27/03/2026 12:04",
+  "indexTotal": 47,
   "risc": "moderat",
   "dominant": {
     "nom": "Plàtan",
@@ -23,7 +23,7 @@
     },
     {
       "nom": "Pi",
-      "valor": 50
+      "valor": 44
     },
     {
       "nom": "Gramínies",
@@ -37,27 +37,27 @@
   "historic": [
     {
       "data": "27/03",
-      "index": 48,
+      "index": 47,
       "risc": "moderat"
     },
     {
       "data": "--/--",
-      "index": 42,
+      "index": 41,
       "risc": "moderat"
     },
     {
       "data": "--/--",
-      "index": 37,
+      "index": 36,
       "risc": "moderat"
     },
     {
       "data": "--/--",
-      "index": 52,
+      "index": 51,
       "risc": "alt"
     },
     {
       "data": "--/--",
-      "index": 45,
+      "index": 44,
       "risc": "moderat"
     }
   ]
