@@ -1,13 +1,13 @@
 {
   "zona": "Maresme central",
-  "data": "27/03/2026 11:04",
-  "indexTotal": 50,
-  "risc": "alt",
+  "data": "27/03/2026 11:34",
+  "indexTotal": 48,
+  "risc": "moderat",
   "dominant": {
     "nom": "Plàtan",
     "text": "Nivell destacat de plàtan segons temporada i condicions meteorològiques locals."
   },
-  "comentari": "La situació actual és compatible amb un risc alt de pol·len al Maresme. El tipus dominant és plàtan. L'absència de pluja afavoreix que el pol·len es mantingui en l'ambient. L'ambient relativament sec pot afavorir una major persistència del pol·len.",
+  "comentari": "La situació actual és compatible amb un risc moderat de pol·len al Maresme. El tipus dominant és plàtan. L'absència de pluja afavoreix que el pol·len es mantingui en l'ambient.",
   "tipus": [
     {
       "nom": "Plàtan",
@@ -15,19 +15,19 @@
     },
     {
       "nom": "Cupressàcies",
-      "valor": 65
+      "valor": 60
     },
     {
       "nom": "Parietària",
-      "valor": 53
+      "valor": 49
     },
     {
       "nom": "Pi",
-      "valor": 54
+      "valor": 50
     },
     {
       "nom": "Gramínies",
-      "valor": 25
+      "valor": 24
     },
     {
       "nom": "Olivera",
@@ -37,27 +37,27 @@
   "historic": [
     {
       "data": "27/03",
-      "index": 50,
-      "risc": "alt"
-    },
-    {
-      "data": "--/--",
-      "index": 44,
+      "index": 48,
       "risc": "moderat"
     },
     {
       "data": "--/--",
-      "index": 39,
+      "index": 42,
       "risc": "moderat"
     },
     {
       "data": "--/--",
-      "index": 54,
+      "index": 37,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 52,
       "risc": "alt"
     },
     {
       "data": "--/--",
-      "index": 47,
+      "index": 45,
       "risc": "moderat"
     }
   ]
