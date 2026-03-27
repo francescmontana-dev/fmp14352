@@ -59,7 +59,7 @@
     const namespace = "elmasnou_ne";
     const key = "visites_web";
 
-    fetch(`https://countapi.mileshilliard.com/hit/${namespace}/${key}`)
+    fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
       .then(response => response.json())
       .then(data => {
         document.getElementById("visites").textContent = data.value;
