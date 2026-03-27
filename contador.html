@@ -1,3 +1,16 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Contador</title>
+</head>
+<body>
+
+<div>
+  🌤️ Visites a la meteo:
+  <span id="visites">Carregant...</span>
+</div>
+
 <script>
 const namespace = "elmasnou_ne";
 const key = "visites_web";
@@ -9,6 +22,9 @@ fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
   })
   .catch(error => {
     console.error(error);
-    document.getElementById("visites").textContent = "0";
+    document.getElementById("visites").textContent = "Error";
   });
 </script>
+
+</body>
+</html>
