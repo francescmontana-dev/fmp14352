@@ -1,1 +1,335 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Índex de pol·len del Maresme</title>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --ok: #22c55e;
+      --mid: #eab308;
+      --high: #f97316;
+      --very-high: #ef4444;
+      --accent: #2563eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .widget {
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      background: #fff;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1rem;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #111827;
+      background: #eef2ff;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .score {
+      font-size: 2.8rem;
+      font-weight: 700;
+      line-height: 1;
+      margin: 8px 0 4px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .dominant {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f9fafb;
+      border: 1px solid var(--line);
+    }
+
+    .dominant strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .levels {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .level {
+      display: grid;
+      grid-template-columns: 110px 1fr 60px;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #eef2f7;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .forecast {
+      margin-top: 14px;
+      line-height: 1.5;
+      font-size: 0.96rem;
+    }
+
+    .history {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.94rem;
+    }
+
+    .history th,
+    .history td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .history th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .footer {
+      padding: 0 20px 20px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .low .dot, .low .fill { background: var(--ok); }
+    .moderate .dot, .moderate .fill { background: var(--mid); }
+    .high .dot, .high .fill { background: var(--high); }
+    .very-high .dot, .very-high .fill { background: var(--very-high); }
+
+    @media (max-width: 760px) {
+      body { padding: 10px; }
+      .grid { grid-template-columns: 1fr; padding: 14px; }
+      .score { font-size: 2.3rem; }
+      .level { grid-template-columns: 88px 1fr 48px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget" id="widgetPolen">
+    <div class="header">
+      <h1 class="title">Índex de pol·len del Maresme</h1>
+      <p class="subtitle">Estimació diària per a la franja litoral del Maresme · actualització automàtica preparada</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2 class="section-title">Situació d'avui</h2>
+        <div class="status-row">
+          <div>
+            <div class="badge moderate" id="badgeRisc">
+              <span class="dot"></span>
+              <span id="textRisc">Risc moderat</span>
+            </div>
+            <div class="score" id="scoreTotal">54</div>
+            <div class="meta" id="metaData">Dades del 27/03/2026 · zona Maresme central</div>
+          </div>
+        </div>
+
+        <div class="dominant" id="blocDominant">
+          <strong>Pol·len dominant</strong>
+          <div id="polenDominant">Plàtan d'ombra</div>
+          <div class="meta" id="textDominant">Concentració rellevant en fase principal de temporada.</div>
+        </div>
+
+        <div class="levels" id="nivellsPolen"></div>
+
+        <div class="forecast">
+          <strong>Comentari:</strong>
+          <span id="comentari">Situació compatible amb un nivell moderat. Si augmenta el vent sec i es manté l'ambient estable, el risc podria pujar durant les pròximes hores.</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title">Últims dies</h2>
+        <table class="history">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Índex</th>
+              <th>Risc</th>
+            </tr>
+          </thead>
+          <tbody id="taulaHistoric"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer">
+  Aquest mòdul llegeix les dades des d'un fitxer JSON extern. Està pensat per publicar-se a GitHub Pages i incrustar-se després a Google Sites.
+</div>
+  </div>
+
+  <script>
+  function classeRisc(risc) {
+    if (risc === 'baix') return 'low';
+    if (risc === 'moderat') return 'moderate';
+    if (risc === 'alt') return 'high';
+    if (risc === 'molt alt') return 'very-high';
+    return 'moderate';
+  }
+
+  function textRisc(risc) {
+    if (risc === 'baix') return 'Risc baix';
+    if (risc === 'moderat') return 'Risc moderat';
+    if (risc === 'alt') return 'Risc alt';
+    if (risc === 'molt alt') return 'Risc molt alt';
+    return 'Risc moderat';
+  }
+
+  function render(dades) {
+    const badge = document.getElementById('badgeRisc');
+    badge.className = 'badge ' + classeRisc(dades.risc);
+    document.getElementById('textRisc').textContent = textRisc(dades.risc);
+    document.getElementById('scoreTotal').textContent = dades.indexTotal;
+    document.getElementById('metaData').textContent = `Dades del ${dades.data} · zona ${dades.zona}`;
+    document.getElementById('polenDominant').textContent = dades.dominant.nom;
+    document.getElementById('textDominant').textContent = dades.dominant.text;
+    document.getElementById('comentari').textContent = dades.comentari;
+
+    const nivells = document.getElementById('nivellsPolen');
+    nivells.innerHTML = '';
+    dades.tipus.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'level';
+      row.innerHTML = `
+        <div>${item.nom}</div>
+        <div class="bar"><div class="fill" style="width:${item.valor}%"></div></div>
+        <div>${item.valor}</div>
+      `;
+      nivells.appendChild(row);
+    });
+
+    const taula = document.getElementById('taulaHistoric');
+    taula.innerHTML = '';
+    dades.historic.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.data}</td>
+        <td>${item.index}</td>
+        <td>${textRisc(item.risc).replace('Risc ', '')}</td>
+      `;
+      taula.appendChild(tr);
+    });
+  }
+
+  async function carregarDades() {
+    try {
+      const resposta = await fetch('dades-pollen.json?_=' + Date.now());
+      if (!resposta.ok) {
+        throw new Error('No s\\'ha pogut llegir el fitxer JSON');
+      }
+      const dades = await resposta.json();
+      render(dades);
+    } catch (error) {
+      document.getElementById('textRisc').textContent = 'Error de càrrega';
+      document.getElementById('scoreTotal').textContent = '--';
+      document.getElementById('metaData').textContent = 'No s\\'han pogut carregar les dades';
+      document.getElementById('polenDominant').textContent = 'Fitxer no disponible';
+      document.getElementById('textDominant').textContent = 'Revisa que index.html i dades-pollen.json siguin a la mateixa carpeta.';
+      document.getElementById('comentari').textContent = error.message;
+      document.getElementById('nivellsPolen').innerHTML = '';
+      document.getElementById('taulaHistoric').innerHTML = '';
+      console.error(error);
+    }
+  }
+
+  carregarDades();
+</script>
+</body>
+</html>
 
