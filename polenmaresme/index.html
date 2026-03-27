@@ -161,6 +161,18 @@
       font-size: 0.96rem;
     }
 
+    .forecast-block {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f9fafb;
+    }
+
+    .previsio-item {
+      margin-top: 6px;
+    }
+
     .history {
       width: 100%;
       border-collapse: collapse;
@@ -231,6 +243,11 @@
         <div class="forecast">
           <strong>Comentari:</strong>
           <span id="comentari">Carregant comentari...</span>
+
+          <div class="forecast-block">
+            <strong>Previsió:</strong>
+            <div id="previsio">Carregant previsió...</div>
+          </div>
         </div>
       </div>
 
@@ -308,6 +325,20 @@
         `;
         taula.appendChild(tr);
       });
+
+      const prev = document.getElementById('previsio');
+      prev.innerHTML = '';
+
+      if (dades.previsio && dades.previsio.length > 0) {
+        dades.previsio.forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'previsio-item';
+          div.textContent = `${p.dia}: ${textRisc(p.risc).replace('Risc ', '')} (${p.index})`;
+          prev.appendChild(div);
+        });
+      } else {
+        prev.textContent = 'Sense dades de previsió.';
+      }
     }
 
     async function carregarDades() {
@@ -331,6 +362,7 @@
         document.getElementById('comentari').textContent = error.message;
         document.getElementById('nivellsPolen').innerHTML = '';
         document.getElementById('taulaHistoric').innerHTML = '';
+        document.getElementById('previsio').textContent = 'No s’ha pogut carregar la previsió.';
         console.error(error);
       }
     }
