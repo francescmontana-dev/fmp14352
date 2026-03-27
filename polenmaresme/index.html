@@ -163,14 +163,50 @@
 
     .forecast-block {
       margin-top: 14px;
-      padding: 12px 14px;
+      padding: 14px;
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 14px;
       background: #f9fafb;
     }
 
-    .previsio-item {
-      margin-top: 6px;
+    .previsio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .previsio-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 14px;
+    }
+
+    .previsio-dia {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .previsio-index {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .previsio-risc {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #111827;
+      background: #eef2ff;
     }
 
     .history {
@@ -198,16 +234,25 @@
       font-size: 0.84rem;
     }
 
-    .low .dot, .low .fill { background: var(--ok); }
-    .moderate .dot, .moderate .fill { background: var(--mid); }
-    .high .dot, .high .fill { background: var(--high); }
-    .very-high .dot, .very-high .fill { background: var(--very-high); }
+    .low .dot, .low .fill, .low.previsio-risc .dot-mini { background: var(--ok); }
+    .moderate .dot, .moderate .fill, .moderate.previsio-risc .dot-mini { background: var(--mid); }
+    .high .dot, .high .fill, .high.previsio-risc .dot-mini { background: var(--high); }
+    .very-high .dot, .very-high .fill, .very-high.previsio-risc .dot-mini { background: var(--very-high); }
+
+    .dot-mini {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
 
     @media (max-width: 760px) {
       body { padding: 10px; }
       .grid { grid-template-columns: 1fr; padding: 14px; }
       .score { font-size: 2.3rem; }
       .level { grid-template-columns: 88px 1fr 48px; font-size: 0.9rem; }
+      .previsio-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -246,7 +291,9 @@
 
           <div class="forecast-block">
             <strong>Previsió:</strong>
-            <div id="previsio">Carregant previsió...</div>
+            <div class="previsio-grid" id="previsio">
+              <div class="previsio-card">Carregant previsió...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -288,6 +335,10 @@
       return 'Risc moderat';
     }
 
+    function textRiscCurt(risc) {
+      return textRisc(risc).replace('Risc ', '');
+    }
+
     function render(dades) {
       const badge = document.getElementById('badgeRisc');
       badge.className = 'badge ' + classeRisc(dades.risc);
@@ -316,28 +367,41 @@
       const taula = document.getElementById('taulaHistoric');
       taula.innerHTML = '';
 
-      dades.historic.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.data}</td>
-          <td>${item.index}</td>
-          <td>${textRisc(item.risc).replace('Risc ', '')}</td>
-        `;
-        taula.appendChild(tr);
-      });
+      if (dades.historic && dades.historic.length > 0) {
+        dades.historic.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.data}</td>
+            <td>${item.index}</td>
+            <td>${textRiscCurt(item.risc)}</td>
+          `;
+          taula.appendChild(tr);
+        });
+      }
 
       const prev = document.getElementById('previsio');
       prev.innerHTML = '';
 
       if (dades.previsio && dades.previsio.length > 0) {
         dades.previsio.forEach(p => {
-          const div = document.createElement('div');
-          div.className = 'previsio-item';
-          div.textContent = `${p.dia}: ${textRisc(p.risc).replace('Risc ', '')} (${p.index})`;
-          prev.appendChild(div);
+          const card = document.createElement('div');
+          card.className = 'previsio-card';
+
+          const riscClass = classeRisc(p.risc);
+
+          card.innerHTML = `
+            <div class="previsio-dia">${p.dia}</div>
+            <div class="previsio-index">${p.index}</div>
+            <div class="previsio-risc ${riscClass}">
+              <span class="dot-mini"></span>
+              <span>${textRiscCurt(p.risc)}</span>
+            </div>
+          `;
+
+          prev.appendChild(card);
         });
       } else {
-        prev.textContent = 'Sense dades de previsió.';
+        prev.innerHTML = '<div class="previsio-card">Sense dades de previsió.</div>';
       }
     }
 
@@ -362,7 +426,7 @@
         document.getElementById('comentari').textContent = error.message;
         document.getElementById('nivellsPolen').innerHTML = '';
         document.getElementById('taulaHistoric').innerHTML = '';
-        document.getElementById('previsio').textContent = 'No s’ha pogut carregar la previsió.';
+        document.getElementById('previsio').innerHTML = '<div class="previsio-card">No s’ha pogut carregar la previsió.</div>';
         console.error(error);
       }
     }
