@@ -203,7 +203,7 @@
   <div class="widget" id="widgetPolen">
     <div class="header">
       <h1 class="title">Índex de pol·len del Maresme</h1>
-      <p class="subtitle">Estimació diària per a la franja litoral del Maresme · actualització automàtica preparada</p>
+      <p class="subtitle">Estimació diària per a la franja litoral del Maresme · lectura des de JSON extern</p>
     </div>
 
     <div class="grid">
@@ -213,24 +213,24 @@
           <div>
             <div class="badge moderate" id="badgeRisc">
               <span class="dot"></span>
-              <span id="textRisc">Risc moderat</span>
+              <span id="textRisc">Carregant dades...</span>
             </div>
-            <div class="score" id="scoreTotal">54</div>
-            <div class="meta" id="metaData">Dades del 27/03/2026 · zona Maresme central</div>
+            <div class="score" id="scoreTotal">--</div>
+            <div class="meta" id="metaData">Esperant dades...</div>
           </div>
         </div>
 
         <div class="dominant" id="blocDominant">
           <strong>Pol·len dominant</strong>
-          <div id="polenDominant">Plàtan d'ombra</div>
-          <div class="meta" id="textDominant">Concentració rellevant en fase principal de temporada.</div>
+          <div id="polenDominant">--</div>
+          <div class="meta" id="textDominant">--</div>
         </div>
 
         <div class="levels" id="nivellsPolen"></div>
 
         <div class="forecast">
           <strong>Comentari:</strong>
-          <span id="comentari">Situació compatible amb un nivell moderat. Si augmenta el vent sec i es manté l'ambient estable, el risc podria pujar durant les pròximes hores.</span>
+          <span id="comentari">Carregant comentari...</span>
         </div>
       </div>
 
@@ -250,86 +250,92 @@
     </div>
 
     <div class="footer">
-  Aquest mòdul llegeix les dades des d'un fitxer JSON extern. Està pensat per publicar-se a GitHub Pages i incrustar-se després a Google Sites.
-</div>
+      Aquest mòdul llegeix les dades des d'un fitxer JSON extern. Està pensat per publicar-se a GitHub Pages i incrustar-se després a Google Sites.
+    </div>
   </div>
 
   <script>
-  function classeRisc(risc) {
-    if (risc === 'baix') return 'low';
-    if (risc === 'moderat') return 'moderate';
-    if (risc === 'alt') return 'high';
-    if (risc === 'molt alt') return 'very-high';
-    return 'moderate';
-  }
-
-  function textRisc(risc) {
-    if (risc === 'baix') return 'Risc baix';
-    if (risc === 'moderat') return 'Risc moderat';
-    if (risc === 'alt') return 'Risc alt';
-    if (risc === 'molt alt') return 'Risc molt alt';
-    return 'Risc moderat';
-  }
-
-  function render(dades) {
-    const badge = document.getElementById('badgeRisc');
-    badge.className = 'badge ' + classeRisc(dades.risc);
-    document.getElementById('textRisc').textContent = textRisc(dades.risc);
-    document.getElementById('scoreTotal').textContent = dades.indexTotal;
-    document.getElementById('metaData').textContent = `Dades del ${dades.data} · zona ${dades.zona}`;
-    document.getElementById('polenDominant').textContent = dades.dominant.nom;
-    document.getElementById('textDominant').textContent = dades.dominant.text;
-    document.getElementById('comentari').textContent = dades.comentari;
-
-    const nivells = document.getElementById('nivellsPolen');
-    nivells.innerHTML = '';
-    dades.tipus.forEach(item => {
-      const row = document.createElement('div');
-      row.className = 'level';
-      row.innerHTML = `
-        <div>${item.nom}</div>
-        <div class="bar"><div class="fill" style="width:${item.valor}%"></div></div>
-        <div>${item.valor}</div>
-      `;
-      nivells.appendChild(row);
-    });
-
-    const taula = document.getElementById('taulaHistoric');
-    taula.innerHTML = '';
-    dades.historic.forEach(item => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${item.data}</td>
-        <td>${item.index}</td>
-        <td>${textRisc(item.risc).replace('Risc ', '')}</td>
-      `;
-      taula.appendChild(tr);
-    });
-  }
-
-  async function carregarDades() {
-    try {
-      const resposta = await fetch('dades-pollen.json?_=' + Date.now());
-      if (!resposta.ok) {
-        throw new Error('No s\\'ha pogut llegir el fitxer JSON');
-      }
-      const dades = await resposta.json();
-      render(dades);
-    } catch (error) {
-      document.getElementById('textRisc').textContent = 'Error de càrrega';
-      document.getElementById('scoreTotal').textContent = '--';
-      document.getElementById('metaData').textContent = 'No s\\'han pogut carregar les dades';
-      document.getElementById('polenDominant').textContent = 'Fitxer no disponible';
-      document.getElementById('textDominant').textContent = 'Revisa que index.html i dades-pollen.json siguin a la mateixa carpeta.';
-      document.getElementById('comentari').textContent = error.message;
-      document.getElementById('nivellsPolen').innerHTML = '';
-      document.getElementById('taulaHistoric').innerHTML = '';
-      console.error(error);
+    function classeRisc(risc) {
+      if (risc === 'baix') return 'low';
+      if (risc === 'moderat') return 'moderate';
+      if (risc === 'alt') return 'high';
+      if (risc === 'molt alt') return 'very-high';
+      return 'moderate';
     }
-  }
 
-  carregarDades();
-</script>
+    function textRisc(risc) {
+      if (risc === 'baix') return 'Risc baix';
+      if (risc === 'moderat') return 'Risc moderat';
+      if (risc === 'alt') return 'Risc alt';
+      if (risc === 'molt alt') return 'Risc molt alt';
+      return 'Risc moderat';
+    }
+
+    function render(dades) {
+      const badge = document.getElementById('badgeRisc');
+      badge.className = 'badge ' + classeRisc(dades.risc);
+
+      document.getElementById('textRisc').textContent = textRisc(dades.risc);
+      document.getElementById('scoreTotal').textContent = dades.indexTotal;
+      document.getElementById('metaData').textContent = `Dades del ${dades.data} · zona ${dades.zona}`;
+      document.getElementById('polenDominant').textContent = dades.dominant.nom;
+      document.getElementById('textDominant').textContent = dades.dominant.text;
+      document.getElementById('comentari').textContent = dades.comentari;
+
+      const nivells = document.getElementById('nivellsPolen');
+      nivells.innerHTML = '';
+
+      dades.tipus.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'level';
+        row.innerHTML = `
+          <div>${item.nom}</div>
+          <div class="bar"><div class="fill" style="width:${item.valor}%"></div></div>
+          <div>${item.valor}</div>
+        `;
+        nivells.appendChild(row);
+      });
+
+      const taula = document.getElementById('taulaHistoric');
+      taula.innerHTML = '';
+
+      dades.historic.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.data}</td>
+          <td>${item.index}</td>
+          <td>${textRisc(item.risc).replace('Risc ', '')}</td>
+        `;
+        taula.appendChild(tr);
+      });
+    }
+
+    async function carregarDades() {
+      try {
+        const resposta = await fetch('dades-pollen.json?_=' + Date.now());
+
+        if (!resposta.ok) {
+          throw new Error("No s'ha pogut llegir el fitxer JSON");
+        }
+
+        const dades = await resposta.json();
+        render(dades);
+
+      } catch (error) {
+        document.getElementById('badgeRisc').className = 'badge';
+        document.getElementById('textRisc').textContent = 'Error de càrrega';
+        document.getElementById('scoreTotal').textContent = '--';
+        document.getElementById('metaData').textContent = "No s'han pogut carregar les dades";
+        document.getElementById('polenDominant').textContent = 'Fitxer no disponible';
+        document.getElementById('textDominant').textContent = 'Revisa que index.html i dades-pollen.json siguin a la mateixa carpeta.';
+        document.getElementById('comentari').textContent = error.message;
+        document.getElementById('nivellsPolen').innerHTML = '';
+        document.getElementById('taulaHistoric').innerHTML = '';
+        console.error(error);
+      }
+    }
+
+    carregarDades();
+  </script>
 </body>
 </html>
-
