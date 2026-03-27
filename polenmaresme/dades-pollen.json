@@ -1,24 +1,64 @@
 {
   "zona": "Maresme central",
   "data": "27/03/2026",
-  "indexTotal": 99,
+  "indexTotal": 40,
   "risc": "moderat",
   "dominant": {
-    "nom": "Plàtan d'ombra",
-    "text": "Concentració rellevant en fase principal de temporada."
+    "nom": "Plàtan",
+    "text": "Nivell destacat de plàtan segons temporada i condicions meteorològiques locals."
   },
-  "comentari": "Situació compatible amb un nivell moderat.",
+  "comentari": "La situació actual és compatible amb un risc moderat de pol·len al Maresme. El tipus dominant és plàtan. L'absència de pluja afavoreix que el pol·len es mantingui en l'ambient. El vent és fluix i la dispersió extra per aire és limitada.",
   "tipus": [
-    { "nom": "Plàtan", "valor": 72 },
-    { "nom": "Cupressàcies", "valor": 43 },
-    { "nom": "Gramínies", "valor": 28 },
-    { "nom": "Olivera", "valor": 8 }
+    {
+      "nom": "Plàtan",
+      "valor": 86
+    },
+    {
+      "nom": "Cupressàcies",
+      "valor": 51
+    },
+    {
+      "nom": "Parietària",
+      "valor": 42
+    },
+    {
+      "nom": "Pi",
+      "valor": 35
+    },
+    {
+      "nom": "Gramínies",
+      "valor": 20
+    },
+    {
+      "nom": "Olivera",
+      "valor": 5
+    }
   ],
   "historic": [
-    { "data": "27/03", "index": 80, "risc": "moderat" },
-    { "data": "26/03", "index": 48, "risc": "moderat" },
-    { "data": "25/03", "index": 37, "risc": "baix" },
-    { "data": "24/03", "index": 62, "risc": "alt" },
-    { "data": "23/03", "index": 41, "risc": "moderat" }
+    {
+      "data": "27/03",
+      "index": 40,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 34,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 29,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 44,
+      "risc": "moderat"
+    },
+    {
+      "data": "--/--",
+      "index": 37,
+      "risc": "moderat"
+    }
   ]
 }
