@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Qualitat de l'Aire - El Masnou</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: white;
+  text-align: center;
+}
+
+.container {
+  width: 300px;
+  margin: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.aqi {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.label {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.good { color: green; }
+.moderate { color: orange; }
+.bad { color: red; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h3>Qualitat de l’aire</h3>
+  <div id="aqi" class="aqi">--</div>
+  <div id="status" class="label">Carregant...</div>
+  <div id="pm25" class="label"></div>
+</div>
+
+<script>
+
+// Coordenades Masnou
+const lat = 41.479;
+const lon = 2.319;
+
+// API Open-Meteo (no cal API key 🔥)
+const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm2_5,european_aqi`;
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => {
+
+    const aqi = data.current.european_aqi;
+    const pm25 = data.current.pm2_5;
+
+    document.getElementById("aqi").innerText = aqi;
+    document.getElementById("pm25").innerText = "PM2.5: " + pm25 + " µg/m³";
+
+    let status = "";
+    let className = "";
+
+    if (aqi <= 20) {
+      status = "Molt bona";
+      className = "good";
+    } else if (aqi <= 40) {
+      status = "Bona";
+      className = "good";
+    } else if (aqi <= 60) {
+      status = "Moderada";
+      className = "moderate";
+    } else {
+      status = "Dolenta";
+      className = "bad";
+    }
+
+    document.getElementById("status").innerText = status;
+    document.getElementById("aqi").className = "aqi " + className;
+
+  });
+
+</script>
+
+</body>
+</html>
