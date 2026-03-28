@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Qualitat Aire Masnou</title>
+</head>
+
+<body style="font-family: Arial; text-align:center;">
+
+<h2>Qualitat de l’aire · El Masnou</h2>
+
+<div id="aqi">Carregant...</div>
+
+<script>
+fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=41.479&longitude=2.319&current=european_aqi")
+.then(r => r.json())
+.then(d => {
+  document.getElementById("aqi").innerText = "AQI: " + d.current.european_aqi;
+})
+.catch(() => {
+  document.getElementById("aqi").innerText = "Error dades";
+});
+</script>
+
+</body>
+</html>
