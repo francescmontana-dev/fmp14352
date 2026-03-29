@@ -1,31 +1,90 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-<meta charset="UTF-8">
-<title>Contador</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contador Meteo PRO</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: transparent;
+    }
+
+    .widget {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid #b7d3e8;
+      background: linear-gradient(180deg, #eef8ff 0%, #dcebfa 100%);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+      color: #1f4e79;
+      min-width: 260px;
+    }
+
+    .icon {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .title {
+      font-size: 12px;
+      color: #4f6f8f;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .counter {
+      font-size: 30px;
+      font-weight: bold;
+      color: #0f3d66;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #5f7f9f;
+      margin-top: 4px;
+    }
+
+    .pulse {
+      animation: pulse 0.8s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
+  <div class="widget">
+    <div class="icon">🌤️</div>
+    <div class="content">
+      <div class="title">Visites a la meteo</div>
+      <div class="counter" id="contador">---</div>
+      <div class="subtitle">Estació El Masnou NE</div>
+    </div>
+  </div>
 
-<div>
-  🌤️ Visites a la meteo:
-  <span id="visites">Carregant...</span>
-</div>
+  <script>
+    const clau = "contador_meteo_elmasnou_ne";
+    let contador = parseInt(localStorage.getItem(clau) || "100", 10);
 
-<script>
-const namespace = "elmasnou_ne";
-const key = "visites_web";
+    contador += 1;
+    localStorage.setItem(clau, contador);
 
-<script>
-const namespace = "elmasnou_ne";
-const key = "visites_web";
-
-fetch(`https://counterapi.dev/api/${namespace}/${key}/up`)
-  .then(response => response.json())
-  .then(data => {
-    document.getElementById("visites").textContent = data.count;
-  })
-  .catch(error => {
-    console.error(error);
-    document.getElementById("visites").textContent = "Error";
-  });
-</script>
+    const el = document.getElementById("contador");
+    el.textContent = contador;
+    el.classList.add("pulse");
+  </script>
+</body>
+</html>
