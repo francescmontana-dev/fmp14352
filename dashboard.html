@@ -3,55 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard 35 — El Masnou</title>
+  <title>Dashboard Públic — El Masnou</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body{
       font-family:Arial, Helvetica, sans-serif;
       margin:0;
-      padding:20px;
-      background:#f4f7fb;
+      padding:24px;
+      background:linear-gradient(180deg,#eef4fb 0%, #f7f9fc 100%);
       color:#1f2937;
     }
     .wrap{
-      max-width:1100px;
+      max-width:1180px;
       margin:0 auto;
     }
     h1{
       margin:0 0 8px 0;
-      font-size:28px;
+      font-size:32px;
+      letter-spacing:.2px;
     }
     .meta{
       color:#4b5563;
-      margin-bottom:18px;
+      margin-bottom:20px;
       font-size:14px;
+      background:#ffffffcc;
+      border:1px solid #e6edf5;
+      border-radius:12px;
+      padding:10px 12px;
+      box-shadow:0 4px 14px rgba(15,23,42,.04);
     }
     .grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:14px;
-      margin-bottom:18px;
+      grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+      gap:16px;
+      margin-bottom:20px;
     }
     .card{
       background:#fff;
-      border-radius:12px;
-      padding:16px;
-      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      border-radius:16px;
+      padding:18px;
+      border:1px solid #e7edf5;
+      box-shadow:0 10px 26px rgba(15,23,42,.06);
     }
     .card h2{
-      margin:0 0 12px 0;
+      margin:0 0 14px 0;
       font-size:18px;
+      letter-spacing:.2px;
     }
     .line{
-      margin:6px 0;
+      margin:8px 0;
       font-size:15px;
     }
     .big{
-      font-size:30px;
+      font-size:34px;
       font-weight:700;
+      line-height:1.05;
     }
     .model{
-      background:#eef6ff;
+      background:linear-gradient(180deg,#eef6ff 0%, #f7fbff 100%);
       border-left:4px solid #2563eb;
     }
     .ok{ color:#15803d; font-weight:700; }
@@ -60,11 +69,12 @@
 
     .chart-wrap{
       background:#fff;
-      border-radius:12px;
-      padding:12px;
-      box-shadow:0 2px 10px rgba(0,0,0,.06);
-      height:320px;
-      margin-bottom:18px;
+      border-radius:16px;
+      padding:16px;
+      border:1px solid #e7edf5;
+      box-shadow:0 10px 26px rgba(15,23,42,.06);
+      height:360px;
+      margin-bottom:20px;
     }
 
     #forecastChart{
@@ -77,10 +87,11 @@
       width:100%;
       border-collapse:collapse;
       background:#fff;
-      border-radius:12px;
+      border-radius:16px;
       overflow:hidden;
-      box-shadow:0 2px 10px rgba(0,0,0,.06);
-      margin-top:18px;
+      border:1px solid #e7edf5;
+      box-shadow:0 10px 26px rgba(15,23,42,.06);
+      margin-top:20px;
     }
     th, td{
       padding:10px 12px;
@@ -89,18 +100,26 @@
       font-size:14px;
     }
     th{
-      background:#f8fafc;
+      background:#f6f9fc;
+      font-weight:700;
     }
     .small{
       font-size:13px;
       color:#6b7280;
     }
+    .public-hide{ display:none !important; }
+    .hero{ background:linear-gradient(180deg,#fff 0%, #f8fbff 100%); border:1px solid #e7edf5; border-radius:16px; padding:18px; box-shadow:0 10px 26px rgba(15,23,42,.06); margin-bottom:20px; }
+    .hero p{ margin:6px 0 0 0; color:#4b5563; font-size:15px; }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Tauler Meteo — El Masnou</h1>
+  <h1>Previsió Meteo — El Masnou</h1>
   <div class="meta" id="metaLine">Carregant dades…</div>
+  <div class="hero">
+    <div class="big" id="publicHeadline">Previsió local pròpia</div>
+    <p id="publicSummary">Carregant resum…</p>
+  </div>
 
   <div class="grid">
     <div class="card">
@@ -124,7 +143,7 @@
       <div class="line" id="wind6">Vent màx. 6h: --</div>
     </div>
 
-    <div class="card model">
+    <div class="card model public-hide">
       <h2>Model El Masnou NE</h2>
       <div class="line" id="modelLearn">Aprenentatge: --</div>
       <div class="line small" id="modelBias">Bias: --</div>
@@ -147,10 +166,11 @@
   </div>
 
   <div class="chart-wrap">
+    <h2 style="margin:0 0 10px 0;font-size:20px;">Evolució prevista</h2>
     <canvas id="forecastChart"></canvas>
   </div>
 
-  <table>
+  <table class="public-hide">
     <thead>
       <tr>
         <th>Hora</th>
@@ -391,9 +411,18 @@ function updateOwnForecast() {
     return `${tLocal.toFixed(1)} °C · vent ${w !== null ? w : "--"} km/h · pluja ${rain !== null ? rain : "--"} mm`;
   }
 
-  setText("p6", "+6 h (hora real) · " + calc(6));
-  setText("p12", "+12 h (hora real) · " + calc(12));
-  setText("p24", "+24 h (hora real) · " + calc(24));
+  const txt6 = calc(6);
+  const txt12 = calc(12);
+  const txt24 = calc(24);
+
+  setText("p6", "+6 h (hora real) · " + txt6);
+  setText("p12", "+12 h (hora real) · " + txt12);
+  setText("p24", "+24 h (hora real) · " + txt24);
+
+  const p6v = txt6.split("·")[0]?.trim() || "--";
+  const p12v = txt12.split("·")[0]?.trim() || "--";
+  const p24v = txt24.split("·")[0]?.trim() || "--";
+  setText("publicSummary", `+6 h: ${p6v} · +12 h: ${p12v} · +24 h: ${p24v}`);
 }
 
 function cbCurrent(data) {
