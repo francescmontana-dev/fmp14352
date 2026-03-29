@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contador Meteo</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: transparent;
+}
+
+.widget {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#eaf6ff,#d6ebff);
+  border: 1px solid #b5d3ea;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.icon {
+  font-size: 26px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 12px;
+  color: #4a6c8c;
+}
+
+.number {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1f4e79;
+}
+</style>
+
+</head>
+<body>
+
+<div class="widget">
+  <div class="icon">🌤️</div>
+  <div class="text">
+    <div class="label">Visites a la meteo</div>
+    <div class="number" id="contador">--</div>
+  </div>
+</div>
+
+<script>
+// 🔥 número inicial (pots posar el que vulguis)
+let contador = localStorage.getItem("contador_meteo") || 100;
+
+// suma 1 cada visita
+contador++;
+
+// guarda
+localStorage.setItem("contador_meteo", contador);
+
+// mostra
+document.getElementById("contador").textContent = contador;
+</script>
+
+</body>
+</html>
