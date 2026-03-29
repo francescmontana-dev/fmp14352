@@ -6,42 +6,23 @@
   <title>Contador Meteo PRO+</title>
   <style>
     body {
-  margin: 0;
-  padding: 0;
-  display: inline-block;
-}
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: transparent;
+    }
 
     .widget {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 1px solid #b9d7ea;
-  background: linear-gradient(180deg, #f3faff 0%, #dfeffc 100%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  color: #1f4e79;
-}
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-radius: 16px;
+      border: 1px solid #b9d7ea;
+      background: linear-gradient(180deg, #f3faff 0%, #dfeffc 100%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+      color: #1f4e79;
+    }
 
-.icon {
-  font-size: 18px;
-}
-
-.title {
-  font-size: 10px;
-}
-
-.digit {
-  min-width: 14px;
-  height: 20px;
-  font-size: 14px;
-  line-height: 20px;
-  padding: 1px 3px;
-}
-
-.subtitle {
-  font-size: 9px;
-}
     .icon {
       font-size: 30px;
       line-height: 1;
@@ -108,30 +89,27 @@
   </div>
 
   <script>
-  const clau = "contador_meteo_elmasnou_real";
+    const clau = "prova_contador_6604_v1";
+    let contador = parseInt(localStorage.getItem(clau) || "6604", 10);
 
-  // 👉 AQUI poses el número real de Statcounter
-  const BASE_REAL = 6604;
+    contador += 1;
+    localStorage.setItem(clau, contador);
 
-  let contador = parseInt(localStorage.getItem(clau) || BASE_REAL, 10);
+    function dibuixaNumero(num) {
+      const contenidor = document.getElementById("contador");
+      contenidor.innerHTML = "";
 
-  contador += 1;
-  localStorage.setItem(clau, contador);
+      const text = String(num).padStart(4, "0");
 
-  function dibuixaNumero(num) {
-    const contenidor = document.getElementById("contador");
-    contenidor.innerHTML = "";
-
-    const text = String(num).padStart(4, "0");
-
-    for (const lletra of text) {
-      const digit = document.createElement("div");
-      digit.className = "digit";
-      digit.textContent = lletra;
-      contenidor.appendChild(digit);
+      for (const lletra of text) {
+        const digit = document.createElement("div");
+        digit.className = "digit";
+        digit.textContent = lletra;
+        contenidor.appendChild(digit);
+      }
     }
-  }
-  dibuixaNumero(contador);
-</script>
+
+    dibuixaNumero(contador);
+  </script>
 </body>
 </html>
