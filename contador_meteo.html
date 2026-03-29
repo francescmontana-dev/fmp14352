@@ -1,73 +1,90 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contador Meteo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contador Meteo PRO</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: transparent;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: transparent;
-}
+    .widget {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid #b7d3e8;
+      background: linear-gradient(180deg, #eef8ff 0%, #dcebfa 100%);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+      color: #1f4e79;
+      min-width: 260px;
+    }
 
-.widget {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  background: linear-gradient(180deg,#eaf6ff,#d6ebff);
-  border: 1px solid #b5d3ea;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+    .icon {
+      font-size: 34px;
+      line-height: 1;
+    }
 
-.icon {
-  font-size: 26px;
-}
+    .content {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
 
-.text {
-  display: flex;
-  flex-direction: column;
-}
+    .title {
+      font-size: 12px;
+      color: #4f6f8f;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
 
-.label {
-  font-size: 12px;
-  color: #4a6c8c;
-}
+    .counter {
+      font-size: 30px;
+      font-weight: bold;
+      color: #0f3d66;
+    }
 
-.number {
-  font-size: 22px;
-  font-weight: bold;
-  color: #1f4e79;
-}
-</style>
+    .subtitle {
+      font-size: 11px;
+      color: #5f7f9f;
+      margin-top: 4px;
+    }
 
+    .pulse {
+      animation: pulse 0.8s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
-
-<div class="widget">
-  <div class="icon">🌤️</div>
-  <div class="text">
-    <div class="label">Visites a la meteo</div>
-    <div class="number" id="contador">--</div>
+  <div class="widget">
+    <div class="icon">🌤️</div>
+    <div class="content">
+      <div class="title">Visites a la meteo</div>
+      <div class="counter" id="contador">---</div>
+      <div class="subtitle">Estació El Masnou NE</div>
+    </div>
   </div>
-</div>
 
-<script>
-// 🔥 número inicial (pots posar el que vulguis)
-let contador = localStorage.getItem("contador_meteo") || 100;
+  <script>
+    const clau = "contador_meteo_elmasnou_ne";
+    let contador = parseInt(localStorage.getItem(clau) || "100", 10);
 
-// suma 1 cada visita
-contador++;
+    contador += 1;
+    localStorage.setItem(clau, contador);
 
-// guarda
-localStorage.setItem("contador_meteo", contador);
-
-// mostra
-document.getElementById("contador").textContent = contador;
-</script>
-
+    const el = document.getElementById("contador");
+    el.textContent = contador;
+    el.classList.add("pulse");
+  </script>
 </body>
 </html>
