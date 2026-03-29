@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard 34 — El Masnou</title>
+  <title>Dashboard 35 — El Masnou</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body{
@@ -140,9 +140,9 @@
 
     <div class="card">
       <h2>Previsió pròpia 24 h</h2>
-      <div class="line" id="p6">+6 h · --</div>
-      <div class="line" id="p12">+12 h · --</div>
-      <div class="line" id="p24">+24 h · --</div>
+      <div class="line" id="p6">+6 h (hora real) · --</div>
+      <div class="line" id="p12">+12 h (hora real) · --</div>
+      <div class="line" id="p24">+24 h (hora real) · --</div>
     </div>
   </div>
 
@@ -368,9 +368,9 @@ function computeOwnTempForRow(row, index, baseTime) {
 
 function updateOwnForecast() {
   if (!lastForecastData || !lastForecastData.ok || !Array.isArray(lastForecastData.hourly)) {
-    setText("p6", "+6 h · --");
-    setText("p12", "+12 h · --");
-    setText("p24", "+24 h · --");
+    setText("p6", "+6 h (hora real) · --");
+    setText("p12", "+12 h (hora real) · --");
+    setText("p24", "+24 h (hora real) · --");
     return;
   }
 
@@ -391,9 +391,9 @@ function updateOwnForecast() {
     return `${tLocal.toFixed(1)} °C · vent ${w !== null ? w : "--"} km/h · pluja ${rain !== null ? rain : "--"} mm`;
   }
 
-  setText("p6", "+6 h · " + calc(6));
-  setText("p12", "+12 h · " + calc(12));
-  setText("p24", "+24 h · " + calc(24));
+  setText("p6", "+6 h (hora real) · " + calc(6));
+  setText("p12", "+12 h (hora real) · " + calc(12));
+  setText("p24", "+24 h (hora real) · " + calc(24));
 }
 
 function cbCurrent(data) {
@@ -470,18 +470,18 @@ function cbForecast(data) {
       labels,
       datasets: [
         {
-          label: "Temperatura model",
+          label: "Temperatura model", borderWidth: 1, borderColor: "rgba(100,100,255,0.5)",
           data: tempsModel,
           yAxisID: "y"
         },
         {
-          label: "Temperatura pròpia",
+          label: "Temperatura pròpia", borderWidth: 3, borderColor: "rgba(255,120,0,1)",
           data: tempsOwn,
           yAxisID: "y",
           borderDash: [6, 4]
         },
         {
-          label: "Temperatura real actual",
+          label: "Temperatura real actual", pointBackgroundColor: "black", pointBorderColor: "black",
           data: labels.map((_, i) => {
             const txt = (document.getElementById("obsTemp")?.textContent || "").replace(",", ".");
             const v = parseFloat(txt);
