@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "29/03/2026 01:04",
+  "data": "29/03/2026 01:34",
   "indexTotal": 14,
   "risc": "baix",
   "dominant": {
@@ -11,19 +11,19 @@
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 29
+      "valor": 30
     },
     {
       "nom": "Cupressàcies",
-      "valor": 16
+      "valor": 17
     },
     {
       "nom": "Parietària",
-      "valor": 18
+      "valor": 19
     },
     {
       "nom": "Pi",
-      "valor": 14
+      "valor": 15
     },
     {
       "nom": "Gramínies",
