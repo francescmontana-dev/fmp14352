@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard 33 — El Masnou</title>
+  <title>Dashboard 34 — El Masnou</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body{
@@ -479,6 +479,20 @@ function cbForecast(data) {
           data: tempsOwn,
           yAxisID: "y",
           borderDash: [6, 4]
+        },
+        {
+          label: "Temperatura real actual",
+          data: labels.map((_, i) => {
+            const txt = (document.getElementById("obsTemp")?.textContent || "").replace(",", ".");
+            const v = parseFloat(txt);
+            if (!Number.isFinite(v)) return null;
+            return i === 0 ? v : null;
+          }),
+          yAxisID: "y",
+          type: "line",
+          showLine: false,
+          pointRadius: 6,
+          pointHoverRadius: 7
         },
         {
           label: "Pluja",
