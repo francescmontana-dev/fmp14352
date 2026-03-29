@@ -89,27 +89,30 @@
   </div>
 
   <script>
-    const clau = "prova_contador_6604_v1";
-    let contador = parseInt(localStorage.getItem(clau) || "6604", 10);
+  const clau = "contador_meteo_elmasnou_real";
 
-    contador += 1;
-    localStorage.setItem(clau, contador);
+  // 👉 AQUI poses el número real de Statcounter
+  const BASE_REAL = 6604;
 
-    function dibuixaNumero(num) {
-      const contenidor = document.getElementById("contador");
-      contenidor.innerHTML = "";
+  let contador = parseInt(localStorage.getItem(clau) || BASE_REAL, 10);
 
-      const text = String(num).padStart(4, "0");
+  contador += 1;
+  localStorage.setItem(clau, contador);
 
-      for (const lletra of text) {
-        const digit = document.createElement("div");
-        digit.className = "digit";
-        digit.textContent = lletra;
-        contenidor.appendChild(digit);
-      }
+  function dibuixaNumero(num) {
+    const contenidor = document.getElementById("contador");
+    contenidor.innerHTML = "";
+
+    const text = String(num).padStart(4, "0");
+
+    for (const lletra of text) {
+      const digit = document.createElement("div");
+      digit.className = "digit";
+      digit.textContent = lletra;
+      contenidor.appendChild(digit);
     }
-
-    dibuixaNumero(contador);
-  </script>
+  }
+  dibuixaNumero(contador);
+</script>
 </body>
 </html>
