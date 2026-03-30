@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banner Mini El Masnou NE — Icons</title>
+  <style>
+    body{margin:0;padding:8px;font-family:Arial;background:#0f172a}
+    .card{max-width:520px;margin:auto;background:#fff;border-radius:16px;overflow:hidden}
+    .top{padding:12px;background:#eef5ff;display:flex;justify-content:space-between}
+    .title{font-size:18px;font-weight:700}
+    .badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .ok{background:#ecfdf5;color:#15803d}
+    .mid{background:#fff7ed;color:#b45309}
+    .bad{background:#fef2f2;color:#b91c1c}
+    .main{padding:12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .metric{text-align:center;background:#f8fafc;border-radius:10px;padding:10px}
+    .label{font-size:11px;color:#64748b;display:flex;justify-content:center;gap:4px}
+    .value{font-size:22px;font-weight:700}
+    .summary{font-size:14px;margin:10px 0}
+    .extra{font-size:13px;color:#334155}
+    .footer{padding:10px}
+    .btn{display:block;text-align:center;background:#2563eb;color:#fff;padding:10px;border-radius:10px;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="title">El Masnou NE</div>
+    <div id="badge" class="badge mid">--</div>
+  </div>
+  <div class="main">
+    <div class="grid">
+      <div class="metric"><div class="label">🌡️ Ara</div><div id="real" class="value">--</div></div>
+      <div class="metric"><div class="label">📈 Previst</div><div id="fc" class="value">--</div></div>
+      <div class="metric"><div class="label">📊 Desv.</div><div id="dev" class="value">--</div></div>
+    </div>
+    <div id="summary" class="summary">--</div>
+    <div id="extra" class="extra">🌬️ -- · 💧 -- · 🌧️ --</div>
+  </div>
+  <div class="footer">
+    <a class="btn" href="dashboard35.html">Veure previsió</a>
+  </div>
+</div>
+
+<script>
+const url="model/banner.json?t="+Date.now();
+
+function qInfo(dev){
+  if(dev<=1)return ["Precisió alta","ok"];
+  if(dev<=2)return ["Precisió mitjana","mid"];
+  return ["Precisió baixa","bad"];
+}
+
+fetch(url).then(r=>r.json()).then(j=>{
+  const r=j.real.temperature_c;
+  const f=j.forecast.temperature_c;
+  const d=j.deviation.temperature_c;
+  const hum=j.real.humidity_pct;
+  const wind=j.real.wind_speed_kmh;
+  const rain=j.real.rain_today_mm ?? "--";
+
+  document.getElementById("real").textContent=r.toFixed(1)+"°";
+  document.getElementById("fc").textContent=f.toFixed(1)+"°";
+  document.getElementById("dev").textContent=(d>0?"+":"")+d.toFixed(1);
+
+  const qi=qInfo(Math.abs(d));
+  const b=document.getElementById("badge");
+  b.textContent=qi[0];
+  b.className="badge "+qi[1];
+
+  document.getElementById("summary").textContent=
+    `Ara ${r.toFixed(1)}° · Model ${f.toFixed(1)}° · Δ ${(d>0?"+":"")+d.toFixed(1)}°`;
+
+  document.getElementById("extra").textContent=
+    `🌬️ ${wind} km/h · 💧 ${hum}% · 🌧️ ${rain} mm`;
+
+}).catch(()=>{});
+
+setTimeout(()=>location.reload(),300000);
+</script>
+</body>
+</html>
