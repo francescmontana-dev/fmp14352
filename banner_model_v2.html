@@ -248,6 +248,11 @@
           <div id="pressureDev" class="sub">Desviació: --</div>
         </div>
         <div class="mini">
+          <div class="label">Pluja</div>
+          <div id="rain" class="value">-- mm</div>
+          <div class="sub">Pluja acumulada avui</div>
+        </div>
+        <div class="mini">
           <div class="label">Hora model</div>
           <div id="modelTime" class="value" style="font-size:20px;">--</div>
           <div id="obsTime" class="sub">Obs: --</div>
@@ -338,6 +343,7 @@
         const windReal = Number(j?.real?.wind_speed_kmh);
         const press = Number(j?.real?.pressure_hpa);
         const pressDev = j?.deviation?.pressure_hpa;
+        const rain = j?.real?.rain_today_mm;
         const q = qualityInfo(j?.quality?.temperature, Number.isFinite(devT) ? Math.abs(devT) : null);
 
         setText("realTemp", Number.isFinite(realT) ? realT.toFixed(1) : "--");
@@ -352,6 +358,7 @@
 
         setText("pressure", Number.isFinite(press) ? `${press.toFixed(1)} hPa` : "-- hPa");
         setText("pressureDev", `Desviació: ${pressDev ?? "--"} hPa`);
+        setText("rain", rain != null ? `${rain} mm` : "-- mm");
 
         setText("modelTime", formatModelTime(j?.matched_model_time));
         setText("obsTime", `Obs: ${formatObsUtc(j?.observed_time_utc)}`);
