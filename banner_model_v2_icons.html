@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banner Model El Masnou NE — Icons</title>
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#172554;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --ok:#15803d;
+      --mid:#b45309;
+      --bad:#b91c1c;
+      --accent:#2563eb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--text);
+      padding:10px;
+    }
+    .widget{
+      max-width:900px;
+      margin:0 auto;
+      background:var(--card);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 14px 34px rgba(2,6,23,.28);
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:16px 18px;
+      background:linear-gradient(180deg,#f8fbff 0%, #eef5ff 100%);
+      border-bottom:1px solid var(--line);
+    }
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .brand .title{
+      font-size:24px;
+      font-weight:700;
+      color:#0f172a;
+      line-height:1.05;
+    }
+    .brand .subtitle{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .badge{
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+      border:1px solid transparent;
+    }
+    .badge.ok{background:#ecfdf5;color:var(--ok);border-color:#bbf7d0}
+    .badge.mid{background:#fff7ed;color:var(--mid);border-color:#fed7aa}
+    .badge.bad{background:#fef2f2;color:var(--bad);border-color:#fecaca}
+    .main{
+      display:grid;
+      grid-template-columns:1.2fr .9fr;
+      gap:0;
+    }
+    .hero{
+      padding:20px 18px 18px 18px;
+      border-right:1px solid var(--line);
+    }
+    .headline{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .metric{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 12px;
+    }
+    .metric .label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      font-weight:700;
+    }
+    .metric .value{
+      font-size:32px;
+      font-weight:700;
+      line-height:1;
+      color:#111827;
+    }
+    .metric .unit{
+      font-size:16px;
+      font-weight:700;
+      color:#475569;
+      margin-left:4px;
+    }
+    .metric.small .value{font-size:28px}
+    .summary{
+      background:linear-gradient(180deg,#ffffff 0%, #f8fbff 100%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 14px 12px 14px;
+    }
+    .summary h2{
+      margin:0 0 10px 0;
+      font-size:18px;
+    }
+    .summary p{
+      margin:0;
+      font-size:15px;
+      line-height:1.45;
+      color:#334155;
+    }
+    .side{
+      padding:18px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      align-content:start;
+    }
+    .mini{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      min-height:88px;
+    }
+    .mini .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .ico{font-size:15px;line-height:1;}
+    .mini .value{
+      font-size:24px;
+      font-weight:700;
+      line-height:1.05;
+    }
+    .mini .sub{
+      margin-top:6px;
+      font-size:12px;
+      color:#64748b;
+    }
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      padding:12px 18px 16px 18px;
+      border-top:1px solid var(--line);
+      background:#fcfdff;
+    }
+    .updated{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .button{
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:12px;
+      background:var(--accent);
+      color:white;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:700;
+    }
+    @media (max-width: 760px){
+      .main{grid-template-columns:1fr}
+      .hero{border-right:none;border-bottom:1px solid var(--line)}
+      .headline{grid-template-columns:1fr}
+      .side{grid-template-columns:1fr 1fr}
+      .footer{flex-direction:column;align-items:flex-start}
+    }
+    @media (max-width: 520px){
+      body{padding:6px}
+      .top{padding:14px}
+      .brand .title{font-size:20px}
+      .metric .value{font-size:28px}
+      .side{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="top">
+      <div class="brand">
+        <div class="title">El Masnou NE</div>
+        <div class="subtitle">Model local ajustat a dades reals</div>
+      </div>
+      <div id="qualityBadge" class="badge mid">Carregant…</div>
+    </div>
+
+    <div class="main">
+      <div class="hero">
+        <div class="headline">
+          <div class="metric">
+            <div class="label"><span class="ico">🌡️</span>Ara</div>
+            <div><span id="realTemp" class="value">--</span><span class="unit">°C</span></div>
+          </div>
+          <div class="metric">
+            <div class="label"><span class="ico">📈</span>Previst</div>
+            <div><span id="forecastTemp" class="value">--</span><span class="unit">°C</span></div>
+          </div>
+          <div class="metric small">
+            <div class="label"><span class="ico">📊</span>Desviació</div>
+            <div><span id="deviationTemp" class="value">--</span><span class="unit">°C</span></div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <h2>Resum del model</h2>
+          <p id="summaryText">Carregant informació del model…</p>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="mini">
+          <div class="label"><span class="ico">💧</span>Humitat</div>
+          <div id="humidity" class="value">-- %</div>
+          <div id="humidityDev" class="sub">Desviació: --</div>
+        </div>
+        <div class="mini">
+          <div class="label"><span class="ico">🌬️</span>Vent</div>
+          <div id="wind" class="value">-- km/h</div>
+          <div id="windReal" class="sub">Real: --</div>
+        </div>
+        <div class="mini">
+          <div class="label"><span class="ico">🔽</span>Pressió</div>
+          <div id="pressure" class="value">-- hPa</div>
+          <div id="pressureDev" class="sub">Desviació: --</div>
+        </div>
+        <div class="mini">
+          <div class="label"><span class="ico">🌧️</span>Pluja</div>
+          <div id="rain" class="value">-- mm</div>
+          <div class="sub">Pluja acumulada avui</div>
+        </div>
+        <div class="mini">
+          <div class="label"><span class="ico">🕒</span>Hora model</div>
+          <div id="modelTime" class="value" style="font-size:20px;">--</div>
+          <div id="obsTime" class="sub">Obs: --</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div id="updatedAt" class="updated">Actualitzat: --</div>
+      <a class="button" href="dashboard35.html">Veure previsió detallada</a>
+    </div>
+  </div>
+
+  <script>
+    const DATA_URL = "model/banner.json?t=" + Date.now();
+
+    function formatObsUtc(s) {
+      if (!s) return "--";
+      const p = String(s).split(",").map(Number);
+      if (p.length < 6 || p.some(n => !Number.isFinite(n))) return s;
+      const d = new Date(Date.UTC(p[0], p[1]-1, p[2], p[3], p[4], p[5]));
+      return d.toLocaleString("ca-ES", {
+        timeZone: "Europe/Madrid",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function formatModelTime(s) {
+      if (!s) return "--";
+      const d = new Date(s);
+      if (isNaN(d)) return s;
+      return d.toLocaleString("ca-ES", {
+        timeZone: "Europe/Madrid",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function formatGenerated(s) {
+      if (!s) return "--";
+      const d = new Date(s);
+      if (isNaN(d)) return s;
+      return d.toLocaleString("ca-ES", {
+        timeZone: "Europe/Madrid",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function setText(id, txt) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    }
+
+    function qualityInfo(q, absDev) {
+      const qq = String(q || "").toLowerCase();
+      if (qq === "baja" || (typeof absDev === "number" && absDev <= 1)) {
+        return { text: "Precisió alta", cls: "ok" };
+      }
+      if (qq === "media" || (typeof absDev === "number" && absDev <= 2)) {
+        return { text: "Precisió mitjana", cls: "mid" };
+      }
+      return { text: "Precisió baixa", cls: "bad" };
+    }
+
+    function summary(realT, fcT, devT, wind, hum, qualityText) {
+      const sign = (typeof devT === "number" && devT > 0) ? "+" : "";
+      return `Ara tenim ${realT.toFixed(1)} °C. El model base preveia ${fcT.toFixed(1)} °C i la desviació actual és de ${sign}${devT.toFixed(1)} °C. ${qualityText}. Vent ${wind.toFixed(1)} km/h i humitat ${hum}% a l'estació.`;
+    }
+
+    fetch(DATA_URL)
+      .then(r => r.json())
+      .then(j => {
+        const realT = Number(j?.real?.temperature_c);
+        const fcT = Number(j?.forecast?.temperature_c);
+        const devT = Number(j?.deviation?.temperature_c);
+        const hum = Number(j?.real?.humidity_pct);
+        const humDev = j?.deviation?.humidity_pct;
+        const wind = Number(j?.forecast?.wind_speed_kmh);
+        const windReal = Number(j?.real?.wind_speed_kmh);
+        const press = Number(j?.real?.pressure_hpa);
+        const pressDev = j?.deviation?.pressure_hpa;
+        const rain = j?.real?.rain_today_mm;
+        const q = qualityInfo(j?.quality?.temperature, Number.isFinite(devT) ? Math.abs(devT) : null);
+
+        setText("realTemp", Number.isFinite(realT) ? realT.toFixed(1) : "--");
+        setText("forecastTemp", Number.isFinite(fcT) ? fcT.toFixed(1) : "--");
+        setText("deviationTemp", Number.isFinite(devT) ? ((devT > 0 ? "+" : "") + devT.toFixed(1)) : "--");
+
+        setText("humidity", Number.isFinite(hum) ? `${hum} %` : "-- %");
+        setText("humidityDev", `Desviació: ${humDev ?? "--"} %`);
+
+        setText("wind", Number.isFinite(wind) ? `${wind.toFixed(1)} km/h` : "-- km/h");
+        setText("windReal", `Real: ${Number.isFinite(windReal) ? windReal.toFixed(1) : "--"} km/h`);
+
+        setText("pressure", Number.isFinite(press) ? `${press.toFixed(1)} hPa` : "-- hPa");
+        setText("pressureDev", `Desviació: ${pressDev ?? "--"} hPa`);
+        setText("rain", rain != null ? `${rain} mm` : "-- mm");
+
+        setText("modelTime", formatModelTime(j?.matched_model_time));
+        setText("obsTime", `Obs: ${formatObsUtc(j?.observed_time_utc)}`);
+        setText("updatedAt", `Actualitzat: ${formatGenerated(j?.generated_at_utc)}`);
+
+        const badge = document.getElementById("qualityBadge");
+        badge.textContent = q.text;
+        badge.className = `badge ${q.cls}`;
+
+        if (Number.isFinite(realT) && Number.isFinite(fcT) && Number.isFinite(devT) && Number.isFinite(windReal) && Number.isFinite(hum)) {
+          setText("summaryText", summary(realT, fcT, devT, windReal, hum, q.text.toLowerCase()));
+        } else {
+          setText("summaryText", "No s'han pogut carregar totes les dades del model.");
+        }
+      })
+      .catch(() => {
+        setText("summaryText", "Error carregant les dades del model.");
+        const badge = document.getElementById("qualityBadge");
+        badge.textContent = "Sense dades";
+        badge.className = "badge bad";
+      });
+
+    setTimeout(() => location.reload(), 300000);
+  </script>
+</body>
+</html>
