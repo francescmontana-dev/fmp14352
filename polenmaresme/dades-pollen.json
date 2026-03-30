@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "30/03/2026 16:04",
-  "indexTotal": 52,
+  "data": "30/03/2026 16:34",
+  "indexTotal": 51,
   "risc": "alt",
   "dominant": {
     "nom": "Plàtan",
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 76
+      "valor": 69
     },
     {
       "nom": "Pi",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 54,
+      "index": 53,
       "risc": "alt"
     },
     {
       "dia": "Demà passat",
-      "index": 55,
+      "index": 54,
       "risc": "alt"
     }
   ]
