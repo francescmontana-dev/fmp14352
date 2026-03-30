@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Banner Model El Masnou NE</title>
+  <title>Banner Model El Masnou NE — Icons</title>
   <style>
     :root{
       --bg1:#0f172a;
@@ -148,7 +148,11 @@
       text-transform:uppercase;
       letter-spacing:.4px;
       margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
     }
+    .ico{font-size:15px;line-height:1;}
     .mini .value{
       font-size:24px;
       font-weight:700;
@@ -212,15 +216,15 @@
       <div class="hero">
         <div class="headline">
           <div class="metric">
-            <div class="label">Ara</div>
+            <div class="label"><span class="ico">🌡️</span>Ara</div>
             <div><span id="realTemp" class="value">--</span><span class="unit">°C</span></div>
           </div>
           <div class="metric">
-            <div class="label">Previst</div>
+            <div class="label"><span class="ico">📈</span>Previst</div>
             <div><span id="forecastTemp" class="value">--</span><span class="unit">°C</span></div>
           </div>
           <div class="metric small">
-            <div class="label">Desviació</div>
+            <div class="label"><span class="ico">📊</span>Desviació</div>
             <div><span id="deviationTemp" class="value">--</span><span class="unit">°C</span></div>
           </div>
         </div>
@@ -233,27 +237,27 @@
 
       <div class="side">
         <div class="mini">
-          <div class="label">Humitat</div>
+          <div class="label"><span class="ico">💧</span>Humitat</div>
           <div id="humidity" class="value">-- %</div>
           <div id="humidityDev" class="sub">Desviació: --</div>
         </div>
         <div class="mini">
-          <div class="label">Vent</div>
+          <div class="label"><span class="ico">🌬️</span>Vent</div>
           <div id="wind" class="value">-- km/h</div>
           <div id="windReal" class="sub">Real: --</div>
         </div>
         <div class="mini">
-          <div class="label">Pressió</div>
+          <div class="label"><span class="ico">🔽</span>Pressió</div>
           <div id="pressure" class="value">-- hPa</div>
           <div id="pressureDev" class="sub">Desviació: --</div>
         </div>
         <div class="mini">
-          <div class="label">Pluja</div>
+          <div class="label"><span class="ico">🌧️</span>Pluja</div>
           <div id="rain" class="value">-- mm</div>
           <div class="sub">Pluja acumulada avui</div>
         </div>
         <div class="mini">
-          <div class="label">Hora model</div>
+          <div class="label"><span class="ico">🕒</span>Hora model</div>
           <div id="modelTime" class="value" style="font-size:20px;">--</div>
           <div id="obsTime" class="sub">Obs: --</div>
         </div>
