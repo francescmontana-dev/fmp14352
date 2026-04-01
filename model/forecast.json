@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-04-01T09:53:12.443098+00:00",
+  "generated_at_utc": "2026-04-01T10:03:12.466622+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1091,7 +1091,7 @@
       "temperature_c": 11.5,
       "humidity_pct": 74,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1027.1,
+      "pressure_hpa": 1027.0,
       "wind_speed_kmh": 5.2,
       "wind_direction_deg": 314
     },
@@ -1100,7 +1100,7 @@
       "temperature_c": 10.4,
       "humidity_pct": 79,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1026.9,
+      "pressure_hpa": 1026.8,
       "wind_speed_kmh": 5.4,
       "wind_direction_deg": 318
     },
@@ -1109,7 +1109,7 @@
       "temperature_c": 10.2,
       "humidity_pct": 77,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1026.6,
+      "pressure_hpa": 1026.4,
       "wind_speed_kmh": 5.4,
       "wind_direction_deg": 312
     },
@@ -1118,7 +1118,7 @@
       "temperature_c": 9.9,
       "humidity_pct": 76,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1026.5,
+      "pressure_hpa": 1026.2,
       "wind_speed_kmh": 5.6,
       "wind_direction_deg": 310
     },
@@ -1127,7 +1127,7 @@
       "temperature_c": 9.3,
       "humidity_pct": 76,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1026.6,
+      "pressure_hpa": 1026.2,
       "wind_speed_kmh": 5.6,
       "wind_direction_deg": 310
     },
@@ -1136,7 +1136,7 @@
       "temperature_c": 8.7,
       "humidity_pct": 76,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1026.8,
+      "pressure_hpa": 1026.4,
       "wind_speed_kmh": 5.6,
       "wind_direction_deg": 310
     },
@@ -1145,7 +1145,7 @@
       "temperature_c": 9.2,
       "humidity_pct": 73,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1027.0,
+      "pressure_hpa": 1026.5,
       "wind_speed_kmh": 5.4,
       "wind_direction_deg": 307
     },
