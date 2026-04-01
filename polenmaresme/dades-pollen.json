@@ -1,8 +1,8 @@
 {
   "zona": "Maresme central",
-  "data": "01/04/2026 12:34",
-  "indexTotal": 47,
-  "risc": "moderat",
+  "data": "01/04/2026 13:04",
+  "indexTotal": 50,
+  "risc": "alt",
   "dominant": {
     "nom": "Pi",
     "text": "Predomini de pi segons condicions locals."
@@ -11,40 +11,40 @@
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 62
+      "valor": 66
     },
     {
       "nom": "Cupressàcies",
-      "valor": 31
+      "valor": 33
     },
     {
       "nom": "Parietària",
-      "valor": 62
+      "valor": 66
     },
     {
       "nom": "Pi",
-      "valor": 68
+      "valor": 72
     },
     {
       "nom": "Gramínies",
-      "valor": 41
+      "valor": 44
     },
     {
       "nom": "Olivera",
-      "valor": 20
+      "valor": 22
     }
   ],
   "historic": [],
   "previsio": [
     {
       "dia": "Demà",
-      "index": 47,
-      "risc": "moderat"
+      "index": 50,
+      "risc": "alt"
     },
     {
       "dia": "Demà passat",
-      "index": 47,
-      "risc": "moderat"
+      "index": 50,
+      "risc": "alt"
     }
   ]
 }
