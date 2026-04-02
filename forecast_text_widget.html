@@ -138,7 +138,13 @@
     fetch(FORECAST_URL)
       .then(r => r.json())
       .then(j => {
-        const hourly = Array.isArray(j?.hourly) ? j.hourly : [];
+        const hourly = Array.isArray(j?.hourly)
+          ? j.hourly
+          : [
+              ...(Array.isArray(j?.hourly_0_99) ? j.hourly_0_99 : []),
+              ...(Array.isArray(j?.hourly_100_167) ? j.hourly_100_167 : [])
+            ];
+
         if (!hourly.length) throw new Error("Sense hourly");
 
         const nowParts = localDateParts(new Date().toISOString());
