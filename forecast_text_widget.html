@@ -90,6 +90,31 @@
       };
     }
 
+    function n(v) {
+      const x = Number(v);
+      return Number.isFinite(x) ? x : null;
+    }
+
+    function getRowTime(row) {
+      return row?.t || row?.time || null;
+    }
+
+    function getTemp(row) {
+      return n(row?.temp ?? row?.temperature_c ?? row?.temperature);
+    }
+
+    function getHumidity(row) {
+      return n(row?.rh ?? row?.humidity_pct ?? row?.humidity);
+    }
+
+    function getRain(row) {
+      return n(row?.rain_mm ?? row?.precipitation_mm ?? row?.precipitation ?? row?.rain);
+    }
+
+    function getWind(row) {
+      return n(row?.wind_kmh ?? row?.wind_speed_kmh ?? row?.wind);
+    }
+
     function classifyRain(total) {
       if (total < 0.1) return "No s’esperen precipitacions.";
       if (total < 2) return "No es descarta alguna precipitació feble.";
@@ -120,16 +145,17 @@
         if (!nowParts) throw new Error("Sense data local");
 
         const todayRows = hourly.filter(row => {
-          const p = localDateParts(row.t || row.time);
+          const t = getRowTime(row);
+          const p = localDateParts(t);
           return p && p.ymd === nowParts.ymd;
         });
 
         const rows = todayRows.length ? todayRows : hourly.slice(0, 24);
 
-        const temps = rows.map(r => Number(r.temp)).filter(Number.isFinite);
-        const hums = rows.map(r => Number(r.rh)).filter(Number.isFinite);
-        const rains = rows.map(r => Number(r.rain_mm)).filter(Number.isFinite);
-        const winds = rows.map(r => Number(r.wind_kmh)).filter(Number.isFinite);
+        const temps = rows.map(getTemp).filter(v => v !== null);
+        const hums = rows.map(getHumidity).filter(v => v !== null);
+        const rains = rows.map(getRain).filter(v => v !== null);
+        const winds = rows.map(getWind).filter(v => v !== null);
 
         if (!temps.length) throw new Error("Sense temperatures");
 
@@ -141,23 +167,20 @@
 
         let text = `Avui a El Masnou s’espera una temperatura màxima d’uns ${maxT.toFixed(0)} °C i una mínima d’uns ${minT.toFixed(0)} °C.`;
 
-        if (avgHum !== null) {
-          text += " " + classifyHumidity(avgHum);
-        }
-
+        if (avgHum !== null) text += " " + classifyHumidity(avgHum);
         text += " " + classifyRain(totalRain);
         text += " " + classifyWind(maxWind);
 
         document.getElementById("forecastText").textContent = text;
         document.getElementById("forecastText").classList.remove("loading");
         document.getElementById("meta").textContent =
-          `Dades actualitzades: ${formatTime(j?.updated_at)} · Basat en la previsió horària d’avui.`;
+          `Dades actualitzades: ${formatTime(j?.updated_at || j?.generated_at_utc)} · Basat en la previsió horària d’avui.`;
       })
-      .catch(() => {
+      .catch((err) => {
         document.getElementById("forecastText").textContent =
           "No s’ha pogut carregar la previsió textual en aquest moment.";
         document.getElementById("forecastText").classList.remove("loading");
-        document.getElementById("meta").textContent = "Torna-ho a provar d’aquí uns minuts.";
+        document.getElementById("meta").textContent = `Torna-ho a provar d’aquí uns minuts. (${err?.message || 'error'})`;
       });
 
     setTimeout(() => location.reload(), 300000);
