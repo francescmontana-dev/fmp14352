@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Previsió textual — El Masnou</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+    }
+    body{
+      margin:0;
+      padding:8px;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f8fafc;
+      color:var(--text);
+    }
+    .card{
+      max-width:760px;
+      margin:0 auto;
+      background:var(--bg);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px 18px;
+      box-shadow:0 8px 24px rgba(15,23,42,.06);
+    }
+    .title{
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 8px 0;
+    }
+    .text{
+      font-size:16px;
+      line-height:1.5;
+      color:#1e293b;
+      margin:0;
+    }
+    .meta{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .loading{
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">Previsió per avui · El Masnou</div>
+    <p id="forecastText" class="text loading">Carregant previsió...</p>
+    <div id="meta" class="meta">Actualitzant dades…</div>
+  </div>
+
+  <script>
+    const FORECAST_URL = "model/forecast.json?t=" + Date.now();
+
+    function formatTime(s) {
+      if (!s) return "--";
+      const d = new Date(s);
+      if (isNaN(d)) return s;
+      return d.toLocaleString("ca-ES", {
+        timeZone: "Europe/Madrid",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function localDateParts(iso) {
+      const d = new Date(iso);
+      if (isNaN(d)) return null;
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Madrid",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }).formatToParts(d);
+      const get = t => parts.find(p => p.type === t)?.value;
+      return {
+        ymd: `${get("year")}-${get("month")}-${get("day")}`,
+        hour: Number(get("hour"))
+      };
+    }
+
+    function classifyRain(total) {
+      if (total < 0.1) return "No s’esperen precipitacions.";
+      if (total < 2) return "No es descarta alguna precipitació feble.";
+      return "Es preveuen precipitacions al llarg del dia.";
+    }
+
+    function classifyHumidity(avg) {
+      if (avg >= 80) return `Ambient molt humit, amb una humitat al voltant del ${Math.round(avg)} %.`;
+      if (avg >= 65) return `Ambient humit, amb una humitat al voltant del ${Math.round(avg)} %.`;
+      if (avg >= 45) return `Humitat moderada, al voltant del ${Math.round(avg)} %.`;
+      return `Ambient més aviat sec, amb una humitat al voltant del ${Math.round(avg)} %.`;
+    }
+
+    function classifyWind(maxWind) {
+      if (maxWind >= 30) return `Vent fort, amb valors previstos al voltant dels ${Math.round(maxWind)} km/h.`;
+      if (maxWind >= 18) return `Vent moderat, amb valors que poden arribar als ${Math.round(maxWind)} km/h.`;
+      if (maxWind >= 8) return `Vent fluix a moderat, amb valors màxims propers als ${Math.round(maxWind)} km/h.`;
+      return `Vent fluix durant la jornada.`;
+    }
+
+    fetch(FORECAST_URL)
+      .then(r => r.json())
+      .then(j => {
+        const hourly = Array.isArray(j?.hourly) ? j.hourly : [];
+        if (!hourly.length) throw new Error("Sense hourly");
+
+        const nowParts = localDateParts(new Date().toISOString());
+        if (!nowParts) throw new Error("Sense data local");
+
+        const todayRows = hourly.filter(row => {
+          const p = localDateParts(row.t || row.time);
+          return p && p.ymd === nowParts.ymd;
+        });
+
+        const rows = todayRows.length ? todayRows : hourly.slice(0, 24);
+
+        const temps = rows.map(r => Number(r.temp)).filter(Number.isFinite);
+        const hums = rows.map(r => Number(r.rh)).filter(Number.isFinite);
+        const rains = rows.map(r => Number(r.rain_mm)).filter(Number.isFinite);
+        const winds = rows.map(r => Number(r.wind_kmh)).filter(Number.isFinite);
+
+        if (!temps.length) throw new Error("Sense temperatures");
+
+        const maxT = Math.max(...temps);
+        const minT = Math.min(...temps);
+        const avgHum = hums.length ? hums.reduce((a,b)=>a+b,0) / hums.length : null;
+        const totalRain = rains.length ? rains.reduce((a,b)=>a+b,0) : 0;
+        const maxWind = winds.length ? Math.max(...winds) : 0;
+
+        let text = `Avui a El Masnou s’espera una temperatura màxima d’uns ${maxT.toFixed(0)} °C i una mínima d’uns ${minT.toFixed(0)} °C.`;
+
+        if (avgHum !== null) {
+          text += " " + classifyHumidity(avgHum);
+        }
+
+        text += " " + classifyRain(totalRain);
+        text += " " + classifyWind(maxWind);
+
+        document.getElementById("forecastText").textContent = text;
+        document.getElementById("forecastText").classList.remove("loading");
+        document.getElementById("meta").textContent =
+          `Dades actualitzades: ${formatTime(j?.updated_at)} · Basat en la previsió horària d’avui.`;
+      })
+      .catch(() => {
+        document.getElementById("forecastText").textContent =
+          "No s’ha pogut carregar la previsió textual en aquest moment.";
+        document.getElementById("forecastText").classList.remove("loading");
+        document.getElementById("meta").textContent = "Torna-ho a provar d’aquí uns minuts.";
+      });
+
+    setTimeout(() => location.reload(), 300000);
+  </script>
+</body>
+</html>
