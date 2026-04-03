@@ -1,8 +1,8 @@
 {
   "zona": "Maresme central",
-  "data": "03/04/2026 11:04",
-  "indexTotal": 49,
-  "risc": "moderat",
+  "data": "03/04/2026 11:34",
+  "indexTotal": 50,
+  "risc": "alt",
   "dominant": {
     "nom": "Parietària",
     "text": "Predomini de parietària segons condicions locals."
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 72
+      "valor": 79
     },
     {
       "nom": "Pi",
@@ -38,13 +38,13 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 49,
-      "risc": "moderat"
+      "index": 50,
+      "risc": "alt"
     },
     {
       "dia": "Demà passat",
-      "index": 49,
-      "risc": "moderat"
+      "index": 50,
+      "risc": "alt"
     }
   ]
 }
