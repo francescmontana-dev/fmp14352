@@ -1,50 +1,50 @@
 {
   "zona": "Maresme central",
-  "data": "04/04/2026 09:34",
-  "indexTotal": 32,
+  "data": "04/04/2026 10:04",
+  "indexTotal": 35,
   "risc": "moderat",
   "dominant": {
-    "nom": "Parietària",
-    "text": "Predomini de parietària segons condicions locals."
+    "nom": "Pi",
+    "text": "Predomini de pi segons condicions locals."
   },
   "comentari": "Model automàtic basat en meteorologia local i temporada.",
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 42
+      "valor": 47
     },
     {
       "nom": "Cupressàcies",
-      "valor": 21
+      "valor": 23
     },
     {
       "nom": "Parietària",
-      "valor": 49
+      "valor": 47
     },
     {
       "nom": "Pi",
-      "valor": 42
+      "valor": 51
     },
     {
       "nom": "Gramínies",
-      "valor": 28
+      "valor": 31
     },
     {
       "nom": "Olivera",
-      "valor": 14
+      "valor": 15
     }
   ],
   "historic": [],
   "previsio": [
     {
       "dia": "Demà",
-      "index": 26,
+      "index": 35,
       "risc": "moderat"
     },
     {
       "dia": "Demà passat",
-      "index": 23,
-      "risc": "baix"
+      "index": 35,
+      "risc": "moderat"
     }
   ]
 }
