@@ -1,8 +1,8 @@
 {
   "zona": "Maresme central",
-  "data": "04/04/2026 08:04",
-  "indexTotal": 23,
-  "risc": "baix",
+  "data": "04/04/2026 08:34",
+  "indexTotal": 28,
+  "risc": "moderat",
   "dominant": {
     "nom": "Plàtan",
     "text": "Predomini de plàtan segons condicions locals."
@@ -11,39 +11,39 @@
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 32
+      "valor": 38
     },
     {
       "nom": "Cupressàcies",
-      "valor": 16
+      "valor": 19
     },
     {
       "nom": "Parietària",
-      "valor": 32
+      "valor": 38
     },
     {
       "nom": "Pi",
-      "valor": 32
+      "valor": 38
     },
     {
       "nom": "Gramínies",
-      "valor": 21
+      "valor": 25
     },
     {
       "nom": "Olivera",
-      "valor": 10
+      "valor": 12
     }
   ],
   "historic": [],
   "previsio": [
     {
       "dia": "Demà",
-      "index": 17,
+      "index": 22,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 14,
+      "index": 19,
       "risc": "baix"
     }
   ]
