@@ -1,8 +1,8 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-04-05T05:23:12.012258+00:00",
+  "generated_at_utc": "2026-04-05T05:33:12.027745+00:00",
   "source_file": "C:\\CumulusMX\\web\\realtimegauges.txt",
-  "observation_time_utc": "2026,4,5,5,22,42",
+  "observation_time_utc": "2026,4,5,5,32,42",
   "forecast_text": "Settled fine",
   "sensor_contact_lost": 0,
   "temperature_c": 12.6,
@@ -11,7 +11,7 @@
   "feels_like_c": 12.6,
   "humidity_pct": 70,
   "pressure_hpa": 1024.2,
-  "pressure_trend_hpa": 0.2,
+  "pressure_trend_hpa": 0.1,
   "rain_today_mm": 0.0,
   "rain_rate_mm_h": 0.0,
   "last_rain_tip_iso": "2026-04-03 19:36",
@@ -24,7 +24,7 @@
   "dominant_wind_dir": "SW",
   "wind_run_km": 51.7,
   "uv_index": 0.0,
-  "solar_radiation_w_m2": 1.0,
+  "solar_radiation_w_m2": 5.0,
   "cloudbase_ft": 2168.0,
   "units": {
     "temperature": "C",
