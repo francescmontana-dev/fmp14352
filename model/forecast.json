@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-04-07T21:43:12.491516+00:00",
+  "generated_at_utc": "2026-04-07T21:53:12.529046+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1178,7 +1178,7 @@
     },
     {
       "time": "2026-04-12T10:00",
-      "temperature_c": 13.3,
+      "temperature_c": 12.6,
       "humidity_pct": 78,
       "precipitation_mm": 1.82,
       "pressure_hpa": 1008.5,
@@ -1187,7 +1187,7 @@
     },
     {
       "time": "2026-04-12T11:00",
-      "temperature_c": 13.2,
+      "temperature_c": 12.0,
       "humidity_pct": 76,
       "precipitation_mm": 1.75,
       "pressure_hpa": 1007.7,
@@ -1196,7 +1196,7 @@
     },
     {
       "time": "2026-04-12T12:00",
-      "temperature_c": 13.1,
+      "temperature_c": 11.5,
       "humidity_pct": 75,
       "precipitation_mm": 1.68,
       "pressure_hpa": 1006.8,
@@ -1205,7 +1205,7 @@
     },
     {
       "time": "2026-04-12T13:00",
-      "temperature_c": 13.3,
+      "temperature_c": 11.4,
       "humidity_pct": 73,
       "precipitation_mm": 0.9,
       "pressure_hpa": 1005.7,
@@ -1214,7 +1214,7 @@
     },
     {
       "time": "2026-04-12T14:00",
-      "temperature_c": 13.7,
+      "temperature_c": 11.9,
       "humidity_pct": 72,
       "precipitation_mm": 0.9,
       "pressure_hpa": 1005.8,
@@ -1223,7 +1223,7 @@
     },
     {
       "time": "2026-04-12T15:00",
-      "temperature_c": 13.8,
+      "temperature_c": 12.2,
       "humidity_pct": 73,
       "precipitation_mm": 0.9,
       "pressure_hpa": 1006.0,
@@ -1232,7 +1232,7 @@
     },
     {
       "time": "2026-04-12T16:00",
-      "temperature_c": 13.4,
+      "temperature_c": 11.9,
       "humidity_pct": 76,
       "precipitation_mm": 0.1,
       "pressure_hpa": 1006.6,
@@ -1241,7 +1241,7 @@
     },
     {
       "time": "2026-04-12T17:00",
-      "temperature_c": 12.8,
+      "temperature_c": 11.3,
       "humidity_pct": 81,
       "precipitation_mm": 0.1,
       "pressure_hpa": 1007.3,
@@ -1250,7 +1250,7 @@
     },
     {
       "time": "2026-04-12T18:00",
-      "temperature_c": 12.2,
+      "temperature_c": 10.9,
       "humidity_pct": 84,
       "precipitation_mm": 0.1,
       "pressure_hpa": 1007.9,
