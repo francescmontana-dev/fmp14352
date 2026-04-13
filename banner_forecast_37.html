@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banner previsió — El Masnou</title>
+  <style>
+    body{
+      margin:0;
+      padding:12px;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f4f7fb;
+      color:#1f2937;
+    }
+
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
+    }
+
+    .banner{
+      background:linear-gradient(135deg,#0f172a 0%, #1d4ed8 100%);
+      color:#fff;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 8px 24px rgba(0,0,0,.14);
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .title{
+      font-size:22px;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .subtitle{
+      font-size:13px;
+      opacity:.9;
+    }
+
+    .status{
+      font-size:13px;
+      opacity:.92;
+      text-align:right;
+    }
+
+    .main{
+      display:grid;
+      grid-template-columns:1.2fr 1fr;
+      gap:14px;
+    }
+
+    .left, .right{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;
+      padding:14px;
+      backdrop-filter:blur(3px);
+    }
+
+    .temp{
+      font-size:38px;
+      font-weight:800;
+      line-height:1;
+      margin-bottom:8px;
+    }
+
+    .line{
+      font-size:14px;
+      margin:6px 0;
+      opacity:.98;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .mini{
+      background:rgba(255,255,255,.10);
+      border-radius:12px;
+      padding:10px;
+    }
+
+    .mini-k{
+      font-size:12px;
+      opacity:.88;
+      margin-bottom:4px;
+    }
+
+    .mini-v{
+      font-size:18px;
+      font-weight:700;
+    }
+
+    .buttons{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      padding:11px 14px;
+      border-radius:12px;
+      font-weight:700;
+      font-size:14px;
+      transition:.2s ease;
+    }
+
+    .btn-primary{
+      background:#fff;
+      color:#0f172a;
+    }
+
+    .btn-secondary{
+      background:rgba(255,255,255,.14);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .pill{
+      display:inline-block;
+      padding:4px 9px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      font-size:12px;
+      font-weight:700;
+      margin-top:6px;
+    }
+
+    @media (max-width: 760px){
+      .main{
+        grid-template-columns:1fr;
+      }
+
+      .status{
+        text-align:left;
+      }
+
+      .temp{
+        font-size:34px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="banner">
+    <div class="top">
+      <div>
+        <div class="title">🌤️ El Masnou — previsió ràpida</div>
+        <div class="subtitle">Resum actual + accés a la previsió interior</div>
+      </div>
+      <div class="status" id="metaLine">Carregant dades…</div>
+    </div>
+
+    <div class="main">
+      <div class="left">
+        <div class="temp" id="obsTemp">-- °C</div>
+        <div class="line" id="obsHum">Humitat: -- %</div>
+        <div class="line" id="obsWind">Vent: -- km/h</div>
+        <div class="line" id="obsRain">Pluja dia: -- mm</div>
+        <div class="pill" id="headlineRain">Pluja properes hores: --</div>
+      </div>
+
+      <div class="right">
+        <div class="mini-grid">
+          <div class="mini">
+            <div class="mini-k">Previsió ara</div>
+            <div class="mini-v" id="prevTemp">-- °C</div>
+          </div>
+
+          <div class="mini">
+            <div class="mini-k">Vent 6 h</div>
+            <div class="mini-v" id="wind6">--</div>
+          </div>
+
+          <div class="mini">
+            <div class="mini-k">Mínima prevista</div>
+            <div class="mini-v" id="headlineMin">--</div>
+          </div>
+
+          <div class="mini">
+            <div class="mini-k">Màxima prevista</div>
+            <div class="mini-v" id="headlineMax">--</div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <a class="btn btn-primary" href="https://francescmontana-dev.github.io/fmp14352/dashboard37_6_forecast.html" target="_blank" rel="noopener noreferrer">
+            Veure previsió completa
+          </a>
+
+          <a class="btn btn-secondary" href="https://francescmontana-dev.github.io/fmp14352/dashboard37_6_forecast.html#taula" target="_blank" rel="noopener noreferrer">
+            Taules i gràfiques
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
+const FORECAST_HOURS = 72;
+let lastForecastData = null;
+
+function loadJSONP(url) {
+  const s = document.createElement("script");
+  s.src = url + "&_=" + Date.now();
+  s.async = true;
+  document.body.appendChild(s);
+}
+
+function setText(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+
+function asNumber(v, fallback = null) {
+  if (v === null || v === undefined || v === "") return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function parseUtcForecastTime(s) {
+  if (!s) return null;
+  const d1 = new Date(s);
+  if (!isNaN(d1)) return d1;
+  const d2 = new Date(s + "Z");
+  return isNaN(d2) ? null : d2;
+}
+
+function getRowTime(row) {
+  return row?.t || null;
+}
+
+function getRowTemp(row) {
+  return asNumber(row?.temp, null);
+}
+
+function getRowWind(row) {
+  return asNumber(row?.wind_kmh, null);
+}
+
+function getRowRain(row) {
+  return asNumber(row?.rain_mm, null);
+}
+
+function formatLocalDateTimeShort(iso) {
+  const dt = parseUtcForecastTime(iso);
+  if (!dt) return "--";
+  return dt.toLocaleString("ca-ES", {
+    timeZone: "Europe/Madrid",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function updateHeadlines(rows) {
+  if (!rows || !rows.length) {
+    setText("headlineRain", "Pluja properes hores: --");
+    setText("headlineMin", "--");
+    setText("headlineMax", "--");
+    return;
+  }
+
+  const rainRow = rows.find(r => (getRowRain(r) ?? 0) >= 0.1);
+  if (rainRow) {
+    setText("headlineRain", `Pluja properes hores: ${getRowRain(rainRow)} mm · ${formatLocalDateTimeShort(getRowTime(rainRow))}`);
+  } else {
+    setText("headlineRain", "Pluja properes hores: no es veu pluja");
+  }
+
+  let minTemp = Infinity;
+  let minRow = null;
+  let maxTemp = -Infinity;
+  let maxRow = null;
+
+  rows.forEach(r => {
+    const t = getRowTemp(r);
+    if (t === null) return;
+    if (t < minTemp) {
+      minTemp = t;
+      minRow = r;
+    }
+    if (t > maxTemp) {
+      maxTemp = t;
+      maxRow = r;
+    }
+  });
+
+  setText("headlineMin", minRow ? `${minTemp.toFixed(1)} °C` : "--");
+  setText("headlineMax", maxRow ? `${maxTemp.toFixed(1)} °C` : "--");
+}
+
+function cbCurrent(data) {
+  if (!data || !data.ok) return;
+
+  const obs = data.obs || {};
+  const now = data.prev_now || {};
+  const der = data.derived || {};
+  const updatedAt = data?.source?.forecast_updated_at || null;
+
+  let meta = "Dades carregades";
+  if (updatedAt) {
+    const d = new Date(updatedAt);
+    if (!isNaN(d)) {
+      meta = "Actualitzat " + d.toLocaleString("ca-ES", {
+        timeZone: "Europe/Madrid"
+      });
+    }
+  }
+
+  setText("metaLine", meta);
+  setText("obsTemp", `${obs.temp ?? "--"} °C`);
+  setText("obsHum", `Humitat: ${obs.rh ?? "--"} %`);
+  setText("obsWind", `Vent: ${obs.wind_kmh ?? "--"} km/h`);
+  setText("obsRain", `Pluja dia: ${obs.rain_day_mm ?? "--"} mm`);
+  setText("prevTemp", `${now.temp ?? "--"} °C`);
+  setText("wind6", `${der.wind6_max_kmh ?? "--"} km/h`);
+}
+
+function cbForecast(data) {
+  if (!data || !data.ok || !Array.isArray(data.hourly)) return;
+
+  lastForecastData = data;
+  const rows = data.hourly.slice(0, FORECAST_HOURS);
+  updateHeadlines(rows);
+}
+
+loadJSONP(API + "?out=current&callback=cbCurrent");
+loadJSONP(API + "?out=forecast&callback=cbForecast");
+</script>
+</body>
+</html>
