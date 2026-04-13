@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Previsió — El Masnou</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  font-family:Arial;
+  background:#f4f7fb;
+  margin:0;
+  padding:20px;
+}
+
+.wrap{max-width:1100px;margin:auto;}
+
+h1{margin-bottom:6px;}
+.meta{color:#666;margin-bottom:15px;font-size:13px;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.card{
+  background:#fff;
+  padding:14px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.big{font-size:28px;font-weight:bold;}
+
+.chart-wrap{
+  background:#fff;
+  padding:10px;
+  border-radius:12px;
+  height:300px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+  margin-top:15px;
+}
+
+th,td{
+  padding:8px;
+  border-bottom:1px solid #eee;
+  font-size:13px;
+  text-align:center;
+}
+
+th{background:#f0f3f7;}
+
+.rain{background:#eef7ff;}
+.wind{background:#fff5ec;}
+.mix{background:#f5efff;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>Previsió — El Masnou</h1>
+<div class="meta" id="meta">Carregant…</div>
+
+<div class="grid">
+
+<div class="card">
+  <div class="big" id="obsTemp">-- °C</div>
+  <div id="obsHum">Humitat --</div>
+  <div id="obsWind">Vent --</div>
+  <div id="obsRain">Pluja dia --</div>
+</div>
+
+<div class="card">
+  <div class="big" id="prevTemp">-- °C</div>
+  <div id="prevWind">Vent --</div>
+  <div id="rain3h">Pluja 3h --</div>
+  <div id="wind6">Vent màx 6h --</div>
+</div>
+
+<div class="card">
+  <b>Resum pròxims dies</b>
+  <div id="summary">--</div>
+</div>
+
+</div>
+
+<div class="chart-wrap">
+<canvas id="chart"></canvas>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Hora</th>
+<th>Temp</th>
+<th>Hum</th>
+<th>Vent</th>
+<th>Pluja</th>
+<th>Temps</th>
+</tr>
+</thead>
+<tbody id="table">
+<tr><td colspan="6">Carregant…</td></tr>
+</tbody>
+</table>
+
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
+
+function load(url){
+  const s=document.createElement("script");
+  s.src=url+"&callback="+url.split("=").pop();
+  document.body.appendChild(s);
+}
+
+function cbCurrent(d){
+ if(!d.ok)return;
+
+ const o=d.obs||{};
+ const n=d.prev_now||{};
+ const der=d.derived||{};
+
+ document.getElementById("obsTemp").textContent=o.temp+" °C";
+ document.getElementById("obsHum").textContent="Humitat "+o.rh+"%";
+ document.getElementById("obsWind").textContent="Vent "+o.wind_kmh+" km/h";
+ document.getElementById("obsRain").textContent="Pluja "+o.rain_day_mm+" mm";
+
+ document.getElementById("prevTemp").textContent=n.temp+" °C";
+ document.getElementById("prevWind").textContent="Vent "+n.wind_kmh+" km/h";
+ document.getElementById("rain3h").textContent="Pluja 3h "+der.rain_3h_mm+" mm";
+ document.getElementById("wind6").textContent="Vent 6h "+der.wind6_max_kmh+" km/h";
+
+ document.getElementById("meta").textContent="Actualitzat";
+}
+
+function icon(s){
+ s=(s||"").toLowerCase();
+ if(s.includes("rain"))return "🌧️";
+ if(s.includes("cloud"))return "☁️";
+ if(s.includes("clear"))return "☀️";
+ return "•";
+}
+
+let chart=null;
+
+function cbForecast(d){
+ if(!d.ok)return;
+
+ const rows=d.hourly.slice(0,48);
+
+ let html="";
+ let temps=[],rain=[],labels=[];
+
+ rows.forEach(r=>{
+   const t=new Date(r.t).toLocaleTimeString("ca",{hour:"2-digit",minute:"2-digit"});
+   labels.push(t);
+   temps.push(r.temp);
+   rain.push(r.rain_mm);
+
+   let cls="";
+   if(r.rain_mm>0.5 && r.wind_kmh>25)cls="mix";
+   else if(r.rain_mm>0.2)cls="rain";
+   else if(r.wind_kmh>20)cls="wind";
+
+   html+=`
+   <tr class="${cls}">
+   <td>${t}</td>
+   <td>${r.temp}</td>
+   <td>${r.rh}</td>
+   <td>${r.wind_kmh}</td>
+   <td>${r.rain_mm}</td>
+   <td>${icon(r.symbol)}</td>
+   </tr>`;
+ });
+
+ document.getElementById("table").innerHTML=html;
+
+ const ctx=document.getElementById("chart").getContext("2d");
+ if(chart)chart.destroy();
+
+ chart=new Chart(ctx,{
+  type:"line",
+  data:{
+    labels:labels,
+    datasets:[
+      {label:"Temp",data:temps},
+      {label:"Pluja",data:rain,type:"bar"}
+    ]
+  }
+ });
+
+ // resum simple
+ let tmin=Math.min(...temps);
+ let tmax=Math.max(...temps);
+ let rainTot=rain.reduce((a,b)=>a+b,0);
+
+ document.getElementById("summary").innerHTML=
+  `Max ${tmax}° / Min ${tmin}°<br>Pluja ${rainTot.toFixed(1)} mm`;
+}
+
+load(API+"?out=current&callback=cbCurrent");
+load(API+"?out=forecast&callback=cbForecast");
+</script>
+
+</body>
+</html>
