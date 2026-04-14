@@ -1,10 +1,10 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-04-14T19:03:12.828001+00:00",
+  "generated_at_utc": "2026-04-14T19:13:12.802554+00:00",
   "matched_model_time": "2026-04-14T19:00",
-  "observed_time_utc": "2026,4,14,19,2,53",
+  "observed_time_utc": "2026,4,14,19,12,53",
   "real": {
-    "temperature_c": 14.7,
+    "temperature_c": 14.6,
     "humidity_pct": 79,
     "pressure_hpa": 1019.4,
     "wind_speed_kmh": 1.0,
@@ -19,7 +19,7 @@
     "wind_speed_kmh": 4.3
   },
   "deviation": {
-    "temperature_c": 0.6,
+    "temperature_c": 0.5,
     "humidity_pct": -8,
     "pressure_hpa": 1.8,
     "wind_speed_kmh": -3.3
