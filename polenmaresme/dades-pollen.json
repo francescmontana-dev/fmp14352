@@ -1,11 +1,11 @@
 {
   "zona": "Maresme central",
-  "data": "15/04/2026 23:34",
-  "indexTotal": 32,
+  "data": "16/04/2026 00:04",
+  "indexTotal": 33,
   "risc": "moderat",
   "dominant": {
-    "nom": "Plàtan",
-    "text": "Predomini de plàtan segons condicions locals."
+    "nom": "Parietària",
+    "text": "Predomini de parietària segons condicions locals."
   },
   "comentari": "Model automàtic basat en meteorologia local i temporada.",
   "tipus": [
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 43
+      "valor": 50
     },
     {
       "nom": "Pi",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 32,
+      "index": 33,
       "risc": "moderat"
     },
     {
       "dia": "Demà passat",
-      "index": 32,
+      "index": 33,
       "risc": "moderat"
     }
   ]
