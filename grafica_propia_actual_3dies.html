@@ -46,6 +46,7 @@ let modelTempCorrection = 0;
 let learningBias = { h6:0, h12:0, h24:0 };
 let learningSamples = { h6:0, h12:0, h24:0 };
 window.modelObservedTimeUtc = null;
+window.obsCurrentTemp = null;
 
 function loadJSONP(url){
   const s = document.createElement("script");
@@ -65,7 +66,18 @@ function parseUtc(s){
 }
 
 function getBaseTime(){
-  return new Date();
+  const d = parseObservedUtc(window.modelObservedTimeUtc);
+  return d || new Date();
+}
+
+function parseObservedUtc(s) {
+  if (!s) return null;
+  try {
+    const p = s.split(",").map(Number);
+    return new Date(Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]));
+  } catch (e) {
+    return null;
+  }
 }
 
 function getRowTemp(r){ return asNumber(r.temp); }
@@ -85,7 +97,6 @@ function getLocalAdjustment(row){
   if(h===null) return 0;
 
   const wind = getRowWind(row) ?? 0;
-
   let a = 0;
 
   if(h>=20 && h<22) a=0.4;
@@ -157,6 +168,12 @@ function ownTemp(row, base){
 
 /* ===== DADES ===== */
 
+function cbCurrent(data){
+  if(!data || !data.ok) return;
+  const obs = data.obs || {};
+  window.obsCurrentTemp = asNumber(obs.temp);
+}
+
 function cbForecast(data){
   if(!data || !data.ok) return;
 
@@ -170,9 +187,7 @@ function cbForecast(data){
     return d ? d.toLocaleString("ca-ES",{day:"2-digit",hour:"2-digit",timeZone:"Europe/Madrid"}) : "--";
   });
 
-  const model = rows.map(r=>getRowTemp(r));
   const own = rows.map(r=>ownTemp(r,base));
-  const rain = rows.map(r=>getRowRain(r));
 
   const ctx = document.getElementById("chart").getContext("2d");
 
@@ -184,14 +199,6 @@ function cbForecast(data){
       labels,
       datasets:[
         {
-          label:"Model",
-          data:model,
-          borderColor:"rgba(100,100,255,0.5)",
-          borderWidth:1.5,
-          tension:0.25,
-          pointRadius:0
-        },
-        {
           label:"Pròpia",
           data:own,
           borderColor:"rgba(255,120,0,1)",
@@ -201,19 +208,29 @@ function cbForecast(data){
           pointRadius:0
         },
         {
-          label:"Pluja",
-          data:rain,
-          type:"bar",
-          yAxisID:"y1"
+          label:"Temperatura actual",
+          data:labels.map((_,i)=>{
+            if(!Number.isFinite(window.obsCurrentTemp)) return null;
+            return i===0 ? window.obsCurrentTemp : null;
+          }),
+          borderColor:"black",
+          pointBackgroundColor:"black",
+          pointBorderColor:"black",
+          type:"line",
+          showLine:false,
+          pointRadius:6,
+          pointHoverRadius:7
         }
       ]
     },
     options:{
       responsive:true,
       interaction:{mode:"index",intersect:false},
+      plugins:{
+        legend:{position:"top"}
+      },
       scales:{
-        y:{position:"left"},
-        y1:{position:"right",grid:{drawOnChartArea:false}}
+        y:{position:"left"}
       }
     }
   });
@@ -231,10 +248,15 @@ function cbModel(data){
     learningBias = data.learning.bias_temperature_c || learningBias;
     learningSamples = data.learning.samples || learningSamples;
   }
+
+  if(lastForecastData && Array.isArray(lastForecastData.hourly)){
+    cbForecast(lastForecastData);
+  }
 }
 
 /* ===== LOAD ===== */
 
+loadJSONP(API+"?out=current&callback=cbCurrent");
 loadJSONP(API+"?out=forecast&callback=cbForecast");
 loadJSONP(API+"?out=model&callback=cbModel");
 
