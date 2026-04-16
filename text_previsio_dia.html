@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Text previsió del dia — El Masnou NE</title>
+  <style>
+    body{
+      margin:0;
+      padding:10px;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f4f7fb;
+      color:#1f2937;
+    }
+
+    .wrap{
+      max-width:760px;
+      margin:0 auto;
+    }
+
+    .box{
+      background:#ffffff;
+      border-radius:14px;
+      padding:16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      border-left:4px solid #2563eb;
+    }
+
+    .title{
+      font-size:18px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .meta{
+      font-size:12px;
+      color:#6b7280;
+      margin-bottom:10px;
+    }
+
+    .text{
+      font-size:15px;
+      line-height:1.6;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="box">
+    <div class="title">Predicció del dia — El Masnou NE</div>
+    <div class="meta" id="metaLine">Carregant dades…</div>
+    <div class="text" id="forecastText">Carregant text de previsió…</div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
+
+let lastForecastData = null;
+let modelTempCorrection = 0;
+let learningBias = { h6: 0, h12: 0, h24: 0 };
+let learningSamples = { h6: 0, h12: 0, h24: 0 };
+window.modelObservedTimeUtc = null;
+window.currentObs = null;
+
+function loadJSONP(url) {
+  const s = document.createElement("script");
+  s.src = url + "&_=" + Date.now();
+  s.async = true;
+  document.body.appendChild(s);
+}
+
+function setText(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+
+function asNumber(v, fallback = null) {
+  if (v === null || v === undefined || v === "") return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function parseUtcForecastTime(s) {
+  if (!s) return null;
+  const d1 = new Date(s);
+  if (!isNaN(d1)) return d1;
+  const d2 = new Date(s + "Z");
+  return isNaN(d2) ? null : d2;
+}
+
+function parseObservedUtc(s) {
+  if (!s) return null;
+  try {
+    const p = s.split(",").map(Number);
+    return new Date(Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]));
+  } catch (e) {
+    return null;
+  }
+}
+
+function getBaseTime() {
+  let baseTime = parseObservedUtc(window.modelObservedTimeUtc);
+  if (!baseTime) baseTime = new Date();
+  return baseTime;
+}
+
+function getRowTime(row) {
+  return row?.t || row?.time || row?.datetime || null;
+}
+
+function getRowTemp(row) {
+  return asNumber(row?.temp ?? row?.temperature_c ?? row?.temperature ?? null, null);
+}
+
+function getRowWind(row) {
+  return asNumber(row?.wind_kmh ?? row?.wind_speed_kmh ?? row?.wind ?? null, null);
+}
+
+function getRowRain(row) {
+  return asNumber(row?.rain_mm ?? row?.precipitation_mm ?? row?.precipitation ?? null, null);
+}
+
+function getLocalHourFromRow(row) {
+  const dt = parseUtcForecastTime(getRowTime(row));
+  if (!dt) return null;
+  return Number(dt.toLocaleString("ca-ES", {
+    hour: "2-digit",
+    hour12: false,
+    timeZone: "Europe/Madrid"
+  }));
+}
+
+function getHorizonBias(h) {
+  let bias = 0;
+
+  if (h === 6 && (learningSamples.h6 ?? 0) >= 8) {
+    bias = Math.max(-1.0, Math.min(1.0, learningBias.h6 ?? 0));
+  } else if (h === 12 && (learningSamples.h12 ?? 0) >= 8) {
+    bias = Math.max(-1.0, Math.min(1.0, learningBias.h12 ?? 0));
+  } else if (h === 24 && (learningSamples.h24 ?? 0) >= 8) {
+    bias = Math.max(-1.0, Math.min(1.0, learningBias.h24 ?? 0));
+  }
+
+  return bias;
+}
+
+function getCurrentCorrection(h) {
+  if (h <= 6) return modelTempCorrection * 0.15;
+  if (h <= 12) return modelTempCorrection * 0.08;
+  if (h <= 24) return modelTempCorrection * 0.05;
+  if (h <= 48) return modelTempCorrection * 0.03;
+  if (h <= 72) return modelTempCorrection * 0.02;
+  return 0;
+}
+
+function getLocalAdjustmentForRow(row) {
+  const hourLocal = getLocalHourFromRow(row);
+  if (hourLocal === null || Number.isNaN(hourLocal)) return 0;
+
+  const wind = getRowWind(row);
+
+  if (hourLocal >= 22 || hourLocal <= 6) {
+    if (wind !== null && wind > 10) return 0.5;
+    if (wind !== null && wind < 3) return 2.0;
+    return 1.2;
+  }
+
+  if (hourLocal <= 9) return 0.8;
+  return 0.0;
+}
+
+function getMarineCorrection(row) {
+  const hourLocal = getLocalHourFromRow(row);
+  if (hourLocal === null || Number.isNaN(hourLocal)) return 0;
+
+  const rh = asNumber(row?.rh, 0) ?? 0;
+  const wind = asNumber(row?.wind_kmh ?? row?.wind_speed_kmh, 0) ?? 0;
+  const dir = asNumber(row?.wdir_deg, null);
+
+  let marine = 0;
+
+  if (hourLocal >= 22 || hourLocal <= 6) marine = 2.0;
+  else if (hourLocal <= 9) marine = 1.0;
+
+  if (rh >= 80) marine += 1.0;
+  else if (rh >= 70) marine += 0.5;
+
+  if (wind < 5) marine += 0.5;
+  if (dir !== null && dir >= 45 && dir <= 135) marine += 0.5;
+
+  return marine;
+}
+
+function computeOwnTempForHorizon(row, h) {
+  const t = getRowTemp(row);
+  if (t === null) return null;
+
+  let biasH = 24;
+  if (h <= 6) biasH = 6;
+  else if (h <= 12) biasH = 12;
+
+  const bias = getHorizonBias(biasH);
+  const currentCorrection = getCurrentCorrection(h);
+  const localAdjust = getLocalAdjustmentForRow(row);
+  const marineCorrection = getMarineCorrection(row);
+
+  return t + currentCorrection + bias + localAdjust + marineCorrection;
+}
+
+function computeOwnTempForRow(row, index, baseTime) {
+  const dt = parseUtcForecastTime(getRowTime(row));
+  const t = getRowTemp(row);
+  if (!dt || t === null) return null;
+
+  const horizonHours = Math.max(0, (dt - baseTime) / 3600000);
+  return computeOwnTempForHorizon(row, horizonHours);
+}
+
+function weatherLabel(symbol) {
+  const s = String(symbol || "").toLowerCase();
+
+  if (!s) return "variable";
+  if (s.includes("thunder")) return "tempestuós";
+  if (s.includes("heavyrain")) return "de pluja intensa";
+  if (s.includes("rainshowers")) return "de ruixats";
+  if (s.includes("rain")) return "de pluja";
+  if (s.includes("lightsnow")) return "de neu feble";
+  if (s.includes("snow")) return "de neu";
+  if (s.includes("sleet")) return "d'aiguaneu";
+  if (s.includes("fog")) return "emboirat";
+  if (s.includes("partlycloudy")) return "amb intervals de núvols";
+  if (s.includes("cloudy")) return "ennuvolat";
+  if (s.includes("fair_night")) return "serè";
+  if (s.includes("fair_day")) return "de poc núvol";
+  if (s.includes("fair")) return "de poc núvol";
+  if (s.includes("clearsky_night")) return "serè";
+  if (s.includes("clearsky_day")) return "assolellat";
+  if (s.includes("clearsky")) return "assolellat";
+  return "variable";
+}
+
+function groupTodayRows(rows) {
+  const todayKey = new Date().toLocaleDateString("ca-ES", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+
+  return rows.filter(r => {
+    const dt = parseUtcForecastTime(getRowTime(r));
+    if (!dt) return false;
+    const key = dt.toLocaleDateString("ca-ES", {
+      timeZone: "Europe/Madrid",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
+    return key === todayKey;
+  });
+}
+
+function buildForecastText() {
+  if (!lastForecastData || !Array.isArray(lastForecastData.hourly) || !window.currentObs) return;
+
+  const rows = groupTodayRows(lastForecastData.hourly);
+  const baseTime = getBaseTime();
+
+  if (!rows.length) {
+    setText("forecastText", "No s'han pogut obtenir prou dades per generar la predicció del dia.");
+    return;
+  }
+
+  const ownTemps = rows.map((r, i) => computeOwnTempForRow(r, i, baseTime)).filter(v => v !== null);
+  const rains = rows.map(r => getRowRain(r) || 0);
+  const winds = rows.map(r => getRowWind(r)).filter(v => v !== null);
+  const hums = rows.map(r => asNumber(r.rh, null)).filter(v => v !== null);
+
+  const tMin = ownTemps.length ? Math.min(...ownTemps) : null;
+  const tMax = ownTemps.length ? Math.max(...ownTemps) : null;
+  const rainTotal = rains.reduce((a, b) => a + b, 0);
+  const windMax = winds.length ? Math.max(...winds) : null;
+  const humMax = hums.length ? Math.max(...hums) : null;
+
+  const firstSymbol = rows.find(r => r.symbol)?.symbol || "";
+  const ambient = weatherLabel(firstSymbol);
+
+  let rainText = "sense precipitació destacable";
+  if (rainTotal >= 10) rainText = `amb precipitació abundant, d'uns ${rainTotal.toFixed(1)} mm`;
+  else if (rainTotal >= 2) rainText = `amb alguns episodis de pluja, acumulant aproximadament ${rainTotal.toFixed(1)} mm`;
+  else if (rainTotal >= 0.1) rainText = `amb possibilitat d'alguna precipitació feble, al voltant de ${rainTotal.toFixed(1)} mm`;
+
+  let windText = "vent fluix";
+  if (windMax !== null) {
+    if (windMax >= 35) windText = `vent fort, amb cops de fins a ${windMax.toFixed(0)} km/h`;
+    else if (windMax >= 20) windText = `vent moderat, amb màxims de ${windMax.toFixed(0)} km/h`;
+    else windText = `vent en general fluix, amb màxims de ${windMax.toFixed(0)} km/h`;
+  }
+
+  let humText = "";
+  if (humMax !== null && humMax >= 85) humText = " La humitat serà alta en alguns moments.";
+  else if (humMax !== null && humMax >= 70) humText = " La humitat es mantindrà moderada o alta.";
+
+  const obs = window.currentObs;
+  const text = `Avui a El Masnou NE s'espera una jornada ${ambient}. La temperatura actual és de ${obs.temp ?? "--"} °C i la previsió pròpia apunta a una mínima d'uns ${tMin !== null ? tMin.toFixed(1) : "--"} °C i una màxima d'uns ${tMax !== null ? tMax.toFixed(1) : "--"} °C. Pel que fa al cel i la precipitació, el dia es presenta ${rainText}. També cal esperar ${windText}.${humText}`;
+
+  setText("forecastText", text);
+}
+
+function cbCurrent(data) {
+  if (!data || !data.ok) return;
+
+  window.currentObs = data.obs || {};
+  const updatedAt = data?.source?.forecast_updated_at || null;
+
+  let meta = "Dades carregades correctament";
+  if (updatedAt) {
+    const d = new Date(updatedAt);
+    if (!isNaN(d)) {
+      meta = "Actualitzat " + d.toLocaleString("ca-ES", {
+        timeZone: "Europe/Madrid"
+      });
+    }
+  }
+  setText("metaLine", meta);
+  buildForecastText();
+}
+
+function cbForecast(data) {
+  if (!data || !data.ok || !Array.isArray(data.hourly)) return;
+  lastForecastData = data;
+  buildForecastText();
+}
+
+function cbModel(data) {
+  if (!data || !data.ok) return;
+
+  window.modelObservedTimeUtc = data.observed_time_utc || null;
+
+  const devT = data.deviation?.temperature_c ?? "--";
+  if (typeof devT === "number") {
+    modelTempCorrection = devT;
+  }
+
+  const learn = data.learning;
+  if (learn) {
+    learningBias = learn.bias_temperature_c || learningBias;
+    learningSamples = learn.samples || learningSamples;
+  }
+
+  buildForecastText();
+}
+
+loadJSONP(API + "?out=current&callback=cbCurrent");
+loadJSONP(API + "?out=forecast&callback=cbForecast");
+loadJSONP(API + "?out=model&callback=cbModel");
+</script>
+</body>
+</html>
