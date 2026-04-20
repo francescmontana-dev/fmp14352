@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-04-20T21:43:12.577842+00:00",
+  "generated_at_utc": "2026-04-20T21:53:12.657505+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1181,7 +1181,7 @@
       "temperature_c": 21.2,
       "humidity_pct": 57,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1016.2,
+      "pressure_hpa": 1016.4,
       "wind_speed_kmh": 5.2,
       "wind_direction_deg": 166
     },
@@ -1190,7 +1190,7 @@
       "temperature_c": 22.1,
       "humidity_pct": 53,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1015.9,
+      "pressure_hpa": 1016.3,
       "wind_speed_kmh": 8.3,
       "wind_direction_deg": 162
     },
@@ -1199,7 +1199,7 @@
       "temperature_c": 23.2,
       "humidity_pct": 49,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1015.5,
+      "pressure_hpa": 1016.3,
       "wind_speed_kmh": 11.0,
       "wind_direction_deg": 160
     },
@@ -1208,7 +1208,7 @@
       "temperature_c": 24.0,
       "humidity_pct": 45,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1015.1,
+      "pressure_hpa": 1016.1,
       "wind_speed_kmh": 12.8,
       "wind_direction_deg": 158
     },
@@ -1217,7 +1217,7 @@
       "temperature_c": 23.7,
       "humidity_pct": 44,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1014.8,
+      "pressure_hpa": 1015.8,
       "wind_speed_kmh": 12.9,
       "wind_direction_deg": 157
     },
@@ -1226,7 +1226,7 @@
       "temperature_c": 23.2,
       "humidity_pct": 45,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1014.6,
+      "pressure_hpa": 1015.5,
       "wind_speed_kmh": 12.1,
       "wind_direction_deg": 157
     },
@@ -1235,7 +1235,7 @@
       "temperature_c": 22.8,
       "humidity_pct": 46,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1014.5,
+      "pressure_hpa": 1015.3,
       "wind_speed_kmh": 10.0,
       "wind_direction_deg": 159
     },
@@ -1244,7 +1244,7 @@
       "temperature_c": 22.1,
       "humidity_pct": 47,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1014.5,
+      "pressure_hpa": 1015.3,
       "wind_speed_kmh": 6.8,
       "wind_direction_deg": 162
     },
@@ -1253,7 +1253,7 @@
       "temperature_c": 21.4,
       "humidity_pct": 50,
       "precipitation_mm": 0.0,
-      "pressure_hpa": 1014.6,
+      "pressure_hpa": 1015.2,
       "wind_speed_kmh": 3.7,
       "wind_direction_deg": 169
     },
