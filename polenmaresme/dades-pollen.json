@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "21/04/2026 09:04",
-  "indexTotal": 48,
+  "data": "21/04/2026 09:34",
+  "indexTotal": 49,
   "risc": "moderat",
   "dominant": {
     "nom": "Parietària",
@@ -23,7 +23,7 @@
     },
     {
       "nom": "Pi",
-      "valor": 62
+      "valor": 68
     },
     {
       "nom": "Gramínies",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 52,
+      "index": 53,
       "risc": "alt"
     },
     {
       "dia": "Demà passat",
-      "index": 54,
+      "index": 55,
       "risc": "alt"
     }
   ]
