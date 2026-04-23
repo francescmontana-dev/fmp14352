@@ -1,11 +1,11 @@
 {
   "zona": "Maresme central",
-  "data": "23/04/2026 14:04",
-  "indexTotal": 60,
+  "data": "23/04/2026 14:34",
+  "indexTotal": 59,
   "risc": "alt",
   "dominant": {
-    "nom": "Parietària",
-    "text": "Predomini de parietària segons condicions locals."
+    "nom": "Pi",
+    "text": "Predomini de pi segons condicions locals."
   },
   "comentari": "Model automàtic basat en meteorologia local i temporada.",
   "tipus": [
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 91
+      "valor": 83
     },
     {
       "nom": "Pi",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 64,
+      "index": 65,
       "risc": "alt"
     },
     {
       "dia": "Demà passat",
-      "index": 66,
+      "index": 68,
       "risc": "alt"
     }
   ]
