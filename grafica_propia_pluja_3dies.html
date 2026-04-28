@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gràfica pròpia + pluja — El Masnou NE</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{margin:0;padding:10px;font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;}
+.wrap{max-width:950px;margin:auto;}
+.card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
+canvas{width:100%!important;height:430px!important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbwf9li15OfcuVCuoiCX3RYnJp67LJnNAXRQXMhgIMhB5G45ujRz5HUncihurI1BfUN6cA/exec";
+const HOURS=72;
+
+let chart=null;
+let forecastData=null;
+let currentTemp=null;
+let modelTempCorrection=0;
+let learningBias={h6:0,h12:0,h24:0};
+let learningSamples={h6:0,h12:0,h24:0};
+window.modelObservedTimeUtc=null;
+
+function loadJSONP(url){
+  const s=document.createElement("script");
+  s.src=url+"&_="+Date.now();
+  document.body.appendChild(s);
+}
+
+function asNumber(v,fallback=null){
+  const n=Number(v);
+  return Number.isFinite(n)?n:fallback;
+}
+
+function parseUtcForecastTime(s){
+  if(!s)return null;
+  const d=new Date(s);
+  return isNaN(d)?null:d;
+}
+
+function parseObservedUtc(s){
+  if(!s)return null;
+  try{
+    const p=s.split(",").map(Number);
+    return new Date(Date.UTC(p[0],p[1]-1,p[2],p[3],p[4],p[5]));
+  }catch(e){return null;}
+}
+
+function getBaseTime(){
+  return parseObservedUtc(window.modelObservedTimeUtc) || new Date();
+}
+
+function getRowTime(r){return r?.t||r?.time||r?.datetime||null;}
+function getRowTemp(r){return asNumber(r?.temp,null);}
+function getRowWind(r){return asNumber(r?.wind_kmh,null);}
+function getRowRain(r){return asNumber(r?.rain_mm,0);}
+function getRowHum(r){return asNumber(r?.rh,0);}
+function getRowDir(r){return asNumber(r?.wdir_deg,null);}
+
+function getLocalHourFromRow(row){
+  const dt=parseUtcForecastTime(getRowTime(row));
+  if(!dt)return null;
+  return Number(dt.toLocaleString("ca-ES",{hour:"2-digit",hour12:false,timeZone:"Europe/Madrid"}));
+}
+
+function getHorizonBias(h){
+  if(h<=6 && (learningSamples.h6??0)>=8) return Math.max(-1,Math.min(1,learningBias.h6??0));
+  if(h<=12 && (learningSamples.h12??0)>=8) return Math.max(-1,Math.min(1,learningBias.h12??0));
+  if(h<=24 && (learningSamples.h24??0)>=8) return Math.max(-1,Math.min(1,learningBias.h24??0));
+  return 0;
+}
+
+function getCurrentCorrection(h){
+  if(h<=6)return modelTempCorrection*0.15;
+  if(h<=12)return modelTempCorrection*0.08;
+  if(h<=24)return modelTempCorrection*0.05;
+  if(h<=48)return modelTempCorrection*0.03;
+  if(h<=72)return modelTempCorrection*0.02;
+  return 0;
+}
+
+function getLocalAdjustmentForRow(row){
+  const h=getLocalHourFromRow(row);
+  if(h===null || Number.isNaN(h))return 0;
+
+  const wind=getRowWind(row)??0;
+  let a=0;
+
+  if(h>=20 && h<22)a=0.4;
+  else if(h>=22 || h<=2)a=0.8;
+  else if(h>2 && h<=6)a=1.0;
+  else if(h>6 && h<=9)a=0.5;
+
+  if(wind<3)a+=0.4;
+  else if(wind>10)a-=0.2;
+
+  return a;
+}
+
+function getMarineCorrection(row){
+  const h=getLocalHourFromRow(row);
+  if(h===null || Number.isNaN(h))return 0;
+
+  const rh=getRowHum(row);
+  const wind=getRowWind(row)??0;
+  const dir=getRowDir(row);
+
+  let m=0;
+
+  if(h>=20 && h<22)m=0.4;
+  else if(h>=22 || h<=2)m=0.8;
+  else if(h>2 && h<=6)m=1.0;
+  else if(h>6 && h<=9)m=0.5;
+
+  if(rh>=85)m+=0.6;
+  else if(rh>=75)m+=0.3;
+
+  if(wind<5)m+=0.2;
+  if(dir!==null && dir>=45 && dir<=135)m+=0.2;
+
+  return m;
+}
+
+function computeOwnTempForRow(row,baseTime){
+  const dt=parseUtcForecastTime(getRowTime(row));
+  const t=getRowTemp(row);
+  if(!dt || t===null)return null;
+
+  const h=Math.max(0,(dt-baseTime)/3600000);
+
+  return t
+    + getCurrentCorrection(h)
+    + getHorizonBias(h)
+    + getLocalAdjustmentForRow(row)
+    + getMarineCorrection(row);
+}
+
+function cbCurrent(data){
+  if(!data || !data.ok)return;
+  currentTemp=asNumber(data.obs?.temp,null);
+  drawChart();
+}
+
+function cbForecast(data){
+  if(!data || !data.ok || !Array.isArray(data.hourly))return;
+  forecastData=data;
+  drawChart();
+}
+
+function cbModel(data){
+  if(!data || !data.ok)return;
+
+  window.modelObservedTimeUtc=data.observed_time_utc||null;
+
+  const dev=data.deviation?.temperature_c;
+  if(typeof dev==="number")modelTempCorrection=dev;
+
+  if(data.learning){
+    learningBias=data.learning.bias_temperature_c||learningBias;
+    learningSamples=data.learning.samples||learningSamples;
+  }
+
+  drawChart();
+}
+
+function drawChart(){
+  if(!forecastData || !Array.isArray(forecastData.hourly))return;
+
+  const rows=forecastData.hourly.slice(0,HOURS);
+  const baseTime=getBaseTime();
+
+  const labels=rows.map(r=>{
+    const dt=parseUtcForecastTime(getRowTime(r));
+    if(!dt)return "--";
+    return dt.toLocaleString("ca-ES",{
+      day:"2-digit",
+      month:"2-digit",
+      hour:"2-digit",
+      minute:"2-digit",
+      timeZone:"Europe/Madrid"
+    });
+  });
+
+  const ownTemps=rows.map(r=>computeOwnTempForRow(r,baseTime));
+  const rain=rows.map(r=>getRowRain(r));
+
+  const canvas=document.getElementById("chart");
+  const ctx=canvas.getContext("2d");
+
+  if(chart)chart.destroy();
+
+  chart=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels,
+      datasets:[
+        {
+          label:"Temperatura pròpia",
+          data:ownTemps,
+          yAxisID:"y",
+          borderWidth:3,
+          borderColor:"rgba(255,120,0,1)",
+          borderDash:[6,4],
+          tension:0.25,
+          pointRadius:0
+        },
+        {
+          label:"Temperatura actual",
+          data:labels.map((_,i)=>{
+            if(!Number.isFinite(currentTemp))return null;
+            return i===0?currentTemp:null;
+          }),
+          yAxisID:"y",
+          type:"line",
+          showLine:false,
+          pointRadius:6,
+          pointHoverRadius:7,
+          pointBackgroundColor:"black",
+          pointBorderColor:"black"
+        },
+        {
+          label:"Pluja",
+          data:rain,
+          yAxisID:"y1",
+          type:"bar"
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:"index",intersect:false},
+      plugins:{
+        legend:{position:"top"}
+      },
+      scales:{
+        x:{
+          ticks:{
+            autoSkip:true,
+            maxTicksLimit:20,
+            maxRotation:60,
+            minRotation:60
+          }
+        },
+        y:{
+          position:"left",
+          title:{display:true,text:"Temperatura °C"}
+        },
+        y1:{
+          position:"right",
+          grid:{drawOnChartArea:false},
+          title:{display:true,text:"Pluja mm"}
+        }
+      }
+    }
+  });
+}
+
+loadJSONP(API+"?out=current&callback=cbCurrent");
+loadJSONP(API+"?out=forecast&callback=cbForecast");
+loadJSONP(API+"?out=model&callback=cbModel");
+</script>
+</body>
+</html>
