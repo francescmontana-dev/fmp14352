@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "01/05/2026 15:34",
-  "indexTotal": 16,
+  "data": "01/05/2026 16:04",
+  "indexTotal": 15,
   "risc": "baix",
   "dominant": {
     "nom": "Parietària",
@@ -23,7 +23,7 @@
     },
     {
       "nom": "Pi",
-      "valor": 15
+      "valor": 13
     },
     {
       "nom": "Gramínies",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 20,
+      "index": 19,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 22,
+      "index": 21,
       "risc": "baix"
     }
   ]
