@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "02/05/2026 10:34",
+  "data": "02/05/2026 11:04",
   "indexTotal": 10,
   "risc": "baix",
   "dominant": {
@@ -15,11 +15,11 @@
     },
     {
       "nom": "Cupressàcies",
-      "valor": 16
+      "valor": 17
     },
     {
       "nom": "Parietària",
-      "valor": 18
+      "valor": 19
     },
     {
       "nom": "Pi",
