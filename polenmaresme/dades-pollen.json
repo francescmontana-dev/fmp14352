@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "03/05/2026 11:04",
-  "indexTotal": 11,
+  "data": "03/05/2026 11:34",
+  "indexTotal": 13,
   "risc": "baix",
   "dominant": {
     "nom": "Parietària",
@@ -11,39 +11,39 @@
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 9
+      "valor": 10
     },
     {
       "nom": "Cupressàcies",
-      "valor": 18
+      "valor": 20
     },
     {
       "nom": "Parietària",
-      "valor": 21
+      "valor": 23
     },
     {
       "nom": "Pi",
-      "valor": 9
+      "valor": 11
     },
     {
       "nom": "Gramínies",
-      "valor": 9
+      "valor": 10
     },
     {
       "nom": "Olivera",
-      "valor": 4
+      "valor": 5
     }
   ],
   "historic": [],
   "previsio": [
     {
       "dia": "Demà",
-      "index": 15,
+      "index": 17,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 17,
+      "index": 19,
       "risc": "baix"
     }
   ]
