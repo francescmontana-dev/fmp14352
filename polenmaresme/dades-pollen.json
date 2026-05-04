@@ -1,11 +1,11 @@
 {
   "zona": "Maresme central",
-  "data": "05/05/2026 00:04",
+  "data": "05/05/2026 00:34",
   "indexTotal": 4,
   "risc": "baix",
   "dominant": {
-    "nom": "Parietària",
-    "text": "Predomini de parietària segons condicions locals."
+    "nom": "Cupressàcies",
+    "text": "Predomini de cupressàcies segons condicions locals."
   },
   "comentari": "Model automàtic basat en meteorologia local i temporada.",
   "tipus": [
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 8
+      "valor": 7
     },
     {
       "nom": "Pi",
