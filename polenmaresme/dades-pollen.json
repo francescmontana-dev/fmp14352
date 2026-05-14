@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "14/05/2026 17:34",
+  "data": "14/05/2026 18:04",
   "indexTotal": 17,
   "risc": "baix",
   "dominant": {
@@ -23,7 +23,7 @@
     },
     {
       "nom": "Pi",
-      "valor": 14
+      "valor": 16
     },
     {
       "nom": "Gramínies",
