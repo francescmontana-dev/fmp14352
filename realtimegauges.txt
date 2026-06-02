@@ -65,7 +65,7 @@
 "TwgustTM":"16:45",
 "windTM":"14",
 "bearingTM":"239",
-"timeUTC":"2026,6,2,1,40,27",
+"timeUTC":"2026,6,2,1,40,57",
 "BearingRangeFrom10":"260",
 "BearingRangeTo10":"290",
 "UV":"0.0",
