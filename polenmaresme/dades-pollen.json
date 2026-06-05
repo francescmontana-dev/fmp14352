@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "05/06/2026 23:04",
+  "data": "05/06/2026 23:34",
   "indexTotal": 7,
   "risc": "baix",
   "dominant": {
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 5,
+      "index": 11,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 4,
+      "index": 13,
       "risc": "baix"
     }
   ]
