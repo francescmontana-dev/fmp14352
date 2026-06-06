@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "06/06/2026 05:04",
+  "data": "06/06/2026 05:34",
   "indexTotal": 6,
   "risc": "baix",
   "dominant": {
@@ -15,11 +15,11 @@
     },
     {
       "nom": "Cupressàcies",
-      "valor": 10
+      "valor": 11
     },
     {
       "nom": "Parietària",
-      "valor": 12
+      "valor": 13
     },
     {
       "nom": "Pi",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 6,
+      "index": 10,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 6,
+      "index": 12,
       "risc": "baix"
     }
   ]
