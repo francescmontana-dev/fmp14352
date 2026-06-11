@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-06-11T23:03:13.255136+00:00",
+  "generated_at_utc": "2026-06-11T23:13:12.970393+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1179,7 +1179,7 @@
     {
       "time": "2026-06-16T10:00",
       "temperature_c": 27.4,
-      "humidity_pct": 57,
+      "humidity_pct": 55,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1016.9,
       "wind_speed_kmh": 9.7,
@@ -1188,7 +1188,7 @@
     {
       "time": "2026-06-16T11:00",
       "temperature_c": 28.2,
-      "humidity_pct": 55,
+      "humidity_pct": 48,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.2,
       "wind_speed_kmh": 11.9,
@@ -1197,7 +1197,7 @@
     {
       "time": "2026-06-16T12:00",
       "temperature_c": 28.9,
-      "humidity_pct": 52,
+      "humidity_pct": 38,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.4,
       "wind_speed_kmh": 13.5,
@@ -1206,7 +1206,7 @@
     {
       "time": "2026-06-16T13:00",
       "temperature_c": 29.3,
-      "humidity_pct": 48,
+      "humidity_pct": 29,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.4,
       "wind_speed_kmh": 13.8,
@@ -1215,7 +1215,7 @@
     {
       "time": "2026-06-16T14:00",
       "temperature_c": 28.9,
-      "humidity_pct": 46,
+      "humidity_pct": 30,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.3,
       "wind_speed_kmh": 12.2,
@@ -1224,7 +1224,7 @@
     {
       "time": "2026-06-16T15:00",
       "temperature_c": 28.4,
-      "humidity_pct": 46,
+      "humidity_pct": 31,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.2,
       "wind_speed_kmh": 10.5,
@@ -1233,7 +1233,7 @@
     {
       "time": "2026-06-16T16:00",
       "temperature_c": 27.8,
-      "humidity_pct": 47,
+      "humidity_pct": 32,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.3,
       "wind_speed_kmh": 8.4,
@@ -1242,7 +1242,7 @@
     {
       "time": "2026-06-16T17:00",
       "temperature_c": 27.1,
-      "humidity_pct": 48,
+      "humidity_pct": 34,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.5,
       "wind_speed_kmh": 6.7,
@@ -1251,7 +1251,7 @@
     {
       "time": "2026-06-16T18:00",
       "temperature_c": 26.3,
-      "humidity_pct": 51,
+      "humidity_pct": 35,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.7,
       "wind_speed_kmh": 5.9,
