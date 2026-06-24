@@ -110,7 +110,13 @@ html,body{
   text-align:center;
   letter-spacing:-1px;
 }
-
+.feels{
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
+  margin-top:-8px;
+  opacity:.95;
+}
 /* Tendències */
 .trends{
   margin-top:-6px;
@@ -205,7 +211,10 @@ html,body{
   <div class="temp">
     <span id="temp">--</span>°C
   </div>
-
+  
+<div class="feels">
+    Sensació <span id="feels">--</span>°C
+</div>
   <!-- Tendències reals -->
   <div class="trends">
     <div class="trendChip">🌡️ <span id="tTrend">--</span><span class="trArrow" id="tArrow">→</span> <span style="opacity:.85">1h</span></div>
@@ -499,6 +508,7 @@ html,body{
     const pressTxt = d[10] ?? "--";
 
     el("temp").textContent = d[2] ?? "--";
+    el("feels").textContent = d[58] ?? "--";
     el("hum").textContent  = humTxt + " %";
     el("wind").textContent = wind + " km/h";
     el("rain").textContent = rainToday + " mm";
