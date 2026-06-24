@@ -184,6 +184,13 @@ html, body{
   letter-spacing:-1px;
   line-height:1;
 }
+  .feels{
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
+  margin-top:-6px;
+  opacity:.95;
+}
 
 /* ===== TRENDS ===== */
 .trends{
@@ -269,7 +276,8 @@ html, body{
         alt="Logo estació">
     </div>
 
-    <div class="temp"><span id="temp">--</span>°C</div>
+       <div class="temp"><span id="temp">--</span>°C</div>
+   <div class="feels">Sensació <span id="feels">--</span>°C</div>
 
     <div class="trends">
       <div class="trendChip">🌡️ <span id="tTrend">--</span><span class="trArrow" id="tArrow">→</span> <span style="opacity:.85">1h</span></div>
@@ -557,6 +565,7 @@ html, body{
 
     // UI
     el("temp").textContent  = d[2] ?? "--";
+    el("feels").textContent = d[58] ?? "--";
     el("hum").textContent   = (d[3] ?? "--") + " %";
     el("wind").textContent  = (d[5] ?? "--") + " km/h";
     el("rain").textContent  = (d[9] ?? "--") + " mm";
