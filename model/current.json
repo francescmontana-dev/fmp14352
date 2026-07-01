@@ -1,8 +1,8 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-07-01T01:13:12.638954+00:00",
+  "generated_at_utc": "2026-07-01T01:23:12.802711+00:00",
   "source_file": "C:\\CumulusMX\\web\\realtimegauges.txt",
-  "observation_time_utc": "2026,7,1,1,12,43",
+  "observation_time_utc": "2026,7,1,1,22,43",
   "forecast_text": "Showery, becoming less settled",
   "sensor_contact_lost": 0,
   "temperature_c": 25.5,
