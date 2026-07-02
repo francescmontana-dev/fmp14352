@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-07-02T22:13:13.126943+00:00",
+  "generated_at_utc": "2026-07-02T22:23:13.224744+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1178,7 +1178,7 @@
     },
     {
       "time": "2026-07-07T10:00",
-      "temperature_c": 34.2,
+      "temperature_c": 34.5,
       "humidity_pct": 31,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1016.8,
@@ -1187,7 +1187,7 @@
     },
     {
       "time": "2026-07-07T11:00",
-      "temperature_c": 35.0,
+      "temperature_c": 35.8,
       "humidity_pct": 33,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1016.6,
@@ -1196,7 +1196,7 @@
     },
     {
       "time": "2026-07-07T12:00",
-      "temperature_c": 36.1,
+      "temperature_c": 37.3,
       "humidity_pct": 32,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1016.2,
@@ -1205,7 +1205,7 @@
     },
     {
       "time": "2026-07-07T13:00",
-      "temperature_c": 37.1,
+      "temperature_c": 37.8,
       "humidity_pct": 30,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1015.9,
@@ -1214,7 +1214,7 @@
     },
     {
       "time": "2026-07-07T14:00",
-      "temperature_c": 36.6,
+      "temperature_c": 35.8,
       "humidity_pct": 37,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1016.0,
@@ -1223,7 +1223,7 @@
     },
     {
       "time": "2026-07-07T15:00",
-      "temperature_c": 35.8,
+      "temperature_c": 34.1,
       "humidity_pct": 44,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1015.9,
@@ -1232,7 +1232,7 @@
     },
     {
       "time": "2026-07-07T16:00",
-      "temperature_c": 34.7,
+      "temperature_c": 33.1,
       "humidity_pct": 49,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1015.7,
@@ -1241,7 +1241,7 @@
     },
     {
       "time": "2026-07-07T17:00",
-      "temperature_c": 33.4,
+      "temperature_c": 32.3,
       "humidity_pct": 53,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1015.5,
@@ -1250,7 +1250,7 @@
     },
     {
       "time": "2026-07-07T18:00",
-      "temperature_c": 32.2,
+      "temperature_c": 31.8,
       "humidity_pct": 56,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1015.3,
@@ -1557,7 +1557,7 @@
     },
     {
       "date": "2026-07-07",
-      "temp_max_c": 37.1,
+      "temp_max_c": 37.8,
       "temp_min_c": 24.8,
       "precipitation_sum_mm": 0.0,
       "wind_speed_max_kmh": 17.3
