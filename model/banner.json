@@ -1,8 +1,8 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-07-07T16:43:13.439573+00:00",
+  "generated_at_utc": "2026-07-07T16:53:13.383343+00:00",
   "matched_model_time": "2026-07-07T17:00",
-  "observed_time_utc": "2026,7,7,16,42,52",
+  "observed_time_utc": "2026,7,7,16,52,52",
   "real": {
     "temperature_c": 29.9,
     "humidity_pct": 69,
