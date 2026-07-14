@@ -1,8 +1,8 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-07-14T04:53:12.411246+00:00",
+  "generated_at_utc": "2026-07-14T05:03:12.410758+00:00",
   "source_file": "C:\\CumulusMX\\web\\realtimegauges.txt",
-  "observation_time_utc": "2026,7,14,4,53,6",
+  "observation_time_utc": "2026,7,14,5,3,6",
   "forecast_text": "Showery, becoming less settled",
   "sensor_contact_lost": 0,
   "temperature_c": 24.8,
@@ -10,7 +10,7 @@
   "apparent_temperature_c": 29.7,
   "feels_like_c": 28.5,
   "humidity_pct": 86,
-  "pressure_hpa": 1016.6,
+  "pressure_hpa": 1016.7,
   "pressure_trend_hpa": -0.1,
   "rain_today_mm": 0.0,
   "rain_rate_mm_h": 0.0,
@@ -24,7 +24,7 @@
   "dominant_wind_dir": "E",
   "wind_run_km": 64.4,
   "uv_index": 0.0,
-  "solar_radiation_w_m2": 16.0,
+  "solar_radiation_w_m2": 24.0,
   "cloudbase_ft": 1022.0,
   "units": {
     "temperature": "C",
