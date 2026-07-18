@@ -474,6 +474,36 @@ html, body{
     el("sunset").textContent  = fmtHM(st.sunset);
   }
 
+  /* ===== SOL PREVIST AVUI (Open-Meteo) ===== */
+  async function updateSunForecast(){
+    const url = new URL("https://api.open-meteo.com/v1/forecast");
+    url.search = new URLSearchParams({
+      latitude: String(LAT),
+      longitude: String(LON),
+      daily: "sunshine_duration",
+      timezone: "Europe/Madrid",
+      forecast_days: "1"
+    }).toString();
+
+    try{
+      const r = await fetch(url, { cache: "no-store" });
+      if(!r.ok) throw new Error(`Open-Meteo ${r.status}`);
+
+      const data = await r.json();
+      const seconds = Number(data?.daily?.sunshine_duration?.[0]);
+      if(!Number.isFinite(seconds)) throw new Error("sunshine_duration no disponible");
+
+      const hours = seconds / 3600;
+      el("sunForecast").textContent = `${hours.toLocaleString("ca-ES", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      })} h`;
+    }catch(err){
+      console.warn("No s'ha pogut carregar el sol previst:", err);
+      el("sunForecast").textContent = "-- h";
+    }
+  }
+
   /* ===== HISTORIAL / TENDÈNCIES REALS ===== */
   function loadHist(){
     if(!CAN_STORE) return memoryHist;
@@ -612,12 +642,14 @@ html, body{
   updateDate();
   updateClock();
   updateSun();
+  updateSunForecast();
   load().catch(()=>{});
 
   setInterval(load, 30000);
   setInterval(updateClock, 1000);
   setInterval(updateDate, 60000);
   setInterval(updateSun, 10 * 60 * 1000);
+  setInterval(updateSunForecast, 60 * 60 * 1000);
 })();
 </script>
 </body>
