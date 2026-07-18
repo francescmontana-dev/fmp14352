@@ -210,6 +210,21 @@ html, body{
 }
 .trArrow{ font-weight:900; margin-left:6px; }
 
+
+/* ===== SUN FORECAST ===== */
+.sunForecastBar{
+  margin:8px 0;
+  padding:8px 10px;
+  text-align:center;
+  background:rgba(255,255,255,.14);
+  border-radius:12px;
+  backdrop-filter:blur(6px);
+  font-size:15px;
+  font-weight:600;
+  position:relative;
+  z-index:2;
+}
+
 /* ===== GRID ===== */
 .grid{
   display:grid;
@@ -282,6 +297,10 @@ html, body{
     <div class="trends">
       <div class="trendChip">🌡️ <span id="tTrend">--</span><span class="trArrow" id="tArrow">→</span> <span style="opacity:.85">1h</span></div>
       <div class="trendChip">📈 <span id="pTrend">--</span><span class="trArrow" id="pArrow">→</span> <span style="opacity:.85">3h</span></div>
+    </div>
+
+    <div class="sunForecastBar">
+      ☀️ <strong>Sol previst avui:</strong> <span id="sunForecast">-- h</span>
     </div>
 
     <div class="grid">
