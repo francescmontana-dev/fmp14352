@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "23/07/2026 12:34",
-  "indexTotal": 15,
+  "data": "23/07/2026 13:04",
+  "indexTotal": 16,
   "risc": "baix",
   "dominant": {
     "nom": "Parietària",
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 27
+      "valor": 30
     },
     {
       "nom": "Pi",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 19,
+      "index": 20,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 21,
+      "index": 22,
       "risc": "baix"
     }
   ]
