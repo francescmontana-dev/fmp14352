@@ -1,28 +1,28 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-07-26T09:23:13.224894+00:00",
-  "matched_model_time": "2026-07-26T09:00",
-  "observed_time_utc": "2026,7,26,9,22,54",
+  "generated_at_utc": "2026-07-26T09:33:13.179404+00:00",
+  "matched_model_time": "2026-07-26T10:00",
+  "observed_time_utc": "2026,7,26,9,32,54",
   "real": {
-    "temperature_c": 26.7,
+    "temperature_c": 27.3,
     "humidity_pct": 46,
-    "pressure_hpa": 1016.0,
+    "pressure_hpa": 1016.1,
     "wind_speed_kmh": 4.0,
-    "wind_gust_kmh": 9.0,
+    "wind_gust_kmh": 13.0,
     "dominant_wind_dir": "NNW",
     "rain_today_mm": 0.0
   },
   "forecast": {
-    "temperature_c": 24.5,
-    "humidity_pct": 63,
-    "pressure_hpa": 1014.9,
-    "wind_speed_kmh": 10.5
+    "temperature_c": 25.4,
+    "humidity_pct": 60,
+    "pressure_hpa": 1015.3,
+    "wind_speed_kmh": 14.0
   },
   "deviation": {
-    "temperature_c": 2.2,
-    "humidity_pct": -17,
-    "pressure_hpa": 1.1,
-    "wind_speed_kmh": -6.5
+    "temperature_c": 1.9,
+    "humidity_pct": -14,
+    "pressure_hpa": 0.8,
+    "wind_speed_kmh": -10.0
   },
   "learning": {
     "bias_temperature_c": {
@@ -37,9 +37,9 @@
     }
   },
   "quality": {
-    "temperature": "alta",
+    "temperature": "media",
     "humidity": "alta",
     "pressure": "baja",
-    "wind": "media"
+    "wind": "alta"
   }
 }
