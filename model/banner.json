@@ -1,14 +1,14 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-08-28T03:13:13.165402+00:00",
+  "generated_at_utc": "2026-08-28T03:23:12.723623+00:00",
   "matched_model_time": "2026-08-28T03:00",
-  "observed_time_utc": "2026,8,28,3,12,43",
+  "observed_time_utc": "2026,8,28,3,22,43",
   "real": {
-    "temperature_c": 27.1,
-    "humidity_pct": 35,
-    "pressure_hpa": 1015.0,
-    "wind_speed_kmh": 3.0,
-    "wind_gust_kmh": 17.0,
+    "temperature_c": 26.8,
+    "humidity_pct": 36,
+    "pressure_hpa": 1015.1,
+    "wind_speed_kmh": 1.0,
+    "wind_gust_kmh": 5.0,
     "dominant_wind_dir": "SW",
     "rain_today_mm": 0.0
   },
@@ -19,16 +19,16 @@
     "wind_speed_kmh": 10.0
   },
   "deviation": {
-    "temperature_c": 1.1,
-    "humidity_pct": -4,
-    "pressure_hpa": 1.7,
-    "wind_speed_kmh": -7.0
+    "temperature_c": 0.8,
+    "humidity_pct": -3,
+    "pressure_hpa": 1.8,
+    "wind_speed_kmh": -9.0
   },
   "learning": {
     "bias_temperature_c": {
-      "h6": 0.61,
-      "h12": 0.65,
-      "h24": 0.65
+      "h6": 0.62,
+      "h12": 0.69,
+      "h24": 0.69
     },
     "samples": {
       "h6": 30,
@@ -37,9 +37,9 @@
     }
   },
   "quality": {
-    "temperature": "media",
+    "temperature": "baja",
     "humidity": "baja",
     "pressure": "media",
-    "wind": "media"
+    "wind": "alta"
   }
 }
