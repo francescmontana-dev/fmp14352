@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-09-15T09:23:12.853241+00:00",
+  "generated_at_utc": "2026-09-15T09:33:12.916598+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1070,7 +1070,7 @@
     },
     {
       "time": "2026-09-19T22:00",
-      "temperature_c": 20.4,
+      "temperature_c": 20.6,
       "humidity_pct": 92,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.0,
@@ -1079,7 +1079,7 @@
     },
     {
       "time": "2026-09-19T23:00",
-      "temperature_c": 19.8,
+      "temperature_c": 20.2,
       "humidity_pct": 91,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.1,
@@ -1088,7 +1088,7 @@
     },
     {
       "time": "2026-09-20T00:00",
-      "temperature_c": 19.2,
+      "temperature_c": 19.7,
       "humidity_pct": 89,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.3,
@@ -1097,7 +1097,7 @@
     },
     {
       "time": "2026-09-20T01:00",
-      "temperature_c": 18.3,
+      "temperature_c": 18.9,
       "humidity_pct": 87,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.3,
@@ -1106,7 +1106,7 @@
     },
     {
       "time": "2026-09-20T02:00",
-      "temperature_c": 17.8,
+      "temperature_c": 18.3,
       "humidity_pct": 85,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.2,
@@ -1115,7 +1115,7 @@
     },
     {
       "time": "2026-09-20T03:00",
-      "temperature_c": 17.5,
+      "temperature_c": 17.8,
       "humidity_pct": 83,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.2,
@@ -1124,7 +1124,7 @@
     },
     {
       "time": "2026-09-20T04:00",
-      "temperature_c": 17.0,
+      "temperature_c": 17.5,
       "humidity_pct": 82,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.3,
@@ -1133,7 +1133,7 @@
     },
     {
       "time": "2026-09-20T05:00",
-      "temperature_c": 16.6,
+      "temperature_c": 17.2,
       "humidity_pct": 82,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.5,
@@ -1142,7 +1142,7 @@
     },
     {
       "time": "2026-09-20T06:00",
-      "temperature_c": 17.2,
+      "temperature_c": 17.1,
       "humidity_pct": 79,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1025.8,
@@ -1558,7 +1558,7 @@
     {
       "date": "2026-09-20",
       "temp_max_c": 29.2,
-      "temp_min_c": 16.6,
+      "temp_min_c": 17.1,
       "precipitation_sum_mm": 0.0,
       "wind_speed_max_kmh": 13.7
     },
