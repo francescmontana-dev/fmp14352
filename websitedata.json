@@ -8,7 +8,7 @@
 },
 
 "location":"El Masnou NE",
-"update":"16/09/2026 2:15:00",
+"update":"16/09/2026 2:20:00",
 "version":"4.7.0",
 "build":"4137",
 "latitude":"N 01° 29\u0027 07\"",
@@ -41,7 +41,7 @@
 "yesterday":"15/09/2026",
 "metdateyesterdayISO":"2026-09-14",
 "date":"16/09/2026",
-"time":"02:15 on 16 septiembre 2026",
+"time":"02:20 on 16 septiembre 2026",
 "monthname":"septiembre",
 "temp":"24.9",
 "tempunit":"°C",
@@ -130,8 +130,8 @@
 "domwinddir":"S",
 "pressTH":"1021.9",
 "TpressTH":"11:07",
-"pressTL":"1018.7",
-"TpressTL":"01:58",
+"pressTL":"1018.6",
+"TpressTL":"02:16",
 
 "tempYH":"29.0",
 "TtempYH":"13:18",
