@@ -1,6 +1,6 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-09-25T21:23:13.145477+00:00",
+  "generated_at_utc": "2026-09-25T21:33:12.963963+00:00",
   "latitude": 41.48,
   "longitude": 2.31,
   "timezone": "UTC",
@@ -1179,7 +1179,7 @@
     {
       "time": "2026-09-30T10:00",
       "temperature_c": 25.7,
-      "humidity_pct": 74,
+      "humidity_pct": 73,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1019.5,
       "wind_speed_kmh": 8.9,
@@ -1188,7 +1188,7 @@
     {
       "time": "2026-09-30T11:00",
       "temperature_c": 26.8,
-      "humidity_pct": 68,
+      "humidity_pct": 67,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1019.0,
       "wind_speed_kmh": 12.0,
@@ -1197,7 +1197,7 @@
     {
       "time": "2026-09-30T12:00",
       "temperature_c": 27.6,
-      "humidity_pct": 64,
+      "humidity_pct": 62,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1018.6,
       "wind_speed_kmh": 14.2,
@@ -1206,7 +1206,7 @@
     {
       "time": "2026-09-30T13:00",
       "temperature_c": 28.1,
-      "humidity_pct": 62,
+      "humidity_pct": 60,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1018.0,
       "wind_speed_kmh": 14.8,
@@ -1215,7 +1215,7 @@
     {
       "time": "2026-09-30T14:00",
       "temperature_c": 28.1,
-      "humidity_pct": 63,
+      "humidity_pct": 61,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.5,
       "wind_speed_kmh": 15.8,
@@ -1224,7 +1224,7 @@
     {
       "time": "2026-09-30T15:00",
       "temperature_c": 27.7,
-      "humidity_pct": 65,
+      "humidity_pct": 63,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.1,
       "wind_speed_kmh": 15.6,
@@ -1233,7 +1233,7 @@
     {
       "time": "2026-09-30T16:00",
       "temperature_c": 26.8,
-      "humidity_pct": 69,
+      "humidity_pct": 68,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.1,
       "wind_speed_kmh": 13.9,
@@ -1251,7 +1251,7 @@
     {
       "time": "2026-09-30T18:00",
       "temperature_c": 24.6,
-      "humidity_pct": 79,
+      "humidity_pct": 78,
       "precipitation_mm": 0.0,
       "pressure_hpa": 1017.4,
       "wind_speed_kmh": 8.2,
