@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "10/10/2026 06:34",
-  "indexTotal": 11,
+  "data": "10/10/2026 07:04",
+  "indexTotal": 12,
   "risc": "baix",
   "dominant": {
     "nom": "Parietària",
@@ -15,15 +15,15 @@
     },
     {
       "nom": "Cupressàcies",
-      "valor": 18
+      "valor": 19
     },
     {
       "nom": "Parietària",
-      "valor": 20
+      "valor": 22
     },
     {
       "nom": "Pi",
-      "valor": 10
+      "valor": 11
     },
     {
       "nom": "Gramínies",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 13,
+      "index": 14,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 14,
+      "index": 15,
       "risc": "baix"
     }
   ]
