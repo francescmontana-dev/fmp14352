@@ -1,8 +1,8 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-10-15T18:33:12.168213+00:00",
+  "generated_at_utc": "2026-10-15T18:43:12.179055+00:00",
   "source_file": "C:\\CumulusMX\\web\\realtimegauges.txt",
-  "observation_time_utc": "2026,10,15,18,32,54",
+  "observation_time_utc": "2026,10,15,18,42,54",
   "forecast_text": "Fine weather",
   "sensor_contact_lost": 0,
   "temperature_c": 20.9,
