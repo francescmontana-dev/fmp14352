@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "12/11/2026 09:04",
+  "data": "12/11/2026 09:34",
   "indexTotal": 4,
   "risc": "baix",
   "dominant": {
@@ -19,7 +19,7 @@
     },
     {
       "nom": "Parietària",
-      "valor": 8
+      "valor": 9
     },
     {
       "nom": "Pi",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 0,
+      "index": 2,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 0,
+      "index": 1,
       "risc": "baix"
     }
   ]
