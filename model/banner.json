@@ -1,28 +1,28 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-11-16T23:23:13.560328+00:00",
-  "matched_model_time": "2026-11-16T23:00",
-  "observed_time_utc": "2026,11,16,23,22,58",
+  "generated_at_utc": "2026-11-16T23:33:13.362234+00:00",
+  "matched_model_time": "2026-11-17T00:00",
+  "observed_time_utc": "2026,11,16,23,32,58",
   "real": {
     "temperature_c": 17.7,
     "humidity_pct": 64,
-    "pressure_hpa": 1014.1,
+    "pressure_hpa": 1014.2,
     "wind_speed_kmh": 5.0,
     "wind_gust_kmh": 13.0,
     "dominant_wind_dir": "W",
     "rain_today_mm": 0.0
   },
   "forecast": {
-    "temperature_c": 17.0,
-    "humidity_pct": 65,
-    "pressure_hpa": 1014.0,
-    "wind_speed_kmh": 11.9
+    "temperature_c": 16.6,
+    "humidity_pct": 67,
+    "pressure_hpa": 1013.6,
+    "wind_speed_kmh": 11.2
   },
   "deviation": {
-    "temperature_c": 0.7,
-    "humidity_pct": -1,
-    "pressure_hpa": 0.1,
-    "wind_speed_kmh": -6.9
+    "temperature_c": 1.1,
+    "humidity_pct": -3,
+    "pressure_hpa": 0.6,
+    "wind_speed_kmh": -6.2
   },
   "learning": {
     "bias_temperature_c": {
@@ -37,7 +37,7 @@
     }
   },
   "quality": {
-    "temperature": "baja",
+    "temperature": "media",
     "humidity": "baja",
     "pressure": "baja",
     "wind": "media"
