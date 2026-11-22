@@ -1,14 +1,14 @@
 {
   "station": "El Masnou NE",
-  "generated_at_utc": "2026-11-22T10:33:13.380404+00:00",
+  "generated_at_utc": "2026-11-22T10:43:13.418214+00:00",
   "matched_model_time": "2026-11-22T11:00",
-  "observed_time_utc": "2026,11,22,10,33,6",
+  "observed_time_utc": "2026,11,22,10,43,6",
   "real": {
-    "temperature_c": 18.6,
+    "temperature_c": 18.8,
     "humidity_pct": 45,
-    "pressure_hpa": 1015.5,
-    "wind_speed_kmh": 7.0,
-    "wind_gust_kmh": 22.0,
+    "pressure_hpa": 1016.0,
+    "wind_speed_kmh": 5.0,
+    "wind_gust_kmh": 15.0,
     "dominant_wind_dir": "W",
     "rain_today_mm": 0.0
   },
@@ -19,10 +19,10 @@
     "wind_speed_kmh": 22.1
   },
   "deviation": {
-    "temperature_c": 0.9,
+    "temperature_c": 1.1,
     "humidity_pct": -9,
-    "pressure_hpa": 0.5,
-    "wind_speed_kmh": -15.1
+    "pressure_hpa": 1.0,
+    "wind_speed_kmh": -17.1
   },
   "learning": {
     "bias_temperature_c": {
