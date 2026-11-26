@@ -1,6 +1,6 @@
 {
   "zona": "Maresme central",
-  "data": "26/11/2026 02:04",
+  "data": "26/11/2026 02:34",
   "indexTotal": 8,
   "risc": "baix",
   "dominant": {
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 4,
+      "index": 1,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 2,
+      "index": 0,
       "risc": "baix"
     }
   ]
