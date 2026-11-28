@@ -1,7 +1,7 @@
 {
   "zona": "Maresme central",
-  "data": "28/11/2026 07:34",
-  "indexTotal": 10,
+  "data": "28/11/2026 08:04",
+  "indexTotal": 11,
   "risc": "baix",
   "dominant": {
     "nom": "Cupressàcies",
@@ -11,23 +11,23 @@
   "tipus": [
     {
       "nom": "Plàtan",
-      "valor": 8
+      "valor": 9
     },
     {
       "nom": "Cupressàcies",
-      "valor": 16
+      "valor": 18
     },
     {
       "nom": "Parietària",
-      "valor": 16
+      "valor": 18
     },
     {
       "nom": "Pi",
-      "valor": 8
+      "valor": 9
     },
     {
       "nom": "Gramínies",
-      "valor": 8
+      "valor": 9
     },
     {
       "nom": "Olivera",
@@ -38,12 +38,12 @@
   "previsio": [
     {
       "dia": "Demà",
-      "index": 7,
+      "index": 11,
       "risc": "baix"
     },
     {
       "dia": "Demà passat",
-      "index": 6,
+      "index": 11,
       "risc": "baix"
     }
   ]
